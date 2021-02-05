@@ -1,0 +1,75 @@
+
+var searchedWords;
+
+$("#studentTable #studentRow #studentCol").on('click','button',function () {
+
+	$("#alertMsgBoxSuccess").css("display","none");
+	$("#alertMsgBoxError").css("display","none");
+	
+	var classId=$(this).parent().find('#hiddenClassId').val();
+	var userId=$(this).parent().find('#hiddenUserId').val();
+	
+	
+	$('#btn'+userId).prop('disabled','disabled');
+	
+	$.ajax({
+
+		type : "POST",
+		url : "/classjoinlocalpayment",
+		
+		data : JSON.stringify({
+			  
+			classId : classId,
+			userId:userId	
+		}),
+
+		contentType : "application/json; charset=utf-8",
+		cache : false,
+		success : function(data) {
+			
+			if(data=="added"){
+				$('#btn'+userId).text("Added");
+				$('#btn'+userId).prop('disabled','disabled');
+				$("#alertMsgBoxSuccess").css("display","block");
+			}else if(data=="error"){
+				$("#alertMsgBoxError").css("display","block");
+			
+				$('#btn'+userId).prop('disabled',false);
+			}else{
+				$("#alertMsgError").text("Student alredy added to this class");
+				$("#alertMsgBoxError").css("display","block");
+				$('#btn'+userId).text("Added");
+				$('#btn'+userId).prop('disabled',true);
+			}
+			
+		},
+		error : function(err) {
+			$("#alertMsgBoxError").css("display","block");
+			
+			$('#btn'+userId).prop('disabled',false);
+		}
+	});
+	
+	
+	
+	
+});
+
+function setSerachedWords() {
+
+	if (searchedWords.length > 0) {
+
+		if (searchedWords[0] != null) {
+              $("#email").val(searchedWords[0]);
+		}
+		if (searchedWords[1] != null) {
+			$("#firstName").val(searchedWords[1]);
+		}
+		if (searchedWords[2] != null) {
+			$("#lastName").val(searchedWords[2]);
+		}
+	}
+	
+	
+}
+

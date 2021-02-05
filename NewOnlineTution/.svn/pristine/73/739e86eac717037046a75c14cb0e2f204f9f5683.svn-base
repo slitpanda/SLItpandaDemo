@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <meta name="description" content="" />
+        <meta name="author" content="" />
+        <title>Dashboard -  Admin</title>
+       
+        
+         
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/js/all.min.js"></script>
+         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+          <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+          
+            <!-- Custom CSS -->
+     
+         <link rel="stylesheet" href="css/style.css">
+          <link href="css/adminstyles.css" rel="stylesheet" />
+         
+             <script th:inline="javascript">
+
+$(document).ready(function() {  
+	
+	 
+	/*<![CDATA[*/
+
+		
+		searchedWords = /*[[${searchedWords}]]*/"searchedWords";
+		admin= /*[[${#request.userPrincipal.principal.userType=='admin'}]]*/;
+	   dataEntry= /*[[${#request.userPrincipal.principal.userType=='data_entry'}]]*/;
+		/*]]>*/
+
+        	
+		checkUserType();
+		
+
+		//set input values according to searched words
+		setSerachedWords();
+		
+		
+
+	});
+</script>
+    </head>
+    <body class="sb-nav-fixed">
+    
+     
+    <!-- navigation -->
+    <div class="fixed-top" style="z-index: 1039">
+	    <div th:replace="sidebar::navigation"></div>
+		<div class="row"  th:unless="${#request.userPrincipal.principal.userType=='data_entry' || #request.userPrincipal.principal.userType=='admin'} ">
+			<div class="col-md-12 shadow-sm" style="background-color: white">
+				<nav aria-label="breadcrumb" class="second ">
+					<ol class="breadcrumb pl-4 pr-4 pb-0" style="background-color: white">
+						<li class="breadcrumb-item "><a class="black-text  "
+							th:href="@{/wall}"><span class="mr-md-3 mr-2">Home</span></a><i
+							class="fa fa-angle-double-right mt-1" aria-hidden="true"></i></li>
+						<li class="breadcrumb-item "><a class="black-text  active-2"
+							href="#"><span>Find Class</span></a></li>
+					</ol>
+				</nav>
+			</div>
+		</div>
+	</div>
+        <div id="layoutSidenav">
+        <!-- side bar -->
+            <div th:replace="sidebar::sidebar"></div>
+            
+            <div id="layoutSidenav_content">
+                <main>
+                    <div class="container-fluid " id="mainDiv">
+                     <!--  <div class="col-md-12 mt-2"><a th:href="@{/wall}">Home </a>/<span style="font-size: 16px; font-weight: bold;"> Find Class</span></div> -->
+					
+					
+                 <!--end alert message -->	
+                 
+                 
+                  <div class="card">
+                        <table class="table table-hover " id="classJoinTable">
+                            <thead class="text-muted">
+                                <tr>
+                                    <th scope="col" >Teacher <span style="margin-left: 50px">Description</span></th>
+                                    <th scope="col"  width="120">Date</th>
+                                    <th scope="col"  width="160">Time</th>
+                                    <th scope="col"  width="160">Payment Type</th>
+                                    <th scope="col"  width="120">Amount</th>
+                                    
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="classes:${classList}">
+                                    <td>
+                                        <figure class="media">
+                                            <div class="img-wrap">
+                                                <img th:src="@{'teacher/image/'+${classes.teacherId}}" class="img-thumbnail img-sm">
+                                            </div>
+                                            <figcaption class="media-body">
+                                                <h6 class="title text-truncate" th:text="${classes.teacher}">Teacher Details </h6>
+                                                <dl class="param param-inline small">
+                                                    <dt>Subject </dt>
+                                                    <dd th:text="${classes.subjectName}">Maths</dd>
+                                                </dl>
+                                                <dl class="param param-inline small">
+                                                    
+							<dd><dd th:text=" ( ${#strings.length(classes.descriptionEnglish) > 15} ) 
+          ? ${#strings.substring(classes.descriptionEnglish,0,15)} + '…' 
+          : ${classes.descriptionEnglish}  "></dd>
+          <dd> - </dd>
+          <dd th:text=" ( ${#strings.length(classes.descriptionSinhala) > 15} ) 
+          ? ${#strings.substring(classes.descriptionSinhala,0,15)} + '…' 
+          : ${classes.descriptionSinhala}"></dd></dd>
+                                                </dl>
+                                            </figcaption>
+                                        </figure>
+                                    </td>
+                                    <td> 
+                                        <div class="price-wrap"> 
+                                            <var class="price"  th:text="${classes.date}">16 July 2020</var> 
+                                            <small class="text-muted">(Friday)</small> 
+                                        </div> 
+                                    </td>
+                                    <td> 
+                                        <div class="price-wrap"> 
+                                            <var class="price" th:text="${classes.startTime +' - '+classes.endTime}">08.00 AM - 10.00 AM</var> 
+                                           
+                                        </div> 
+                                    </td>
+                                     <td> 
+                                        <div class="price-wrap"> 
+                                            <var class="price" th:text="${classes.paymentType}">Rs. 350.00/=</var> 
+                                            
+                                        </div> 
+                                    </td>
+                                    <td> 
+                                        <div class="price-wrap"> 
+                                            <var class="price" th:text="${ 'Rs: '+classes.amount}">Rs. 350.00/=</var> 
+                                            
+                                        </div> 
+                                    </td>
+                                   
+                                </tr>
+                               <tr>
+                               <td colspan="5" id="noDataMsg"></td>
+                               </tr>
+
+                            </tbody>
+                        </table>
+                    </div> <!-- card.// -->
+                 
+                 
+            <div class="row mt-2">
+                <div class="col-md-12">
+                    <div class="card card-body" style="border-radius: 20px">
+                        <div class="p-lg-2">
+                        <form th:action="@{/adminsearchstudentbyemail}" method="get" id="findClassForm">
+                            <div class="row">
+                            
+                             
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <label style="margin-left: 10px;">Teacher</label>
+                                        <input type="text"  name="email" id="email" class="form-control "  placeholder="--- Email ---" >
+                                            
+                                    </div>
+                                </div>
+                                 <div class="col-lg-3">
+                                    <div class="form-group">
+                                        <label style="margin-left: 10px;">First Name</label>
+                                        <input type="text"  name="firstName" id="firstName" class="form-control "  placeholder="--- first name ---" >
+                                            
+                                    </div>
+                                </div>
+                                
+                                <div class="col-lg-3">
+                                    <div class="form-group">
+                                        <label style="margin-left: 10px;" >Last Name</label>
+                                        <input type="text"  name="lastName"   id="lastName" class="form-control "  placeholder="--- last name ---" >
+                                            
+                                               <input type="text"  name="classId" class="form-control " hidden="" th:value="${classId}"  placeholder="--- Email ---" >
+                                    </div>
+                                </div>
+                                <div class="col-lg-2">
+                                   
+                                        <button id="btnFind" type="button" class="button mt-4 btn-primary"  style="background-color: #035696 ">
+                                            Search <i class="fa fa-search"></i>
+                                        </button>   
+                                    
+                                </div>
+                            </div>
+                            </form>
+                        </div>
+                    </div>
+
+                </div>
+              
+                <div class="col-md-12 mt-3">
+                <!--start alert message -->	
+					<div class="alert alert-success mt-2"  id="alertMsgBoxSuccess" style="text-align: center; display:none;" >
+				 
+                 <span id="alertMsgSuccess" >Student added to the class </span> 
+                 </div>
+                 
+                 <div class="alert alert-danger mt-2"  id="alertMsgBoxError" style="text-align: center;display:none;" >
+				 
+                 <span id="alertMsgError" >Student not added to the class.Try again! </span> 
+                 </div>
+                    <div class="card">
+                        <table class="table table-hover " id="studentTable">
+                            <thead class="text-muted">
+                                <tr>
+                                    <th scope="col" > <span style="margin-left: 50px">Name</span></th>
+                                    <th scope="col" > <span>Email</span></th>
+                                    <th scope="col" > <span >School</span></th>
+                                    <th scope="col" > <span >Grade</span></th>
+                                   
+                                    <th scope="col"  width="120" class="text-right"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="userList:${users}" id="studentRow">
+                                  
+                                    <td> 
+                                        <div class="price-wrap"> 
+                                            <var class="price" th:text="${userList.fullName}">08.00 AM - 10.00 AM</var> 
+                                           
+                                        </div> 
+                                    </td>
+                                    
+                                    <td> 
+                                        <div class="price-wrap"> 
+                                            <var class="price" th:text="${userList.username}">08.00 AM - 10.00 AM</var> 
+                                           
+                                        </div> 
+                                    </td>
+                                    
+                                    <td> 
+                                        <div class="price-wrap"> 
+                                            <var class="price" th:text="${userList.school}">08.00 AM - 10.00 AM</var> 
+                                           
+                                        </div> 
+                                    </td>
+                                    
+                                    <td> 
+                                        <div class="price-wrap"> 
+                                            <var class="price" th:text="${userList.grade}">08.00 AM - 10.00 AM</var> 
+                                           
+                                        </div> 
+                                    </td>
+                                     
+                                    
+                                    <td class="text-right" id="studentCol"> 
+                                 <!--     <form th:action="@{'/classjoinlocalpayment/'+ ${userList.id} +'/'+${classId}}" method="post" >-->
+                                   <input type="text" th:value="${userList.id}" id="hiddenUserId" hidden="">
+                                   <input type="text" th:value="${classId}" id="hiddenClassId" hidden="">
+					            
+					            
+                                <button type="submit" class="btn btn-outline-danger" th:id="${'btn'+userList.id}" >Add <i class="fa fa-hand-pointer" aria-hidden="true"></i></button>
+                               
+                                  <!-- </form> -->  
+                                    </td>
+                                </tr>
+                               <tr>
+                               <td colspan="5" id="noDataMsg"></td>
+                               </tr>
+
+                            </tbody>
+                        </table>
+                    </div> <!-- card.// -->
+
+
+                </div>
+            </div>
+        
+
+				</div>
+                </main>
+                
+            <!-- footer -->
+            <div  th:replace="footer::footer" >
+                
+            </div>
+            
+            <!-- /footer -->
+            </div>
+        </div>
+      
+       
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js">
+        </script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js">
+        </script>
+        <script  th:src="@{/js/scripts.js}"></script>
+         <script src="js/searchClass.js"></script>
+         <script src="js/constant.js"></script>
+          <script src="js/adminJoinNewStudent.js"></script>
+      
+    </body>
+</html>

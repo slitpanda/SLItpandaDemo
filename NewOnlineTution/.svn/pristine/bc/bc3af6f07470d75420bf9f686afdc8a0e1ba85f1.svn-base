@@ -1,0 +1,106 @@
+package com.itpanda.tution.util;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.itpanda.tution.Constant;
+import com.itpanda.tution.entity.ClassCategory;
+import com.itpanda.tution.entity.Classes;
+import com.itpanda.tution.entity.Subject;
+import com.itpanda.tution.entity.Teacher;
+import com.itpanda.tution.loginSecurity.entity.User;
+import com.itpanda.tution.loginSecurity.repository.UserRepository;
+import com.itpanda.tution.model.ClassCategoryModel;
+import com.itpanda.tution.model.ClassModel;
+import com.itpanda.tution.model.SubjectModel;
+import com.itpanda.tution.model.TeacherModel;
+import com.itpanda.tution.repository.ClassCategoryRepository;
+import com.itpanda.tution.repository.SubjectRepository;
+import com.itpanda.tution.service.TeacherService;
+
+public class DataLoader {
+	
+	
+	@Autowired
+	TeacherService teacherService;
+	
+	public List<ClassCategoryModel> copyClassCategoryToClassCategoryModel(List<ClassCategory> categoryList){
+		
+		ClassCategoryModel classCategoryModel = null;
+		List<ClassCategoryModel> classCategoryModelList = new ArrayList<ClassCategoryModel>();
+		
+		for (int i = 0; i < categoryList.size(); i++) {
+			classCategoryModel = new ClassCategoryModel();
+			BeanUtils.copyProperties(categoryList.get(i), classCategoryModel);
+			classCategoryModelList.add(classCategoryModel);
+		}
+		
+		return classCategoryModelList;
+	}
+	
+
+
+
+
+public List<SubjectModel> copySubjectToSubjectModel(List<Subject> subjectList){
+	
+	SubjectModel subjectModel = null;
+	List<SubjectModel> subjectModelList = new ArrayList<SubjectModel>();
+	
+	for (int i = 0; i < subjectList.size(); i++) {
+		subjectModel = new SubjectModel();
+		BeanUtils.copyProperties(subjectList.get(i), subjectModel);
+		BeanUtils.copyProperties(subjectList.get(i).getClassCategory(), subjectModel);
+		subjectModelList.add(subjectModel);
+	}
+	
+	return subjectModelList;
+}
+
+public List<TeacherModel> getAllTeachers(List<User> userList) {
+	TeacherModel teacherModel = null;
+	List<TeacherModel> teacherModelList = new ArrayList<TeacherModel>();
+	// List<Classes> classList = new ArrayList<Classes>();
+	// List<Teacher> teacherList = new ArrayList<Teacher>();
+
+	// get all teachers
+	//List<User> userList = teacherService.findTeachers(Constant.USER_TYPE_TEACHER);
+
+	for (int i = 0; i < userList.size(); i++) {
+		teacherModel = new TeacherModel();
+
+		// copy user model object to teacher object
+		BeanUtils.copyProperties(userList.get(i).getTeacher(), teacherModel);
+		teacherModel.setFirstName(userList.get(i).getFirstName());
+		teacherModel.setMiddleName(userList.get(i).getMiddlName());
+		teacherModel.setLastName(userList.get(i).getLastName());
+		teacherModel.setSubjectId(userList.get(i).getTeacher().getSubjectId());
+		teacherModel.setUserId(userList.get(i).getId());
+
+		teacherModelList.add(teacherModel);
+
+	}
+
+	return teacherModelList;
+}
+
+public List<ClassModel> copyClassesToClassModel(List<Classes> classList ){
+	
+	List<ClassModel> classModelList=new ArrayList<ClassModel>();
+	for (int i = 0; i < classList.size(); i++) {
+		ClassModel classModel = new ClassModel();
+		BeanUtils.copyProperties(classList.get(i), classModel);
+		classModel.setTeacherId(classList.get(i).getTeacher().getTeacherId());
+		classModelList.add(classModel);
+	}
+	return classModelList;
+}
+    
+
+}

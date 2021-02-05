@@ -1,0 +1,37 @@
+package com.itpanda.tution.model;
+
+public class ClassCategoryModel {
+
+    private int clCategoryId;
+	
+	private String stream;
+	
+	private String medium;
+
+	public int getClCategoryId() {
+		return clCategoryId;
+	}
+
+	public void setClCategoryId(int clCategoryId) {
+		this.clCategoryId = clCategoryId;
+	}
+
+	public String getStream() {
+		return stream;
+	}
+
+	public void setStream(String stream) {
+		this.stream = stream;
+	}
+
+	public String getMedium() {
+		return medium;
+	}
+
+	public void setMedium(String medium) {
+		this.medium = medium;
+	}
+	
+	
+	
+}

@@ -1,0 +1,62 @@
+package com.itpanda.tution.model;
+
+import java.util.Date;
+
+public class TeacherPaymentModel {
+
+	
+	 private int paymentId;
+		
+		private String bank;
+		private String branch;
+		private String accountNumber;
+		private String date;
+		private float amount;
+		private int teacherId;
+		
+		public String getBank() {
+			return bank;
+		}
+		public void setBank(String bank) {
+			this.bank = bank;
+		}
+		public String getBranch() {
+			return branch;
+		}
+		public void setBranch(String branch) {
+			this.branch = branch;
+		}
+		public String getAccountNumber() {
+			return accountNumber;
+		}
+		public void setAccountNumber(String accountNumber) {
+			this.accountNumber = accountNumber;
+		}
+		
+		public int getPaymentId() {
+			return paymentId;
+		}
+		public void setPaymentId(int paymentId) {
+			this.paymentId = paymentId;
+		}
+		public String getDate() {
+			return date;
+		}
+		public void setDate(String date) {
+			this.date = date;
+		}
+		public float getAmount() {
+			return amount;
+		}
+		public void setAmount(float amount) {
+			this.amount = amount;
+		}
+		public int getTeacherId() {
+			return teacherId;
+		}
+		public void setTeacherId(int teacherId) {
+			this.teacherId = teacherId;
+		}
+		
+		
+}

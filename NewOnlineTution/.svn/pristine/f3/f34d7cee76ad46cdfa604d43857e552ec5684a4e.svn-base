@@ -1,0 +1,62 @@
+
+	
+	$("#btnSaveBankDetailsAdmin").on('click',function(){
+		 
+		var bank=$("#bank").val();
+		 var branch=$("#branch").val();
+		 var accountNumber=$("#accountNumber").val();
+		 var teacherId=$("#teacherId").val();
+		 
+		 
+		 if(bank!="0"){
+			 if(branch!=""){
+				 if(accountNumber!=""){
+						$.ajax({
+
+							type : "PUT",
+							url : "/updatebankdetails",
+							
+							data : JSON.stringify({
+								  
+								teacherId:teacherId,
+								bankId:bank,
+								branch:branch,
+								accountNumber:accountNumber
+							}),
+
+							contentType : "application/json; charset=utf-8",
+							cache : false,
+							success : function(data) {
+								$("#alertBox").css('display','block');
+								if(data.hasError==true){
+									$("#alertBox").addClass("alert alert-danger");
+									$('#msg').text(data.message);
+								}else{
+									
+									$("#alertBox").addClass("alert alert-success");
+									$('#msg').text(data.message);
+								}
+								
+							},
+							error : function(err) {
+								$("#alertBox").css('display','block');
+								$("#alertBox").propClass("alert-danger");
+								$('#msg').text("Institute charge not updated. Try again");
+							}
+						});
+					
+					
+				 }else{
+					 $("#accountNumber").focus();  
+				 }
+			 }else{
+				 $("#branch").focus(); 
+			 }
+		 }else{ 
+              $("#bank").focus(); 
+		 }
+		 
+		});
+	
+	
+	

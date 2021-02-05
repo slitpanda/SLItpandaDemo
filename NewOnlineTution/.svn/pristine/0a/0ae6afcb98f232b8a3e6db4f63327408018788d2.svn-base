@@ -1,0 +1,57 @@
+package com.itpanda.tution.controller;
+
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+import com.itpanda.tution.loginSecurity.entity.User;
+import com.itpanda.tution.model.UserModel;
+import com.itpanda.tution.service.StudentService;
+
+
+@Controller
+public class StudentController {
+	
+@Autowired
+private StudentService studentService;
+
+
+// save new student
+@RequestMapping(value = "/savestudent", method = RequestMethod.POST)
+public String saveStudent(@ModelAttribute("user") UserModel userModel) {
+	User user=new User();
+	
+	// copy user model object to user object
+	BeanUtils.copyProperties(userModel, user);
+	
+	user.setUserType("student");
+	user.setPassword(passGenerator(userModel.getPassword()));
+	user.setEnabled(true);
+	if(userModel.getWhatsApp()!=null) {
+		user.setWhatsApp(1);
+	}else {
+		user.setWhatsApp(0);
+	}
+	
+	if(userModel.getViber()!=null) {
+		user.setViber(1);
+	}else {
+		user.setViber(0);
+	}
+	
+	studentService.saveStudent(user);
+	
+	return "redirect:/";
+}
+
+//for encode a string
+
+public String passGenerator(String password) {
+	BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder(4);
+	return bCryptPasswordEncoder.encode(password);
+}
+}

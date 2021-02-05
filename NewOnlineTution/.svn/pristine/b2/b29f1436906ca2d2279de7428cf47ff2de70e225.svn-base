@@ -1,0 +1,36 @@
+package com.itpanda.tution.repository;
+
+import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.itpanda.tution.entity.Classes;
+import com.itpanda.tution.entity.Teacher;
+
+public interface ClassesRepository extends JpaRepository<Classes, Integer>{
+
+	@Query(value="Select b from Classes b where b.subject.subjectId=:subjectId")
+	List<Classes> searchClassBySubjectId(@Param("subjectId") int subjectId);
+	
+	@Query(value = "Select b from Classes b where b.teacher.teacherId=:teacherId and b.subject.subjectId=:subjectId order by date desc ")
+	List<Classes> searchClassByTeacherIdAndSubjectId(@Param("teacherId") int teacherId,@Param("subjectId")int subjectId);
+	
+	List<Classes> findByClassId(int classId);
+	
+	List<Classes> findByTeacher(Teacher teacher);
+	
+	@Query(value = "select * from classes where class_id=?1" ,nativeQuery = true)
+	Classes getClassByClassId(int classId);
+	
+	@Transactional
+	@Modifying
+	@Query(value = "update classes set join_url=?1, start_url=?2 where classes.classes=?3" ,nativeQuery = true)
+	void updateZoomUrls(String joinUrl,String startUrl,int classId);
+	
+//	List<Classes> findBySubjectIdAndDate(int subjectId,String date);
+	
+}

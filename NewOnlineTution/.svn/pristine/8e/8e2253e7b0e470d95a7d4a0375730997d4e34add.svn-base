@@ -1,0 +1,156 @@
+package com.itpanda.tution.entity;
+
+import java.util.Set;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+
+import com.itpanda.tution.loginSecurity.entity.User;
+
+@Entity
+@Table(name="teacher")
+public class Teacher {
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	private int teacherId;
+	
+	//private Long userId;
+	private int clCategoryId;
+	private int subjectId;
+	private String location;
+	private float insChargePercentage;
+	private byte[] proImage;
+	
+	private String branch;
+	private String accountNumber;
+	
+	////@JoinColumn(name = "userId", referencedColumnName = "id", insertable=false, updatable=false )
+	
+	@OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "userId", referencedColumnName = "id")
+    private User user;
+	
+	
+	 @OneToMany(mappedBy="teacher",fetch= FetchType.LAZY)
+	 private Set<Classes> classes;
+	 
+	 @OneToMany(mappedBy="teacher",fetch= FetchType.LAZY)
+	 private Set<TeacherPayments> teacherPayments;
+	 
+	 @ManyToOne
+	@JoinColumn(name="bank", nullable=false)
+	 private Banks banks;
+	 
+	/*
+	 * @OneToMany(mappedBy="teacher",fetch= FetchType.LAZY) private Set<ClassJoin>
+	 * classJoins;
+	 */
+	 
+	 
+	
+	/*
+	 * public Set<ClassJoin> getClassJoins() { return classJoins; } public void
+	 * setClassJoins(Set<ClassJoin> classJoins) { this.classJoins = classJoins; }
+	 */
+	public Set<Classes> getClasses() {
+		return classes;
+	}
+	public void setClasses(Set<Classes> classes) {
+		this.classes = classes;
+	}
+	public User getUser() {
+		return user;
+	}
+	public void setUser(User user) {
+		this.user = user;
+	}
+	public int getTeacherId() {
+		return teacherId;
+	}
+	public void setTeacherId(int teacherId) {
+		this.teacherId = teacherId;
+	}
+
+	/*
+	 * public long getUserId() { return userId; } public void setUserId(Long userId)
+	 * { this.userId = userId; }
+	 */
+	public int getClCategoryId() {
+		return clCategoryId;
+	}
+	public void setClCategoryId(int clCategoryId) {
+		this.clCategoryId = clCategoryId;
+	}
+	public int getSubjectId() {
+		return subjectId;
+	}
+	public void setSubjectId(int subjectId) {
+		this.subjectId = subjectId;
+	}
+	public String getLocation() {
+		return location;
+	}
+	public void setLocation(String location) {
+		this.location = location;
+	}
+	public float getInsChargePercentage() {
+		return insChargePercentage;
+	}
+	public void setInsChargePercentage(float insChargePercentage) {
+		this.insChargePercentage = insChargePercentage;
+	}
+	public byte[] getProImage() {
+		return proImage;
+	}
+	public void setProImage(byte[] proImage) {
+		this.proImage = proImage;
+	}
+	
+	public String getBranch() {
+		return branch;
+	}
+	public void setBranch(String branch) {
+		this.branch = branch;
+	}
+	
+	public Set<TeacherPayments> getTeacherPayments() {
+		return teacherPayments;
+	}
+	public void setTeacherPayments(Set<TeacherPayments> teacherPayments) {
+		this.teacherPayments = teacherPayments;
+	}
+	public String getAccountNumber() {
+		return accountNumber;
+	}
+	public void setAccountNumber(String accountNumber) {
+		this.accountNumber = accountNumber;
+	}
+	public Banks getBanks() {
+		return banks;
+	}
+	public void setBanks(Banks banks) {
+		this.banks = banks;
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+
+	
+}

@@ -1,0 +1,104 @@
+var list;
+var subject;
+var category;
+
+function getSubjectByClassCategoryId() {
+	$("#classCategory").on(
+			'change',
+			function() {
+				var selectedClassCategoryId = parseInt($(this).val());
+
+				var htmlCode = "";
+
+				for (var i = 0; i < list.length; i++) {
+
+					if (list[i].clCategoryId == selectedClassCategoryId) {
+						htmlCode = htmlCode + "<option  value='"
+								+ list[i].subjectId + "'>"
+								+ list[i].subjectName + "</option>";
+					}
+				}
+				$("#subject").html(htmlCode);
+			});
+
+	//  alert(list[0].stream);
+
+}
+
+
+
+function readURL(input) {
+	if (input.files && input.files[0]) {
+		var reader = new FileReader();
+
+		reader.onload = function(e) {
+			$('#proImg').attr('src', e.target.result);
+			$('#proImg').attr('hidden', false);
+		}
+
+		reader.readAsDataURL(input.files[0]); // convert to base64 string
+	} else {
+		$('#proImg').attr('hidden', true);
+	}
+}
+
+$("#imgInp").change(function() {
+	readURL(this);
+});
+
+
+
+function passwordMatcher(){
+	 var password = document.getElementById("password");
+	  var confirm_password = document.getElementById("confirmPassword");
+
+	function validatePassword(){
+	  if(password.value != confirm_password.value) {
+	    confirm_password.setCustomValidity("Passwords Don't Match");
+	  } else {
+	    confirm_password.setCustomValidity('');
+	  }
+	}
+
+	password.onchange = validatePassword;
+	confirm_password.onkeyup = validatePassword;
+}
+
+function selectedSubject(){
+	 var htmlCode="";
+	 var subId=0;
+	 if(category!=0){
+		
+	
+		 for (var i = 0; i < list.length; i++) {
+
+				if (list[i].clCategoryId == category) {
+					htmlCode = htmlCode + "<option  value='"
+							+ list[i].subjectId + "'>"
+							+ list[i].subjectName + "</option>";
+							
+							
+				}
+			}
+			$("#subject").html(htmlCode);
+			$("#subject").val(subject);
+	 }
+}
+
+
+
+
+$("#userForm").on('submit',function(e){
+	 var cat = $('#classCategory');
+//	 cat.prop('required', true);
+	  /* Check if there is no selected value on ready if not mark select as invalid */
+	  if(cat.val()=="0"){
+		 $("#validatAlertMsgBox").css('display','block');
+		 $("#validatAlertMsg").text("Please select a category");
+		  e.preventDefault();
+	  }
+
+});
+
+
+

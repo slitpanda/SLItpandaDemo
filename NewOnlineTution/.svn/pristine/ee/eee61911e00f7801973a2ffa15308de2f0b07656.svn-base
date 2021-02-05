@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <meta name="description" content="" />
+        <meta name="author" content="" />
+        <title>Dashboard -  Admin</title>
+       
+          <!-- Custom CSS -->
+     
+         <link rel="stylesheet" href="/css/style.css">
+          <link href="/css/adminstyles.css" rel="stylesheet" />
+         
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/js/all.min.js" crossorigin="anonymous"></script>
+         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+          <script src="https://code.jquery.com/jquery-3.5.1.min.js" crossorigin="anonymous"></script>
+             <script th:inline="javascript">
+
+$(document).ready(function() {  
+	
+	 
+	/*<![CDATA[*/
+
+		admin= /*[[${#request.userPrincipal.principal.userType=='admin'}]]*/;
+	   dataEntry= /*[[${#request.userPrincipal.principal.userType=='data_entry'}]]*/;
+	   teacherList = /*[[${teacher}]]*/"teacher";
+
+		/*]]>*/
+
+        	
+		checkUserType();
+		selectedBank();
+		
+	
+		
+
+		
+		
+	
+
+	});
+</script>
+    </head>
+    <body class="sb-nav-fixed">
+    
+     
+    <!-- navigation -->
+	<div class="fixed-top" style="z-index: 1039">
+		<div th:replace="sidebar::navigation"></div>
+		<div class="row"  th:unless="${#request.userPrincipal.principal.userType=='data_entry' || #request.userPrincipal.principal.userType=='admin'} ">
+			<div class="col-md-12 shadow-sm" style="background-color: white">
+				<nav aria-label="breadcrumb" class="second ">
+					<ol class="breadcrumb pl-4 pr-4 pb-0" th:unless="${#request.userPrincipal.principal.userType=='admin'}"
+						style="background-color: white">
+						<li class="breadcrumb-item " >
+						<a class="black-text"
+							th:href="@{/wall}"><span class="mr-md-3 mr-2">Home</span></a>
+							<i class="fa fa-angle-double-right mt-1" aria-hidden="true"></i></li>
+							
+							
+							<li class="breadcrumb-item " >
+						<a class="black-text"
+							th:href="@{'/paymentlist/'+${#request.userPrincipal.principal.id}}"><span class="mr-md-3 mr-2">Financial Details</span></a>
+							<i class="fa fa-angle-double-right mt-1" aria-hidden="true"></i></li>
+							
+							
+							<li class="breadcrumb-item "><a class="black-text  active-2"
+							href="#"><span>Bank Details</span></a></li>
+					</ol>
+				</nav>
+			</div>
+		</div>
+	</div>
+        <div id="layoutSidenav">
+        <!-- side bar -->
+            <div th:replace="sidebar::sidebar"></div>
+            
+            <div id="layoutSidenav_content">
+                <main>
+                 
+                    <div class="container-fluid mt-5 mb-5">
+                   
+					
+            <div class="row mt-4" th:object="${teacher}">
+                  
+             
+					
+                <div class="col-md-8 m-auto ">
+              
+              <div  class="alert" style="margin-top:40px; display: none;" id="alertBox" >
+              
+               <center><span  id="alertMsg" ></span></center>
+              </div>
+           
+              <table class="table mt-4" >
+              
+              <tbody>
+              
+             
+              
+              <tr>
+              <th colspan="2"><h4>Bank Account Details</h4></th>
+              </tr>
+              <tr>
+              <th>Bank</th>
+              <td>
+             
+              <select class="form-control custom-select col-md-8"  id="bank"  >
+                                                <option value="0">--- Select Bank ---</option>
+                                                <option  th:each="bank:${bankList}" th:value="${bank.bankId}" th:text="${bank.bankName} "></option>
+                                            </select>
+              </td>
+              </tr>
+              <tr>
+              <th>Branch</th>
+              <input type="text" hidden="" id="teacherId" th:value="*{teacherId}">
+              <td><input type="text" id="branch" class="form-control col-md-8" th:value="*{branch}"></td>
+              </tr>
+              <tr>
+              <th>Account Number</th>
+              <td><input type="text" id="accountNumber" class="form-control col-md-8" th:value="*{accountNumber}"></td>
+              </tr>
+             
+              <tr>
+               <td><center><button class="button  btn-success btn-block col-md-12" id="btnSaveBankDetails">Save</button></td>
+              <td><button class="button btn-danger btn-block  col-md-8" ><a th:href="@{'/paymentlist/'+${#request.userPrincipal.principal.id}}" ><span style="color:white">Cancel</span></a></button></td>
+             
+              </tr>
+              </tbody>
+              </table>
+             
+
+                </div>
+            </div>
+        
+
+				</div>
+                </main>
+                
+            <!-- footer -->
+            <div  th:replace="footer::footer" >
+                
+            </div>
+            
+            <!-- /footer -->
+            </div>
+        </div>
+      
+       
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js">
+        </script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js">
+        </script>
+        <script  th:src="@{/js/scripts.js}"></script>
+         <script src="/js/singleTeacher.js"></script>
+         <script src="/js/constant.js"></script>
+      
+    </body>
+</html>

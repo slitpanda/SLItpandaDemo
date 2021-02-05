@@ -1,0 +1,60 @@
+package com.itpanda.tution.service;
+
+import java.sql.Time;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.itpanda.tution.entity.Classes;
+import com.itpanda.tution.entity.Teacher;
+import com.itpanda.tution.repository.ClassesRepository;
+
+@Service
+@Transactional
+public class ClassService {
+
+	@Autowired
+	ClassesRepository classesRepository;
+	
+	public void saveClass(Classes clasess) {
+		classesRepository.save(clasess);
+	}
+	
+	public List<Classes> searchClass(int teacherId,int subjectId,String status){
+		
+		if(teacherId==0) {
+			return classesRepository.searchClassBySubjectId(subjectId,status);
+		}else {
+			return classesRepository.searchClassByTeacherIdAndSubjectId(teacherId, subjectId,status);
+		}
+	
+	}
+	
+	public List<Classes> getClassById(int classId){
+		
+		return classesRepository.findByClassId(classId);
+	}
+	
+	public List<Classes> getClassByTeacher(Teacher teacher){
+		return classesRepository.findByTeacher(teacher);
+	}
+	
+	public Classes getClassByClassId(int classId) {
+		return classesRepository.getClassByClassId(classId);
+	}
+	
+	public List<Classes> findAllClasses(){
+		return classesRepository.findAll();
+	}
+	
+	public void updateZoomUrls(String joinUrl,String startUrl,int classId) {
+		classesRepository.updateZoomUrls(joinUrl, startUrl, classId);
+	}
+	
+	public List<Classes> findExistingClasses(int subjectId,int clCategoryId,String date,Time newStartTime,Time newEndTime,String status){
+		return classesRepository.findExistingClasses(subjectId,clCategoryId, date,newStartTime,newEndTime,status);
+	}
+	
+}

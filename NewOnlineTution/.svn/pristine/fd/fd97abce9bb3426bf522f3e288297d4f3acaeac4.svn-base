@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <meta name="description" content="" />
+        <meta name="author" content="" />
+        <title>Dashboard -  Admin</title>
+       
+          <!-- Custom CSS -->
+     
+         <link rel="stylesheet" href="css/style.css">
+          <link href="css/adminstyles.css" rel="stylesheet" />
+         
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/js/all.min.js" crossorigin="anonymous"></script>
+         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+          <script src="https://code.jquery.com/jquery-3.5.1.min.js" crossorigin="anonymous"></script>
+              <script th:inline="javascript">
+
+$(document).ready(function() {  
+	
+	/*<![CDATA[*/
+
+	teacherList = /*[[${teacherModelList}]]*/"teacherModelList";
+	classList= /*[[${classList}]]*/"classList";
+	selectedParam=/*[[${selectedParam}]]*/"selectedParam";
+	
+	/*]]>*/
+	$("#bankSlips").addClass("active");
+	setTeacherList();
+	setSlectedParam();
+	getClassesByAccordingToTeacher();
+	//addRowHandlers();
+	acceptBankSlip();
+	changeToPendingBankSlip();
+ 
+});
+</script>
+    </head>
+    <body class="sb-nav-fixed">
+    
+     
+    <!-- navigation -->
+    <div th:replace="sidebar::navigation">
+    
+    </div>
+        <div id="layoutSidenav">
+        <!-- side bar -->
+            <div th:replace="sidebar::sidebar"></div>
+            
+            <div id="layoutSidenav_content">
+                <main>
+                    <div class="container-fluid mt-4 mb-5">
+                    <form th:action="@{/filterslips}" method="get">
+					<div class="row m-auto" >
+					
+						<div class="col-sm-4 col-md-3 col-lg-3 col-xl-3 mt-4">
+							<span class="badge  badge-primary" style="font-size: 17px;">Status</span>
+							<select class="form-control mt-2" th:name="status" id="status">
+							  <option value="all">All</option>
+								<option value="pending">Pending</option>
+								<option value="complete">Complete</option>
+							</select>
+						</div>
+						
+						
+						<div class="col-sm-6 col-md-4 col-lg-4 mt-4">
+							<span class="badge  badge-primary" style="font-size: 17px;">Teacher</span>
+							<select class="form-control mt-2 " th:name="teacherId" id="teacher">
+									<option value="0">Select Teacher</option>
+								
+							</select>
+						</div>
+						
+						<div class="col-sm-6 col-md-4 col-lg-4 mt-4">
+							<span class="badge  badge-primary" style="font-size: 17px;">Class</span>
+							<select class="form-control mt-2" th:name="classId" id="class"> 
+									<option value="0">Select Class</option>
+								
+							</select>
+						</div>
+						
+						<div class="col-sm-6 col-md-1 col-lg-1 mt-2">
+							
+							<button class="btn btn-outline-dark mt-5" type="submit"><i class="fa fa-search"></i></button>
+						</div>
+						
+					</div>
+					</form>
+					
+				<div class="table-responsive">	
+			<table  class="table col-xs-6 col-md-12 col-lg-12 mt-4" id="classJoinTable" >
+
+
+				<tr>
+					<th >Date</th>
+					<th>Student</th>
+					<th>Class</th>
+					<th>Ammount</th>
+					<th>Status</th>
+					
+					
+				</tr>
+
+
+				<tr th:each="bankSlip:${pendingSlipLsit}" id="dataRow">
+					<td
+						th:text="${bankSlip.date}"></td>
+					<td th:text="${bankSlip.studentName}"></td>
+					<td th:text="${bankSlip.className}"></td>
+					
+					<td th:text="${'Rs: '+bankSlip.ammount}"></td> 
+					
+					<td th:id="${'txtStatus'+bankSlip.clJoinId}" th:text="${bankSlip.status}"></td>
+					<td> <form th:action="@{/displayslip}" method="get" target="_blank"> 
+					     
+					      <input type="text" th:value="${bankSlip.bankSlip}" th:name="bankSlip" hidden=""> 
+					    
+						<button type="submit" >View</button>
+						</form></td>
+						<td id="colAccept"> 
+					     <input type="text" th:value="${bankSlip.clJoinId}" th:name="clJoinId"  hidden=""> 
+					      
+					    
+						<button type="button" class="btn btn-success col-md-10" th:id="${'btnAccept'+bankSlip.clJoinId}" th:if="${bankSlip.status=='pending'}">Accept</button>
+						<a class="btn btn-danger col-md-10"  th:id="${'btnChange'+bankSlip.clJoinId}" th:if="${bankSlip.status=='complete' && #request.userPrincipal.principal.userType=='admin'}">Ch Pending</a>
+						</td>
+				</tr>
+
+				
+			</table>
+		
+					</div>
+					
+
+				</div>
+                </main>
+                <footer class="py-4 bg-light mt-auto">
+                    <div class="container-fluid">
+                        <div class="d-flex align-items-center justify-content-between small">
+                            <div class="text-muted">Copyright &copy; onlinetuitiiom 2020</div>
+                            <div>
+                                <a href="#">Privacy Policy</a>
+                                &middot;
+                                <a href="#">Terms &amp; Conditions</a>
+                            </div>
+                        </div>
+                    </div>
+                </footer>
+            </div>
+        </div>
+      
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+        <script src="js/scripts.js"></script>
+         <script src="js/admin.js"></script>
+         <script src="js/constant.js"></script>
+      
+    </body>
+</html>

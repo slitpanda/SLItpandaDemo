@@ -1,0 +1,12 @@
+package com.itpanda.tution;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+//test
+@SpringBootApplication
+public class OnlineTutionApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(OnlineTutionApplication.class, args);
+	}
+}

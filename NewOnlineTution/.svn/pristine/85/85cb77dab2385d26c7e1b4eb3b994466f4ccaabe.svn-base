@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="ISO-8859-1">
+<title>Insert title here</title>
+</head>
+<body>
+<div style="width:100%;background-color: #000;height: 40px;">
+
+</div>
+<center>
+<table  cellpadding="10" border="1" style="margin-top: 50px;">
+<thead>
+<tr>
+<th>Date</th>
+<th>Teacher</th>
+<th>Stream</th>
+<th>Lessson</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>2020-07-30</td>
+<td>Mr.Kumara Gunarathna</td>
+<td>A/L Chemistry</td>
+<td> Chemical Calculations</td>
+<td><button>join</button></td>
+</tr>
+
+<tr>
+<td>2020-07-31</td>
+<td>Mr.Karunarathna</td>
+<td>A/L Maths</td>
+<td> Anukalanaya</td>
+<td><button>join</button></td>
+</tr>
+</tbody>
+</table>
+</center>
+
+</body>
+</html>

@@ -1,0 +1,23 @@
+// payment bbuttons
+ 
+ 
+	 $("#paymentOnlin").on('change',function(){
+			$("#btnUpload").css('display','none');
+			$("#btnLocal").css('display','block');
+			$("#bankSlip").css('display','none');
+			$("#btnOnline").css('display','block');
+			$("#bankSlip").prop("disabled",true);
+			
+		});
+ 
+ 
+
+	 $("#paymentBank").on('change',function(){
+			$("#btnUpload").css('display','block');
+			$("#bankSlip").css('display','block');
+			$("#btnLocal").css('display','none');
+			$("#btnOnline").css('display','none');
+			$("#bankSlip").prop("disabled",false);
+			
+		});
+ 

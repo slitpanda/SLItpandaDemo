@@ -1,0 +1,37 @@
+package com.itpanda.tution.repository;
+
+import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.itpanda.tution.entity.ClassJoin;
+
+public interface ClassJoinRepository extends JpaRepository<ClassJoin, Integer> {
+
+	@Transactional
+	@Modifying
+	@Query(value = "UPDATE classjoin SET status=?1 , type=?2 WHERE classjoin.cl_join_id=?3", nativeQuery = true)
+	void updateClassJoin(String status,String type,int clJoinId);
+	
+	@Query(value = "select count(*) from classjoin where class_id=?1 and status=?2" ,nativeQuery = true)
+	int getClassesByStatus(int classId,String status);
+	
+	@Transactional
+	@Modifying
+	@Query(value = "update classjoin set type=?1, bank_slip=?2 where classjoin.cl_join_id=?3 " ,nativeQuery = true)
+	void updateBankSlip(String type,String fileName,int clJoinId);
+	
+	@Query(value = "select * from classjoin where type=?1 and status=?2" ,nativeQuery = true)
+	List<ClassJoin> getPendingBankDepositSlips(String type,String status);
+	
+	@Transactional
+	@Modifying
+	@Query(value = "update classjoin set status=?1 where classjoin.cl_join_id=?2 " ,nativeQuery = true)
+	void updateBankSlipStatus(String status,int clJoinId);
+	
+	@Query(value = "SELECT * FROM `classjoin` WHERE type=?1 and status like ?2 and CAST( teacher_id as CHAR) like ?3 and CAST( class_id as CHAR) like ?4 " ,nativeQuery = true)
+	List<ClassJoin> filterBankSlips(String type,String status,String teacherId,String classId);
+}

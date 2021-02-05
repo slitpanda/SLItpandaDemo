@@ -1,0 +1,262 @@
+package com.itpanda.tution.controller;
+
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.sql.Blob;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import javax.imageio.ImageIO;
+import javax.sql.rowset.serial.SerialBlob;
+
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.servlet.ModelAndView;
+
+import com.itpanda.tution.Constant;
+import com.itpanda.tution.entity.ClassCategory;
+import com.itpanda.tution.entity.Classes;
+import com.itpanda.tution.entity.Subject;
+import com.itpanda.tution.entity.Teacher;
+import com.itpanda.tution.loginSecurity.entity.User;
+import com.itpanda.tution.loginSecurity.repository.UserRepository;
+import com.itpanda.tution.model.TeacherModel;
+import com.itpanda.tution.model.UserDTO;
+import com.itpanda.tution.model.UserModel;
+import com.itpanda.tution.service.ClassService;
+import com.itpanda.tution.service.StudentService;
+import com.itpanda.tution.service.TeacherService;
+
+import net.coobird.thumbnailator.Thumbnails;
+
+@Controller
+public class TeacherController {
+
+	@Autowired
+	TeacherService teacherService;
+	
+	@Autowired
+	StudentService studentService;
+	
+	@Autowired
+	ClassService classService;
+	
+	@Autowired
+	UserRepository userRepository;
+	
+	@Value("${onlinetution.bankslip.derectrory}")
+	String UPLOAD_DIR;
+	//load teacher register page
+	@RequestMapping("/teacherregister")
+	public String teacherRegister(Model model) {
+		
+		UserModel userModel=new UserModel();
+		
+		// get all class categories
+		List<ClassCategory> classCategoryList=teacherService.getAllClassCategories();
+		//get all subjects
+		List<Subject> subjectList=teacherService.getAllSubjects();
+		
+		
+		
+		model.addAttribute("user",userModel);
+		model.addAttribute("classCategoryList",classCategoryList);
+		model.addAttribute("subjectList", subjectList);
+		
+		
+		
+		return "teacherRegister";
+	}
+	
+	
+	//save new teacher
+	
+	@RequestMapping(value = "/saveteacher" , method = RequestMethod.POST)
+	public String saveTeacher(@ModelAttribute("user") UserModel userModel) throws IOException {
+		
+		User user=new User();
+		
+		Teacher teacher=new Teacher();
+		
+		
+		
+		// copy user model object to user object
+		BeanUtils.copyProperties(userModel, user);
+		
+		user.setUserType(Constant.USER_TYPE_TEACHER);
+		user.setPassword(passGenerator(userModel.getPassword()));
+		user.setEnabled(true);
+		
+		
+		//save user details
+		User newUser=studentService.saveStudent(user);
+		
+
+		// copy user model object to teacher object
+				BeanUtils.copyProperties(userModel, teacher);
+				teacher.setUserId(newUser.getId());
+				teacher.setProImage(userModel.getProImage().getBytes());
+				// save teacher details
+				teacherService.saveTacher(teacher);
+		
+				
+				//upload pro image
+				
+
+
+
+
+	/*	
+		try {
+        //	byte[] bytes = userModel.getProImage().getBytes();
+            String path = UPLOAD_DIR + newUser.getId()+"_proImage."+userModel.getProImage().getOriginalFilename().split("\\.")[1];
+          //  Files.write(path, bytes);
+           
+            Thumbnails.of(userModel.getProImage().getInputStream()).size(400, 400).toFile(path);
+           
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.out.println(e.getMessage());
+        }
+		*/
+				
+	//	List<User> userList=teacherService.findTeacherByEmail(userModel.getUsername());
+		
+		
+	
+		
+		return "redirect:/";
+	}
+	
+	
+	@RequestMapping(value = "/updateprofile/teacher", method = RequestMethod.POST)
+	public String editProfile(@ModelAttribute("user") UserModel userModel) throws IOException {
+		
+		User user=new User();
+		Teacher teacher=new Teacher();
+		String password = userModel.getPassword();
+		
+		
+		
+		// get authenticated user details
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		UserDTO u = (UserDTO) authentication.getPrincipal();
+		
+		// copy user model object to user object
+		BeanUtils.copyProperties(userModel, user);
+		BeanUtils.copyProperties(userModel, teacher);
+		
+		user.setId(u.getId());
+		user.setUserType(Constant.USER_TYPE_TEACHER);
+		user.setEnabled(true);
+		
+		// check password
+		if (password.equals("")) {
+			// currnt password
+			user.setPassword(u.getPassword());
+
+		} else {
+			// new password
+			user.setPassword(passGenerator(password));
+		}
+		
+		teacher.setUserId(u.getId());
+		teacher.setTeacherId(teacherService.getTeacherIdBtUserId(u.getId()));
+		teacher.setInsChargePercentage(teacherService.getInsPrecentageByUserId(u.getId()));
+		
+		// check profile image is empty
+		if(!userModel.getProImage().isEmpty()) {
+			teacher.setProImage(userModel.getProImage().getBytes());
+		}else {
+			
+	       teacher.setProImage(teacherService.getProImageByUserId(u.getId()));
+		}
+
+		// update user table
+		studentService.saveStudent(user);
+		// update teacher table
+		teacherService.saveTacher(teacher);
+		return "wall";
+	}
+	
+	//load my classes
+	@RequestMapping("/myclasses")
+	public String myClasses(Model model) {
+		
+		// get authenticated user details
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		UserDTO u=(UserDTO)authentication.getPrincipal();
+		
+		List<Teacher> teacherList=teacherService.findTeacherByUserId(u.getId());
+		List<Classes> classList=classService.getClassByTeacherId(teacherList.get(0).getTeacherId());
+		
+		model.addAttribute("classList", classList);
+		return "myClasses";
+	}
+	
+	@RequestMapping("/teacherList")
+	public String getAllTeachers(Model model) {
+		
+		TeacherModel teacherModel=null;
+		List<TeacherModel> teacherModelList=new ArrayList<TeacherModel>();
+		List<User> userList=new ArrayList<User>();
+		List<Teacher> teacherList=teacherService.getAllTeachers();
+		for(int i=0;i<teacherList.size();i++) {
+			teacherModel=new TeacherModel();
+			userList=userRepository.findUserById(teacherList.get(i).getUserId());
+			BeanUtils.copyProperties(teacherList.get(i),teacherModel);
+			BeanUtils.copyProperties( userList.get(0),teacherModel);
+			teacherModel.setMiddleName(userList.get(0).getMiddlName());
+			teacherModelList.add(teacherModel);
+		}
+		
+		model.addAttribute("teacherList", teacherModelList);
+		return "adminTeacherList";
+	}
+	
+	
+	@RequestMapping("/teacher/{id}")
+	public ModelAndView getSingleTeacher(@PathVariable(name = "id") Long id ) {
+		
+		ModelAndView mav = new ModelAndView("singleTeacher");
+		TeacherModel teacherModel=new TeacherModel();
+		List<User> userDetails=userRepository.findUserById(id);
+		List<Teacher> teacherDetails=teacherService.findTeacherByUserId(id);
+		BeanUtils.copyProperties(userDetails.get(0),teacherModel);
+		BeanUtils.copyProperties( teacherDetails.get(0),teacherModel);
+		teacherModel.setMiddleName(userDetails.get(0).getMiddlName());
+		teacherModel.setClCategoryName(teacherService.getCategoryById(teacherDetails.get(0).getClCategoryId()).get().getStream());
+		teacherModel.setMedium(teacherService.getCategoryById(teacherDetails.get(0).getClCategoryId()).get().getMedium());
+		teacherModel.setSubjectName(teacherService.getSubjectById(teacherDetails.get(0).getSubjectId()).get().getSubjectName());
+		mav.addObject("teacher", teacherModel);
+		
+		
+		
+		return mav;
+	}
+	
+	
+	
+	
+	//for encode a string
+
+	public String passGenerator(String password) {
+		BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder(4);
+		return bCryptPasswordEncoder.encode(password);
+	}
+	
+}

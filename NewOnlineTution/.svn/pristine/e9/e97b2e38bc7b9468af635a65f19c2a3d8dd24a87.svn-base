@@ -1,0 +1,94 @@
+package com.itpanda.tution.entity;
+
+import java.util.Date;
+
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
+@Entity
+@Table(name="teacherpayments")
+public class TeacherPayments {
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+    private int	paymentId;
+	
+	private String bank;
+	private String branch;
+	private String accountNumber;
+	private Date date;
+	private float amount;
+	
+	@ManyToOne
+	@JoinColumn(name="teacherId", nullable=false)
+	Teacher teacher;
+
+	public int getPaymentId() {
+		return paymentId;
+	}
+
+	public void setPaymentId(int paymentId) {
+		this.paymentId = paymentId;
+	}
+
+	public String getBank() {
+		return bank;
+	}
+
+	public void setBank(String bank) {
+		this.bank = bank;
+	}
+
+	public String getBranch() {
+		return branch;
+	}
+
+	public void setBranch(String branch) {
+		this.branch = branch;
+	}
+
+	public String getAccountNumber() {
+		return accountNumber;
+	}
+
+	public void setAccountNumber(String accountNumber) {
+		this.accountNumber = accountNumber;
+	}
+
+	
+
+	public Date getDate() {
+		return date;
+	}
+
+	public void setDate(Date date) {
+		this.date = date;
+	}
+
+	public float getAmount() {
+		return amount;
+	}
+
+	public void setAmount(float amount) {
+		this.amount = amount;
+	}
+
+	public Teacher getTeacher() {
+		return teacher;
+	}
+
+	public void setTeacher(Teacher teacher) {
+		this.teacher = teacher;
+	}
+	
+	
+	
+	
+	
+	
+}

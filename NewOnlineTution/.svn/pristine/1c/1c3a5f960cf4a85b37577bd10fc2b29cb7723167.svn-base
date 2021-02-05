@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+<center>
+<div style="width: 60%; margin-top: 30px;" >
+			<table cellpadding="10" >
+
+
+				<tr>
+					<th>Date</th>
+					<th>Student</th>
+					<th>Class</th>
+					<th>Ammount</th>
+					
+					
+				</tr>
+
+
+				<tr th:each="bankSlip:${pendingSlipLsit}">
+					<td
+						th:text="${bankSlip.date}"></td>
+					<td th:text="${bankSlip.studentName}"></td>
+					<td th:text="${bankSlip.className}"></td>
+					
+					<td th:text="${'Rs: '+bankSlip.ammount}"></td>
+					<td> <form th:action="@{/displayslip}" method="get" target="_blank"> 
+					     
+					      <input type="text" th:value="${bankSlip.bankSlip}" th:name="bankSlip" hidden=""> 
+					    
+						<button type="submit" >View</button>
+						</form></td>
+						<td> <form th:action="@{/acceptslip}" method="post" >
+					     <input type="text" th:value="${bankSlip.clJoinId}" th:name="clJoinId" hidden=""> 
+					      
+					    
+						<button type="submit" >Accept</button>
+						</form></td>
+				</tr>
+
+				
+			</table>
+		</div>
+		</center>
+</body>
+</html>

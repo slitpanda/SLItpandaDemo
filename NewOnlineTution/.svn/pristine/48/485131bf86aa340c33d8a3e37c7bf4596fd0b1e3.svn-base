@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script th:inline="javascript">
+
+$(document).ready(function() {  
+	
+	 /*<![CDATA[*/
+	  teacherList= /*[[${teacherList}]]*/ "teacherList";
+	  subjectList=/*[[${subjectList}]]*/ "subjectList";
+	
+	 /*]]>*/
+	
+	 //set date format
+	setDateFormat();
+	 
+	 // set defualt class category & subject of user
+	setUserDefaultCategoryAndSubject();
+	 
+	// get subject according to selected category
+    getSubjectByCategoryId();
+	
+	
+ 
+	
+});
+</script>
+</head>
+<body>
+<center><h1> Add New Class</h1>
+<form th:object="${classes}" th:action="@{/saveclass}" 	method="post">
+<table cellpadding="10">
+<tr hidden="">
+<td>Teacher Id</td>
+<td><input type="text" id="hiddenTeacherId" th:field="*{teacherId}"></td>
+</tr>
+<tr>
+<td>Class Category</td>
+<td><select  id="clCategory" disabled="disabled" >
+<option value="0">select category</option>
+<option  th:each="clCatList:${categoryList}" th:value="${clCatList.clCategoryId}" th:text="${clCatList.stream +' '+ clCatList.medium} "></option>
+</select>
+<input  th:field="*{clCategoryId}" type="text" id="hiddenCatId" hidden="">
+</td>
+</tr>
+
+<tr>
+<td>Subject</td>
+<td><select   id="subjects" disabled="disabled" ></select>
+<input th:field="*{subjectId}" type="text" id="hiddenSubjectId" hidden=""></td>
+
+</tr>
+
+<tr>
+<td>Description English</td>
+<td><textArea th:field="*{descriptionEnglish}"></textArea></td>
+</tr>
+
+<tr>
+<td>Description Sinhala</td>
+<td><textArea th:field="*{descriptionSinhala}"></textArea></td>
+</tr>
+
+<tr>
+<td>Date</td>
+<td><input type="date" placeholder="dd-mm-yyyy" id="date"  min="1997-01-01"><input type="text" id="hiddenDate" hidden="" th:field="*{date}"></td>
+</tr>
+
+<tr>
+<td>Start Time</td>
+<td><input type="text" th:field="*{startTime}"></td>
+</tr>
+
+<tr>
+<td>End Time</td>
+<td><input type="text" th:field="*{endTime}"></td>
+</tr>
+
+<tr>
+<td>Ammount</td>
+<td><input type="text" th:field="*{amount}"></td>
+</tr>
+
+<tr>
+<td></td>
+<td><input type="submit" value="add"></td>
+</tr>
+</table>
+</form>
+
+
+</center>
+
+<script src="js/classes.js"></script>
+</body>
+</html>

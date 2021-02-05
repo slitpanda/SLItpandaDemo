@@ -1,0 +1,39 @@
+package com.itpanda.tution.loginSecurity.service;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
+
+
+import com.itpanda.tution.loginSecurity.repository.UserRepository;
+import com.itpanda.tution.model.UserDTO;
+
+@Service
+public class UserDetailsServiceImpl implements UserDetailsService {
+
+    @Autowired
+    UserRepository userRepository;
+	
+    @Override
+     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+		
+     //Buscar el usuario con el repositorio y si no existe lanzar una exepcion
+     com.itpanda.tution.loginSecurity.entity.User appUser = 
+                 userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("No existe usuario"));
+	
+     UserDTO userDto=new UserDTO(appUser);
+    
+   
+    //Crear El objeto UserDetails que va a ir en sesion y retornarlo.
+   // UserDetails user = (UserDetails) new User(appUser.getUsername(), appUser.getPassword(), grantList);
+         return userDto;
+    }
+}

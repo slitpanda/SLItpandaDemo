@@ -1,0 +1,104 @@
+
+
+var  teacherList;
+	
+	// select bank
+	function selectedBank(){
+		
+		if(teacherList.bank==null){
+			$("#bank").val("0");
+		}else
+			{
+			$("#bank").val(teacherList.bank);
+			}
+		
+		
+	}
+	
+	
+
+		
+		$("#btnSave").on('click',function(){
+		 var insCharg=$("#insChargPres").val();
+		 var teacherId=$("#teacherId").val();
+			$.ajax({
+
+				type : "PUT",
+				url : "/updateinscharg",
+				
+				data : JSON.stringify({
+					  
+					teacherId:teacherId,
+					insChargePercentage: insCharg
+				}),
+
+				contentType : "application/json; charset=utf-8",
+				cache : false,
+				success : function(data) {
+					
+					
+					$('#msg').text("Saved").css('color','green').delay(2000).show();
+				},
+				error : function(err) {
+					alert("not called");
+				}
+			});
+		});
+		
+		
+		
+		
+			
+			$("#btnSaveBankDetails").on('click',function(){
+			 
+			var bank=$("#bank").val();
+			 var branch=$("#branch").val();
+			 var accountNumber=$("#accountNumber").val();
+			 var teacherId=$("#teacherId").val();
+			 
+			 
+			 if(bank!="0"){
+				 if(branch!=""){
+					 if(accountNumber!=""){
+							$.ajax({
+
+								type : "PUT",
+								url : "/updatebankdetails",
+								
+								data : JSON.stringify({
+									  
+									teacherId:teacherId,
+									bank:bank,
+									branch:branch,
+									accountNumber:accountNumber
+								}),
+
+								contentType : "application/json; charset=utf-8",
+								cache : false,
+								success : function(data) {
+									if(data=="success"){
+										$('#bankMsg').text("Saved").css('color','green').delay(2000).show();
+									}else{
+										$('#bankMsg').text("Error Try Again!").css('color','red').delay(2000).show();
+									}
+									
+									
+								},
+								error : function(err) {
+									$('#bankMsg').text("Error Try Again!").css('color','red').delay(2000).show();
+								}
+							});
+						
+						
+					 }else{
+						 $("#accountNumber").focus();  
+					 }
+				 }else{
+					 $("#branch").focus(); 
+				 }
+			 }else{ 
+	              $("#bank").focus(); 
+			 }
+			 
+			});
+		

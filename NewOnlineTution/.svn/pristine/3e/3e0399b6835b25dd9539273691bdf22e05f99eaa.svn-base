@@ -1,0 +1,46 @@
+package com.itpanda.tution.service;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.itpanda.tution.entity.ClassJoin;
+import com.itpanda.tution.entity.Classes;
+import com.itpanda.tution.repository.ClassJoinRepository;
+
+@Service
+@Transactional
+public class ClassJoinService {
+
+	
+	@Autowired
+	private ClassJoinRepository classJoinRepository;
+	
+	public ClassJoin saveClassJoin(ClassJoin classJoin) {
+		return classJoinRepository.save(classJoin);
+	}
+	
+	public void updateClassJoin(String status,String type,int classJoinId) {
+		classJoinRepository.updateClassJoin(status,type, classJoinId);
+	}
+	
+    public int getClassesByStatus(int classId,String status){
+	
+    	return classJoinRepository.getClassesByStatus(classId, status);
+	}
+    
+    public void updateBankSlip(String type,String fileName,int clJoinId) {
+    
+    	classJoinRepository.updateBankSlip(type,fileName, clJoinId);
+    }
+    
+    public List<ClassJoin> getPendingBankDepositSlips(String type,String status) {
+    	return classJoinRepository.getPendingBankDepositSlips(type, status);
+    }
+    
+    public void updateBankSlipStatus(String status,int clJoinId) {
+    	classJoinRepository.updateBankSlipStatus(status, clJoinId);
+    }
+}

@@ -1,0 +1,69 @@
+var subjectList;
+var idList;
+
+
+//get subject according to selected category
+
+
+	$("#clCategory").on('change',function(){
+		var selectedClassCategoryId=parseInt($(this).val());
+		
+		if(selectedClassCategoryId!=0){
+			$("#techers").html("<option value='0'>--- Select Teacher ---</option>");
+			
+			var htmlCode="<option value='0'>--- Select Subject ---</option>";
+			
+			for(var i=0;i<subjectList.length;i++){
+				
+				
+				if(subjectList[i].clCategoryId==selectedClassCategoryId){
+					htmlCode=htmlCode+"<option  value='"+subjectList[i].subjectId+"'>"+subjectList[i].subjectName+"</option>";
+				}
+			}
+			
+			$("#subjects").html(htmlCode);
+		}else{
+			
+			$("#subjects").html("<option value='0'>--- Select Subject ---</option>");
+		}
+		
+	});
+	
+
+	//set select box values according to searched ids
+	function searchIds(){
+		
+		
+		var subjecthtmlCode="<option value='0'>--- Select Subject ---</option>";
+		var teacherHtmlCodes="";
+		
+		
+		
+		if(parseInt(idList[0])!=0){
+			$("#clCategory").val(idList[0]);
+			for(var j=0;j<subjectList.length;j++){
+				if(subjectList[j].clCategoryId===parseInt(idList[0])){
+					subjecthtmlCode=subjecthtmlCode+"<option  value='"+subjectList[j].subjectId+"'>"+subjectList[j].subjectName+"</option>";
+				}
+			}
+			
+			
+			$("#subjects").html(subjecthtmlCode);
+			$("#subjects").val(idList[1]);
+	
+	}
+		
+	}
+	
+	// select bank
+	function selectedBank(){
+		
+		if(teacherList.bank==null){
+			$("#bank").val("0");
+		}else
+			{
+			$("#bank").val(teacherList.bank);
+			}
+		
+		
+	}

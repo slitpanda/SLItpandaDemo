@@ -1,0 +1,191 @@
+package com.itpanda.tution.entity;
+
+import java.sql.Time;
+import java.util.Date;
+import java.util.Set;
+
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+@Entity
+@Table(name = "classes")
+
+public class Classes {
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	private int classId;
+
+	// private int teacherId;
+	// private int clCategoryId;
+	// private int subjectId;
+	private String descriptionEnglish;
+	private String descriptionSinhala;
+	private float amount;
+	private Date date;
+	private Time startTime;
+
+	private Time endTime;
+
+	private String type;
+	private String status;
+	private String startUrl;
+	private String joinUrl;
+	private String paymentType;
+
+	@ManyToOne
+	@JoinColumn(name = "subjectId", nullable = false)
+	Subject subject;
+
+	@ManyToOne
+	@JoinColumn(name = "teacherId", nullable = false)
+	Teacher teacher;
+
+	@OneToMany(mappedBy = "classes", fetch = FetchType.LAZY)
+	private Set<ClassJoin> classJoins;
+
+	public Set<ClassJoin> getClassJoins() {
+		return classJoins;
+	}
+
+	public void setClassJoins(Set<ClassJoin> classJoins) {
+		this.classJoins = classJoins;
+	}
+
+	public Teacher getTeacher() {
+		return teacher;
+	}
+
+	public void setTeacher(Teacher teacher) {
+		this.teacher = teacher;
+	}
+
+	public Subject getSubject() {
+		return subject;
+	}
+
+	public void setSubject(Subject subject) {
+		this.subject = subject;
+	}
+
+	public int getClassId() {
+		return classId;
+	}
+
+	public void setClassId(int classId) {
+		this.classId = classId;
+	}
+	/*
+	 * public int getTeacherId() { return teacherId; } public void setTeacherId(int
+	 * teacherId) { this.teacherId = teacherId; }
+	 */
+
+	/*
+	 * public int getClCategoryId() { return clCategoryId; } public void
+	 * setClCategoryId(int clCategoryId) { this.clCategoryId = clCategoryId; }
+	 */
+	/*
+	 * public int getSubjectId() { return subjectId; } public void setSubjectId(int
+	 * subjectId) { this.subjectId = subjectId; }
+	 */
+	public String getDescriptionEnglish() {
+		return descriptionEnglish;
+	}
+
+	public void setDescriptionEnglish(String descriptionEnglish) {
+		this.descriptionEnglish = descriptionEnglish;
+	}
+
+	public String getDescriptionSinhala() {
+		return descriptionSinhala;
+	}
+
+	public void setDescriptionSinhala(String descriptionSinhala) {
+		this.descriptionSinhala = descriptionSinhala;
+	}
+
+	public float getAmount() {
+		return amount;
+	}
+
+	public void setAmount(float amount) {
+		this.amount = amount;
+	}
+
+	public Date getDate() {
+		return date;
+	}
+
+	public void setDate(Date date) {
+		this.date = date;
+	}
+
+	public Time getStartTime() {
+		return startTime;
+	}
+
+	public void setStartTime(Time startTime) {
+		this.startTime = startTime;
+	}
+
+	public Time getEndTime() {
+		return endTime;
+	}
+
+	public void setEndTime(Time endTime) {
+		this.endTime = endTime;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+
+		this.status = status;
+	}
+
+	public String getStartUrl() {
+		return startUrl;
+	}
+
+	public void setStartUrl(String startUrl) {
+		this.startUrl = startUrl;
+	}
+
+	public String getJoinUrl() {
+		return joinUrl;
+	}
+
+	public void setJoinUrl(String joinUrl) {
+		this.joinUrl = joinUrl;
+	}
+
+	public String getPaymentType() {
+		return paymentType;
+	}
+
+	public void setPaymentType(String paymentType) {
+		this.paymentType = paymentType;
+	}
+
+}

@@ -1,0 +1,36 @@
+var searchedWords;
+var id;
+function setSerachedWords() {
+
+	if (searchedWords.length > 0) {
+
+		if (searchedWords[0] != null) {
+			$("#email").val(searchedWords[0]);
+		}
+		if (searchedWords[1] != null) {
+			$("#firstName").val(searchedWords[1]);
+		}
+		if (searchedWords[2] != null) {
+			$("#lastName").val(searchedWords[2]);
+		}
+	}
+
+}
+
+$("#btnSendMessage").on('click', function() {
+
+	// id= $(this).parent().find('#hiddenUserId').val();
+	//var name=$('#userName'+id).text();
+
+	var modal = $('#messageModal');
+	modal.css('display', 'block');
+
+});
+
+$('#closeSpan').on('click', function() {
+
+	var modal = $('#messageModal');
+	modal.css('display', 'none');
+
+});
+

@@ -1,0 +1,43 @@
+package com.itpanda.tution.repository;
+
+import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.itpanda.tution.entity.Teacher;
+
+public interface TeacherRepository extends JpaRepository<Teacher, Integer>  {
+
+	
+	
+	List<Teacher> findByUserId(Long userId);
+	
+	List<Teacher> findByTeacherId(int teacherId);
+	
+	@Query(value = "select pro_image from teacher where user_id=?1" ,nativeQuery = true)
+	byte[] getProImageByUserId(Long id);
+	
+	@Query(value = "select teacher_id from teacher where user_id=?1" ,nativeQuery = true)
+	int getTeacherIdByUserId(Long id);
+	
+	@Query(value = "select ins_charge_percentage from teacher where user_id=?1" ,nativeQuery = true)
+	float getInsPrecentageBtUseRId(Long id);
+	
+	@Transactional
+	@Modifying
+	@Query(value = "update teacher set ins_charge_percentage=?1 where teacher_id=?2" ,nativeQuery = true)
+	void updateInsCharge(float insChargePercentage,int teacherId);
+	
+	@Query(value = "select * from teacher where CAST( cl_category_id as CHAR) like ?1 and CAST( subject_id as CHAR) like ?2  ", nativeQuery = true)
+	List<Teacher> searchTeachers(String clCategoryId,String subjectId);
+	
+	@Transactional
+	@Modifying
+	@Query(value = "update teacher set bank=?1 , branch=?2 ,account_number=?3 where teacher_id=?4" ,nativeQuery = true)
+	
+	void updateBankDetails(String bank,String branch,int accountNumber,int teacherId);
+	
+}

@@ -1,0 +1,12 @@
+package com.itpanda.tution.repository;
+
+import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.itpanda.tution.entity.TeacherPayments;
+
+public interface TeacherPaymentsRepository extends JpaRepository<TeacherPayments, Integer> {
+
+	List<TeacherPayments> findByTeacher_TeacherId(int teacherId);
+}

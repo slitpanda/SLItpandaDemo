@@ -1,0 +1,108 @@
+package com.itpanda.tution.model;
+
+public class TeacherModel {
+	
+	private Long userId;
+	private int teacherId;
+	private int clCategoryId;
+	private int subjectId;
+	private String firstName;
+	private String middleName;
+	private String lastName;
+	private byte[] proImage;
+	private String clCategoryName;
+	private String subjectName;
+	private String medium;
+	private String username;
+	private String mobile;
+	private float insChargePercentage;
+	
+	
+	public Long getUserId() {
+		return userId;
+	}
+	public void setUserId(Long userId) {
+		this.userId = userId;
+	}
+	public int getTeacherId() {
+		return teacherId;
+	}
+	public void setTeacherId(int teacherId) {
+		this.teacherId = teacherId;
+	}
+	public int getClCategoryId() {
+		return clCategoryId;
+	}
+	public void setClCategoryId(int clCategoryId) {
+		this.clCategoryId = clCategoryId;
+	}
+	public int getSubjectId() {
+		return subjectId;
+	}
+	public void setSubjectId(int subjectId) {
+		this.subjectId = subjectId;
+	}
+	public String getFirstName() {
+		return firstName;
+	}
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
+	public String getMiddleName() {
+		return middleName;
+	}
+	public void setMiddleName(String middleName) {
+		this.middleName = middleName;
+	}
+	public String getLastName() {
+		return lastName;
+	}
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
+	}
+	public byte[] getProImage() {
+		return proImage;
+	}
+	public void setProImage(byte[] proImage) {
+		this.proImage = proImage;
+	}
+	public String getClCategoryName() {
+		return clCategoryName;
+	}
+	public void setClCategoryName(String clCategoryName) {
+		this.clCategoryName = clCategoryName;
+	}
+	public String getSubjectName() {
+		return subjectName;
+	}
+	public void setSubjectName(String subjectName) {
+		this.subjectName = subjectName;
+	}
+	public String getMedium() {
+		return medium;
+	}
+	public void setMedium(String medium) {
+		this.medium = medium;
+	}
+	public String getUsername() {
+		return username;
+	}
+	public void setUsername(String username) {
+		this.username = username;
+	}
+	public String getMobile() {
+		return mobile;
+	}
+	public void setMobile(String mobile) {
+		this.mobile = mobile;
+	}
+	public float getInsChargePercentage() {
+		return insChargePercentage;
+	}
+	public void setInsChargePercentage(float insChargePercentage) {
+		this.insChargePercentage = insChargePercentage;
+	}
+	
+	
+
+}

@@ -1,0 +1,2 @@
+var CL_JOIN_STATUS_PENDING=	"pending";
+var CL_JOIN_STATUS_COMPLETE="complete";

@@ -1,0 +1,29 @@
+package com.itpanda.tution.repository;
+
+import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+
+import com.itpanda.tution.entity.Teacher;
+
+public interface TeacherRepository extends JpaRepository<Teacher, Integer>  {
+
+	
+	
+	List<Teacher> findByUserId(Long userId);
+	
+	List<Teacher> findByTeacherId(int teacherId);
+	
+	@Query(value = "select pro_image from teacher where user_id=?1" ,nativeQuery = true)
+	byte[] getProImageByUserId(Long id);
+	
+	@Query(value = "select teacher_id from teacher where user_id=?1" ,nativeQuery = true)
+	int getTeacherIdByUserId(Long id);
+	
+	@Query(value = "select ins_charge_percentage from teacher where user_id=?1" ,nativeQuery = true)
+	float getInsPrecentageBtUseRId(Long id);
+	
+	
+	
+}

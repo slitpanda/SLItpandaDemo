@@ -1,0 +1,68 @@
+package com.itpanda.tution.model;
+
+public class ClassJoinModel {
+
+	private int clJoinId;
+	private String studentName;
+	private String teacherName;
+	private String className;
+	private String bankSlip;
+	private String date;
+	private float ammount;
+	
+	private String status;
+	
+	public int getClJoinId() {
+		return clJoinId;
+	}
+	public void setClJoinId(int clJoinId) {
+		this.clJoinId = clJoinId;
+	}
+	public String getStudentName() {
+		return studentName;
+	}
+	public void setStudentName(String studentName) {
+		this.studentName = studentName;
+	}
+	public String getTeacherName() {
+		return teacherName;
+	}
+	public void setTeacherName(String teacherName) {
+		this.teacherName = teacherName;
+	}
+	public String getClassName() {
+		return className;
+	}
+	public void setClassName(String className) {
+		this.className = className;
+	}
+	public String getBankSlip() {
+		return bankSlip;
+	}
+	public void setBankSlip(String bankSlip) {
+		this.bankSlip = bankSlip;
+	}
+	public String getDate() {
+		return date;
+	}
+	public void setDate(String date) {
+		this.date = date;
+	}
+	public float getAmmount() {
+		return ammount;
+	}
+	public void setAmmount(float ammount) {
+		this.ammount = ammount;
+	}
+	public String getStatus() {
+		return status;
+	}
+	public void setStatus(String status) {
+		this.status = status;
+	}
+	
+	
+	
+	
+	
+}

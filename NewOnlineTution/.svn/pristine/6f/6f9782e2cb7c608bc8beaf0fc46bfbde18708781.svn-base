@@ -1,0 +1,161 @@
+package com.itpanda.tution.controller;
+
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+
+import javax.imageio.ImageIO;
+
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+import com.itpanda.tution.Constant;
+import com.itpanda.tution.entity.ClassCategory;
+import com.itpanda.tution.entity.Classes;
+import com.itpanda.tution.entity.Subject;
+import com.itpanda.tution.entity.Teacher;
+import com.itpanda.tution.loginSecurity.entity.User;
+import com.itpanda.tution.model.UserDTO;
+import com.itpanda.tution.model.UserModel;
+import com.itpanda.tution.service.ClassService;
+import com.itpanda.tution.service.StudentService;
+import com.itpanda.tution.service.TeacherService;
+
+import net.coobird.thumbnailator.Thumbnails;
+
+@Controller
+public class TeacherController {
+
+	@Autowired
+	TeacherService teacherService;
+	
+	@Autowired
+	StudentService studentService;
+	
+	@Autowired
+	ClassService classService;
+	
+	@Value("${onlinetution.bankslip.derectrory}")
+	String UPLOAD_DIR;
+	//load teacher register page
+	@RequestMapping("/teacherregister")
+	public String teacherRegister(Model model) {
+		
+		UserModel userModel=new UserModel();
+		
+		// get all class categories
+		List<ClassCategory> classCategoryList=teacherService.getAllClassCategories();
+		//get all subjects
+		List<Subject> subjectList=teacherService.getAllSubjects();
+		
+		
+		
+		model.addAttribute("user",userModel);
+		model.addAttribute("classCategoryList",classCategoryList);
+		model.addAttribute("subjectList", subjectList);
+		
+		
+		
+		return "teacherRegister";
+	}
+	
+	
+	//save new teacher
+	
+	@RequestMapping(value = "/saveteacher" , method = RequestMethod.POST)
+	public String saveTeacher(@ModelAttribute("user") UserModel userModel) {
+		
+		User user=new User();
+		
+		Teacher teacher=new Teacher();
+		
+		
+		
+		// copy user model object to user object
+		BeanUtils.copyProperties(userModel, user);
+		
+		user.setUserType(Constant.USER_TYPE_TEACHER);
+		user.setPassword(passGenerator(userModel.getPassword()));
+		user.setEnabled(true);
+		if(userModel.getWhatsApp()!=null) {
+			user.setWhatsApp(1);
+		}else {
+			user.setWhatsApp(0);
+		}
+		
+		if(userModel.getViber()!=null) {
+			user.setViber(1);
+		}else {
+			user.setViber(0);
+		}
+		
+		//save user details
+		User newUser=studentService.saveStudent(user);
+		
+
+		// copy user model object to teacher object
+				BeanUtils.copyProperties(userModel, teacher);
+				teacher.setUserId(newUser.getId());
+				teacher.setProImage(newUser.getId()+"_proImage."+userModel.getProImage().getOriginalFilename().split("\\.")[1]);
+				// save teacher details
+				teacherService.saveTacher(teacher);
+		
+				
+				//upload pro image
+		
+		try {
+        //	byte[] bytes = userModel.getProImage().getBytes();
+            String path = UPLOAD_DIR + newUser.getId()+"_proImage."+userModel.getProImage().getOriginalFilename().split("\\.")[1];
+          //  Files.write(path, bytes);
+           
+            Thumbnails.of(userModel.getProImage().getInputStream()).size(400, 400).toFile(path);
+           
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.out.println(e.getMessage());
+        }
+		
+	//	List<User> userList=teacherService.findTeacherByEmail(userModel.getUsername());
+		
+		
+	
+		
+		return "redirect:/";
+	}
+	
+	//load my classes
+	@RequestMapping("/myclasses")
+	public String myClasses(Model model) {
+		
+		// get authenticated user details
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		UserDTO u=(UserDTO)authentication.getPrincipal();
+		
+		List<Teacher> teacherList=teacherService.findTeacherByUserId(u.getId());
+		List<Classes> classList=classService.getClassByTeacherId(teacherList.get(0).getTeacherId());
+		
+		model.addAttribute("classList", classList);
+		return "myClasses";
+	}
+	
+	
+	//for encode a string
+
+	public String passGenerator(String password) {
+		BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder(4);
+		return bCryptPasswordEncoder.encode(password);
+	}
+	
+}

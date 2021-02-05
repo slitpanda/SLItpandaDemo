@@ -1,0 +1,131 @@
+package com.itpanda.tution.model;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import com.itpanda.tution.loginSecurity.entity.User;
+
+public class UserDTO implements UserDetails{
+	
+	
+
+
+
+	public User user;
+	
+	private Long id;
+	private String firstName;
+	private String middleName;
+	private String lastName;
+	private String userType;
+	private String password;
+	
+
+	public UserDTO(User user) {
+		this.user=user;
+	}
+	
+	
+
+	@Override
+	public Collection<? extends GrantedAuthority> getAuthorities() {
+		 List<GrantedAuthority> grantList = new ArrayList();
+		    GrantedAuthority grantedAuthority = new SimpleGrantedAuthority("ROLE_ADMIN");
+		    grantList.add(grantedAuthority);
+		    GrantedAuthority grantedAuthority2 = new SimpleGrantedAuthority("ROLE_USER");
+		    grantList.add(grantedAuthority2);
+				
+		return grantList;
+	}
+
+	@Override
+	public String getPassword() {
+		// TODO Auto-generated method stub
+		return this.user.getPassword();
+	}
+
+	@Override
+	public String getUsername() {
+		// TODO Auto-generated method stub
+		return this.user.getUsername();
+	}
+
+	@Override
+	public boolean isAccountNonExpired() {
+		// TODO Auto-generated method stub
+		return true;
+	}
+
+	@Override
+	public boolean isAccountNonLocked() {
+		// TODO Auto-generated method stub
+		return true;
+	}
+
+	@Override
+	public boolean isCredentialsNonExpired() {
+		// TODO Auto-generated method stub
+		return true;
+	}
+
+	@Override
+	public boolean isEnabled() {
+		// TODO Auto-generated method stub
+		return this.user.isEnabled()==true;
+	}
+
+
+
+	public Long getId() {
+		return this.user.getId();
+	}
+
+
+
+	public String getFirstName() {
+		return this.user.getFirstName();
+	}
+
+
+
+	public String getUserType() {
+		return this.user.getUserType();
+	}
+
+
+
+	public String getMiddleName() {
+		return this.user.getMiddlName();
+	}
+
+
+
+	public String getLastName() {
+		return this.user.getLastName();
+	}
+
+ 
+	public User getUser() {
+		return user;
+	}
+
+
+
+	public void setUser(User user) {
+		this.user = user;
+	}
+
+
+
+	
+
+	
+	
+	
+
+}

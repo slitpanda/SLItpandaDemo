@@ -1,0 +1,9 @@
+package com.itpanda.tution.repository;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.itpanda.tution.entity.ClassCategory;
+
+public interface ClassCategoryRepository extends JpaRepository<ClassCategory, Integer> {
+
+}

@@ -1,0 +1,517 @@
+package com.itpanda.tution.controller;
+
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.sql.Blob;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
+
+import javax.imageio.ImageIO;
+import javax.servlet.http.HttpSession;
+import javax.sql.rowset.serial.SerialBlob;
+
+import org.apache.tomcat.util.http.fileupload.ByteArrayOutputStream;
+
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.servlet.view.RedirectView;
+
+import com.itpanda.tution.Constant;
+import com.itpanda.tution.entity.Banks;
+import com.itpanda.tution.entity.ClassCategory;
+import com.itpanda.tution.entity.Classes;
+import com.itpanda.tution.entity.Subject;
+import com.itpanda.tution.entity.Teacher;
+import com.itpanda.tution.loginSecurity.entity.User;
+import com.itpanda.tution.loginSecurity.repository.UserRepository;
+import com.itpanda.tution.model.ClassCategoryModel;
+import com.itpanda.tution.model.ClassModel;
+import com.itpanda.tution.model.SubjectModel;
+import com.itpanda.tution.model.TeacherModel;
+import com.itpanda.tution.model.UserDTO;
+import com.itpanda.tution.model.UserModel;
+import com.itpanda.tution.repository.BankRepository;
+import com.itpanda.tution.service.ClassService;
+import com.itpanda.tution.service.StudentService;
+import com.itpanda.tution.service.TeacherService;
+import com.itpanda.tution.util.DataLoader;
+import com.itpanda.tution.util.TimeFormattor;
+
+import net.coobird.thumbnailator.Thumbnails;
+
+@Controller
+public class TeacherController {
+
+	@Autowired
+	TeacherService teacherService;
+
+	@Autowired
+	StudentService studentService;
+
+	@Autowired
+	ClassService classService;
+
+	@Autowired
+	UserRepository userRepository;
+
+	@Autowired
+	BankRepository bankRepository;
+
+	TimeFormattor timeFormattor = new TimeFormattor();
+	
+	DataLoader dataLoader=new DataLoader();
+
+	@Value("${onlinetution.bankslip.derectrory}")
+	String UPLOAD_DIR;
+
+	// load teacher register page
+	@RequestMapping("/teacherregister")
+	public String teacherRegister(Model model,@ModelAttribute("user") UserModel usermodel) {
+
+		
+		ClassCategoryModel classCategoryModel = null;
+		SubjectModel subjectModel = null;
+		List<ClassCategoryModel> classCategoryModelList = new ArrayList<ClassCategoryModel>();
+		List<SubjectModel> subjectModelList = new ArrayList<SubjectModel>();
+
+		
+		
+		// get all class categories
+		List<ClassCategory> classCategoryList = teacherService.getAllClassCategories();
+		// get all subjects
+		List<Subject> subjectList = teacherService.getAllSubjects();
+
+		if (classCategoryList.size() > 0 && subjectList.size() > 0) {
+
+			// copy data to models
+			for (int i = 0; i < classCategoryList.size(); i++) {
+				classCategoryModel = new ClassCategoryModel();
+				BeanUtils.copyProperties(classCategoryList.get(i), classCategoryModel);
+				classCategoryModelList.add(classCategoryModel);
+			}
+
+			for (int i = 0; i < subjectList.size(); i++) {
+				subjectModel = new SubjectModel();
+				BeanUtils.copyProperties(subjectList.get(i), subjectModel);
+				BeanUtils.copyProperties(subjectList.get(i).getClassCategory(), subjectModel);
+				subjectModelList.add(subjectModel);
+			}
+
+			
+			if(usermodel!=null) {
+				model.addAttribute("user", usermodel);
+				model.addAttribute("category", usermodel.getClCategoryId());
+				model.addAttribute("subject", usermodel.getSubjectId());
+				
+				
+			}else {
+				UserModel userModel = new UserModel();
+				model.addAttribute("user", userModel);
+				model.addAttribute("subject", 0);
+				
+			}
+			
+			
+		
+			model.addAttribute("classCategoryList", classCategoryModelList);
+			model.addAttribute("subjectList", subjectModelList);
+			return "teacherRegister";
+
+		} else {
+			return "redirect:errorpage?statuscode=500";
+		}
+
+	}
+
+	// save new teacher
+
+	@RequestMapping(value = "/saveteacher", method = RequestMethod.POST)
+	public RedirectView saveTeacher(@ModelAttribute("user") UserModel userModel,RedirectAttributes  model) throws IOException {
+
+		User user = new User();
+		int enabledUsers = 0;
+		Teacher teacher = new Teacher();
+		Banks banks = new Banks();
+		String defaultProImage = "src/main/resources/static/img/propic.jpg";
+
+		RedirectView redirectView = new RedirectView();
+		redirectView.setContextRelative(true);
+		
+		model.addFlashAttribute("user", userModel);
+		try {
+			enabledUsers = userRepository.countEnabledUsers(userModel.getUsername());
+			if (enabledUsers != 0) {
+				model.addFlashAttribute("subject", userModel.getSubjectId());
+				 redirectView.setUrl("/teacherregister?register=email");
+				return redirectView;
+			} else {
+				BeanUtils.copyProperties(userModel, user);
+        
+				user.setUserType(Constant.USER_TYPE_TEACHER);
+				user.setPassword(passGenerator(userModel.getPassword()));
+				user.setEnabled(true);
+
+				// banks.setBankId(1);
+
+				// save user details
+				User newUser = studentService.saveStudent(user);
+
+				// copy user model object to teacher object
+				BeanUtils.copyProperties(userModel, teacher);
+				// teacher.setUserId(newUser.getId());
+				teacher.setUser(newUser);
+				// teacher.setBanks(banks);
+
+				if (!userModel.getProImage().isEmpty()) {
+					ByteArrayOutputStream baos = new ByteArrayOutputStream();
+					ImageIO.write(
+							Thumbnails.of(userModel.getProImage().getInputStream()).size(500, 500).asBufferedImage(),
+							"jpg", baos);
+					baos.flush();
+
+					teacher.setProImage(baos.toByteArray());
+				} else {
+					teacher.setProImage(Files.readAllBytes(Paths.get(defaultProImage)));
+				}
+
+				// save teacher details
+				teacherService.saveTacher(teacher);
+				 redirectView.setUrl("/?register=success");
+				return redirectView;
+			}
+
+		} catch (Exception e) {
+			System.out.println("teacher register : " + e);
+			redirectView.setUrl("/errorpage?statuscode=500");
+			return redirectView;
+
+		}
+
+		// copy user model object to user object
+
+		// upload pro image
+
+		/*
+		 * try { // byte[] bytes = userModel.getProImage().getBytes(); String path =
+		 * UPLOAD_DIR +
+		 * newUser.getId()+"_proImage."+userModel.getProImage().getOriginalFilename().
+		 * split("\\.")[1]; // Files.write(path, bytes);
+		 * 
+		 * Thumbnails.of(userModel.getProImage().getInputStream()).size(400,
+		 * 400).toFile(path);
+		 * 
+		 * } catch (IOException e) { e.printStackTrace();
+		 * System.out.println(e.getMessage()); }
+		 */
+
+		// List<User>
+		// userList=teacherService.findTeacherByEmail(userModel.getUsername());
+
+	}
+
+	@RequestMapping(value = "/updateprofile/teacher", method = RequestMethod.POST)
+	public String editProfile(@ModelAttribute("user") UserModel userModel) throws IOException {
+
+		User user = new User();
+		Teacher teacher = new Teacher();
+		String password = userModel.getPassword();
+
+		// get authenticated user details
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		UserDTO u = (UserDTO) authentication.getPrincipal();
+
+		try {
+			List userList = userRepository.findUserById(u.getId());
+			if (!userList.isEmpty()) {
+				user = (User) userList.get(0);
+				teacher = user.getTeacher();
+
+			}
+			// copy user model object to user object
+			BeanUtils.copyProperties(userModel, user);
+			user.setId(u.getUser().getId());
+			BeanUtils.copyProperties(userModel, teacher);
+			// teacher.setLocation("Kandy2"); //For testing
+
+			// user.setId(u.getId());
+			user.setUserType(Constant.USER_TYPE_TEACHER);
+			user.setEnabled(true);
+
+			// check password
+			if (password.equals("")) {
+				// currnt password
+				user.setPassword(u.getPassword());
+
+			} else {
+				// new password
+				user.setPassword(passGenerator(password));
+			}
+
+			
+
+			// check profile image is empty
+			if (!userModel.getProImage().isEmpty()) {
+				
+				ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				ImageIO.write(Thumbnails.of(userModel.getProImage().getInputStream()).size(500, 500).asBufferedImage(),
+						"jpg", baos);
+				baos.flush();
+				teacher.setProImage(baos.toByteArray());
+			} else {
+
+				// teacher.setProImage(teacherService.getProImageByUserId(u.getId()));
+			}
+
+			userRepository.save(user);
+			return "redirect:/wall?update=success";
+		} catch (Exception e) {
+			System.out.println("teacher profile edit: " + e);
+			return "redirect:/editprofile/teacher/" + u.getId() + "?update=error";
+		}
+
+	}
+
+	// load my classes
+	@SuppressWarnings("unchecked")
+	@RequestMapping("/classes/{id}")
+	public String myClasses(@PathVariable(name = "id") Long id, Model model,HttpSession session) {
+
+		ClassModel classModel;
+		List<ClassModel> classModelList = new ArrayList<ClassModel>();
+
+		// get authenticated user details
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		UserDTO u = (UserDTO) authentication.getPrincipal();
+		
+			if (u!=null) {
+				List<Classes> classList=new ArrayList<Classes>();
+				if(u.getUser().getUserType()==Constant.USER_TYPE_TEACHER) {
+				 classList = classService.getClassByTeacher(u.getUser().getTeacher());
+				}else {
+					classList=classService.getClassByTeacher(userRepository.findById(id).get().getTeacher());
+				}
+				
+				for (int i = 0; i < classList.size(); i++) {
+					classModel = new ClassModel();
+					BeanUtils.copyProperties(classList.get(i), classModel);
+					classModel.setTeacherId(classList.get(i).getTeacher().getTeacherId());
+					classModel.setStartTime(timeFormattor.javaSqlTimeToString(classList.get(i).getStartTime()));
+					classModel.setEndTime(timeFormattor.javaSqlTimeToString(classList.get(i).getEndTime()));
+					classModel.setDate(timeFormattor.dateToString(classList.get(i).getDate()));
+
+					classModelList.add(classModel);
+
+				}
+
+				model.addAttribute("classList", classModelList);
+				return "myClasses";
+			} else {
+				System.out.println("teacher not exist");
+				return "redirect:/login";
+			}
+		
+		
+		
+
+	}
+
+	// load teachers on admin panel
+	@SuppressWarnings("unchecked")
+	@RequestMapping("/teacherList")
+	public String getAllTeachers(Model model,HttpSession session) {
+
+		
+		
+		List<TeacherModel> teacherModelList = new ArrayList<TeacherModel>();
+
+	
+
+		List<String> idList = new ArrayList<String>();
+		idList.add("0");
+		idList.add("0");
+		idList.add("0");
+
+		
+		if(session.getAttribute("classCategoryList")!=null && session.getAttribute("subjectList")!=null ) {
+			// get All Class Categories
+			List<ClassCategoryModel> categoryList = (List<ClassCategoryModel>) session.getAttribute("classCategoryList");
+
+			// get All Subjects
+			List<SubjectModel> subjectList = (List<SubjectModel>) session.getAttribute("subjectList");
+			
+			
+			if(session.getAttribute("teacherList")!=null) {
+            	teacherModelList=(List<TeacherModel>) session.getAttribute("teacherList");
+            }else {
+            	//teacherList = teacherService.getAllTeachers();
+            	List<User> userList = teacherService.findTeachers(Constant.USER_TYPE_TEACHER);
+            	session.setAttribute("teacherList", dataLoader.getAllTeachers(userList));
+            	teacherModelList=dataLoader.getAllTeachers(userList);
+            }
+			
+			if (teacherModelList.size() > 0 && categoryList.size() > 0 && subjectList.size() > 0) {
+
+				
+
+				model.addAttribute("teacherList", teacherModelList);
+				model.addAttribute("categoryList", categoryList);
+				model.addAttribute("subjectList", subjectList);
+				model.addAttribute("idList", idList);
+
+				return "adminTeacherList";
+			} else {
+				return "redirect:errorpage?statuscode=500";
+			}
+
+		}else {
+			return "redirect:/login";
+		}
+		
+
+		
+	}
+
+	// search teacher
+	@SuppressWarnings("unchecked")
+	@RequestMapping("/searchteachers")
+	public String searchTeachers(@RequestParam("clCategory") String clCategory, @RequestParam("subject") String subject,
+			@RequestParam("teacher") String teacher, Model model,HttpSession session) {
+
+		TeacherModel teacherModel = null;
+		ClassCategoryModel classCategoryModel = null;
+		SubjectModel subjectModel = null;
+		List<ClassCategoryModel> classCategoryModelList = new ArrayList<ClassCategoryModel>();
+		List<SubjectModel> subjectModelList = new ArrayList<SubjectModel>();
+		List<TeacherModel> teacherModelList = new ArrayList<TeacherModel>();
+
+		List<String> idList = new ArrayList<String>();
+
+		idList.add(clCategory);
+		idList.add(subject);
+
+		List<Teacher> teacherList = teacherService.searchTeachers(Integer.parseInt(clCategory),
+				Integer.parseInt(subject));
+
+		
+		if(session.getAttribute("classCategoryList")!=null && session.getAttribute("subjectList")!=null ) {
+			
+			// get All Class Categories
+			List<ClassCategory> categoryList = (List<ClassCategory>) session.getAttribute("classCategoryList");
+
+			// get All Subjects
+			List<Subject> subjectList = (List<Subject>) session.getAttribute("subjectList");
+			if (categoryList.size() > 0 && subjectList.size() > 0) {
+
+				// copy data to models
+				for (int i = 0; i < categoryList.size(); i++) {
+					classCategoryModel = new ClassCategoryModel();
+					BeanUtils.copyProperties(categoryList.get(i), classCategoryModel);
+					classCategoryModelList.add(classCategoryModel);
+				}
+
+				for (int i = 0; i < subjectList.size(); i++) {
+					subjectModel = new SubjectModel();
+					BeanUtils.copyProperties(subjectList.get(i), subjectModel);
+					BeanUtils.copyProperties(subjectList.get(i).getClassCategory(), subjectModel);
+					subjectModelList.add(subjectModel);
+				}
+
+				for (int i = 0; i < teacherList.size(); i++) {
+					teacherModel = new TeacherModel();
+
+					BeanUtils.copyProperties(teacherList.get(i), teacherModel);
+					BeanUtils.copyProperties(teacherList.get(i).getUser(), teacherModel);
+					teacherModel.setMiddleName(teacherList.get(i).getUser().getMiddlName());
+					teacherModel.setUserId(teacherList.get(i).getUser().getId());
+					teacherModelList.add(teacherModel);
+				}
+
+				model.addAttribute("teacherList", teacherModelList);
+				model.addAttribute("categoryList", classCategoryModelList);
+				model.addAttribute("subjectList", subjectModelList);
+				model.addAttribute("idList", idList);
+
+				return "adminTeacherList";
+
+			} else {
+				return "redirect:errorpage?statuscode=500";
+			}
+
+		}else {
+			return "redirect:/login";
+		}
+		
+
+		
+	}
+
+	// get a teacher
+	@RequestMapping("/teacher/{id}")
+	public String getSingleTeacher(@PathVariable(name = "id") int id, Model model) {
+
+		TeacherModel teacherModel = new TeacherModel();
+		Banks bankList = new Banks();
+		// List<User> userDetails=userRepository.findUserById(id);
+		List<Teacher> teacherDetails = teacherService.getTeacherById(id);
+		Optional<Subject> subject = teacherService.getSubjectById(teacherDetails.get(0).getSubjectId());
+
+		if (teacherDetails.size() > 0 && subject != null) {
+
+			bankList = teacherDetails.get(0).getBanks();
+
+			if (bankList!=null) {
+
+				if (teacherDetails.get(0).getBanks() != null) {
+					BeanUtils.copyProperties(teacherDetails.get(0).getBanks(), teacherModel);
+				}
+				BeanUtils.copyProperties(teacherDetails.get(0).getUser(), teacherModel);
+				BeanUtils.copyProperties(teacherDetails.get(0), teacherModel);
+
+				teacherModel.setMiddleName(teacherDetails.get(0).getUser().getMiddlName());
+				teacherModel.setClCategoryName(subject.get().getClassCategory().getStream());
+				teacherModel.setMedium(subject.get().getClassCategory().getMedium());
+				teacherModel.setSubjectName(subject.get().getSubjectName());
+				model.addAttribute("teacher", teacherModel);
+				model.addAttribute("bankList", bankList);
+
+				return "singleTeacher";
+
+			} else {
+				return "redirect:errorpage?statuscode=500";
+			}
+
+		} else {
+			return "redirect:errorpage?statuscode=500";
+		}
+
+	}
+
+	// for encode a string
+
+	public String passGenerator(String password) {
+		BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder(4);
+		return bCryptPasswordEncoder.encode(password);
+	}
+
+}

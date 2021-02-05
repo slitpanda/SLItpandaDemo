@@ -1,0 +1,142 @@
+var subjectList;
+var teacherList;
+
+
+$('#datepicker').datepicker({
+    uiLibrary: 'bootstrap4',
+    format: 'yyyy-mm-dd',
+    
+});
+
+// set default class category and subject of currant user
+function setUserDefaultCategoryAndSubject() {
+
+	$("#hiddenTeacherId").val(teacherList[0].teacherId);
+	$("#clCategory").val(teacherList[0].clCategoryId);
+	$("#hiddenCatId").val(teacherList[0].clCategoryId);
+
+	var defaultCategoryId = teacherList[0].clCategoryId;
+	var defaultSubjectId = teacherList[0].subjectId;
+	var htmlCodes = "";
+
+	for (var i = 0; i < subjectList.length; i++) {
+		if (subjectList[i].clCategoryId === defaultCategoryId) {
+			htmlCodes = htmlCodes + "<option  value='"
+					+ subjectList[i].subjectId + "'>"
+					+ subjectList[i].subjectName + "</option>";
+		}
+	}
+
+	$("#subjects").html(htmlCodes);
+
+	$("#subjects").val(defaultSubjectId);
+	$("#hiddenSubjectId").val(defaultSubjectId);
+}
+
+
+
+
+// validate add class form ///////////////////////
+
+	 $("#startTime").on(
+		'blur',
+		function() {
+			var startTime = /^\(?([0-2]{1})\)?([0-9]{1})?[:]{1}?([0-9]{2})?$/;
+
+			var key = event.keyCode || event.charCode;
+			if (key == 8 || key == 46) {
+
+			} else {
+				if ($(this).val() != "") {
+
+					if ($(this).val().split(":")[0].length != 2) {
+						$(this).val(
+								"0" + $(this).val().split(":")[0] + ":"
+										+ $(this).val().split(":")[1]);
+					}
+
+					if ($(this).val().length == 5
+							&& $(this).val().match(startTime)) {
+						$(this).css('border', 'solid 1px green');
+
+					} else {
+						$(this).css('border', 'solid 1px red');
+
+					}
+
+				} else {
+					$(this).css('border', 'solid 1px #e5e0e0');
+
+				}
+			}
+
+		});
+
+
+
+	 $("#endTime").on(
+		'blur',
+		function() {
+			var startTime = /^\(?([0-2]{1})\)?([0-9]{1})?[:]{1}?([0-9]{2})?$/;
+			var key = event.keyCode || event.charCode;
+			if (key == 8 || key == 46) {
+
+			} else {
+				if ($(this).val() != "") {
+
+					if ($(this).val().split(":")[0].length != 2) {
+						$(this).val(
+								"0" + $(this).val().split(":")[0] + ":"
+										+ $(this).val().split(":")[1]);
+
+					}
+
+					if ($(this).val().length == 5
+							&& $(this).val().match(startTime)) {
+						$(this).css('border', 'solid 1px green');
+
+					} else {
+						$(this).css('border', 'solid 1px red');
+
+					}
+
+				} else {
+					$(this).css('border', 'solid 1px #e5e0e0');
+
+				}
+			}
+
+		});
+
+
+
+	 // save class
+	 
+
+	 $("#btnSave").on('click', function() {
+	var validate = true;
+
+	if ($("#paymentType").val() != "0") {
+		$(".form-control").each(function() {
+			if ($.trim($(this).val()).length == 0) {
+
+				$("#alertMsgValid").text("Please fill all details !");
+				$("#validmsgBox").css('display', 'block');
+				validate = false;
+			}
+
+		});
+	} else {
+		validate = false;
+		$("#alertMsgValid").text("Please select payment type !");
+		$("#validmsgBox").css('display', 'block');
+
+	}
+
+	if (validate != false) {
+
+		$("#validmsgBox").css('display', 'none');
+		$("#classform").submit();
+	}
+
+});

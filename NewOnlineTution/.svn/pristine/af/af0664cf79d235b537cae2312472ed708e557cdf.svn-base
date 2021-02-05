@@ -1,0 +1,12 @@
+
+$("#btnInstituteBankDetails").on('click',function(){
+	var modal = $('#messageModal');
+	modal.css('display', 'block');
+});
+
+$('#closeSpan').on('click', function() {
+
+	var modal = $('#messageModal');
+	modal.css('display', 'none');
+
+});

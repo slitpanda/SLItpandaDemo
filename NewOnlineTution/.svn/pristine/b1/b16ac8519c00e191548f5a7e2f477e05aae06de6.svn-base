@@ -1,0 +1,75 @@
+// validate add class form 
+
+  $('#datepicker').datepicker({
+	uiLibrary : 'bootstrap4',
+	format : 'yyyy-mm-dd',
+
+});
+
+$("#startTime").on(
+		'blur',
+		function() {
+			var startTime = /^\(?([0-2]{1})\)?([0-9]{1})?[:]{1}?([0-9]{2})?$/;
+
+			var key = event.keyCode || event.charCode;
+			if (key == 8 || key == 46) {
+
+			} else {
+				if ($(this).val() != "") {
+
+					if ($(this).val().split(":")[0].length != 2) {
+						$(this).val(
+								"0" + $(this).val().split(":")[0] + ":"
+										+ $(this).val().split(":")[1]);
+					}
+
+					if ($(this).val().length == 5
+							&& $(this).val().match(startTime)) {
+						$(this).css('border', 'solid 1px green');
+
+					} else {
+						$(this).css('border', 'solid 1px red');
+
+					}
+
+				} else {
+					$(this).css('border', 'solid 1px #e5e0e0');
+
+				}
+			}
+
+		});
+
+$("#endTime").on(
+		'blur',
+		function() {
+			var startTime = /^\(?([0-2]{1})\)?([0-9]{1})?[:]{1}?([0-9]{2})?$/;
+			var key = event.keyCode || event.charCode;
+			if (key == 8 || key == 46) {
+
+			} else {
+				if ($(this).val() != "") {
+
+					if ($(this).val().split(":")[0].length != 2) {
+						$(this).val(
+								"0" + $(this).val().split(":")[0] + ":"
+										+ $(this).val().split(":")[1]);
+
+					}
+
+					if ($(this).val().length == 5
+							&& $(this).val().match(startTime)) {
+						$(this).css('border', 'solid 1px green');
+
+					} else {
+						$(this).css('border', 'solid 1px red');
+
+					}
+
+				} else {
+					$(this).css('border', 'solid 1px #e5e0e0');
+
+				}
+			}
+
+		});

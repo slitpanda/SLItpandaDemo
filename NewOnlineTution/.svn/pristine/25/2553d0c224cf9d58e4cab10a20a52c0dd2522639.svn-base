@@ -1,0 +1,33 @@
+<!doctype html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark p-0" style="background-color: #035696;" th:fragment="header">
+            <a class="navbar-header" href="#"><img src="img/logoNew.svg"  class="animate__animated animate__fadeInLeft"></a>
+            <button class="navbar-toggler  mr-2" type="button" data-toggle="collapse" data-target="#navbarText" >
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarText">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item active pl-3 pt-1 pr-3 pb-1">
+                        <a class="nav-link text-light" href="index.html">Home</a>
+                    </li>
+                    <li class="nav-item  pl-3 pt-1 pr-3 pb-1">
+                        <a class="nav-link text-light" href="about.html">About Us</a>
+                    </li>
+                    <li class="nav-item  pl-3 pt-1 pr-3 pb-1">
+                        <a class="nav-link text-light" href="#">Start Learn</a>
+                    </li>
+                    <li class="nav-item  pl-3 pt-1 pr-3 pb-1">
+                        <a class="nav-link text-light" href="#">Contact Us</a>
+                    </li>
+                </ul>
+            </div>
+            
+        </nav>
+</body>
+</html>

@@ -1,0 +1,119 @@
+var teacherList;
+var classList;
+var selectedParam;
+
+function setTeacherList(){
+	var htmlcode="<option value='0'>Select Teacher</option>";
+	
+	for(var i=0;i<teacherList.length;i++){
+		htmlcode=htmlcode+"<option value='"+teacherList[i].teacherId+"'>"+teacherList[i].firstName+" "+teacherList[i].middleName+" "+teacherList[i].lastName+"</option>";
+	}
+	
+	$("#teacher").html(htmlcode);
+}
+
+
+
+
+	
+	
+	$("#teacher").on('change',function(){
+		var selectedTeacherId;
+		var htmlcode="<option value='0'>Select Class</option>";
+		var selectedTeacherId=parseInt($(this).val());
+		
+		for(var i=0;i<classList.length;i++){
+			if(classList[i].teacherId===selectedTeacherId){
+				htmlcode=htmlcode+"<option value='"+classList[i].classId+"'>"+classList[i].descriptionEnglish+" / "+classList[i].descriptionSinhala+"</option>";
+			}
+		}
+		
+		$("#class").html(htmlcode);
+		
+	});
+
+
+$("#logOutLink").on('click',function(){
+	form.submit();
+});
+
+function setSlectedParam(){
+	if(selectedParam.length!=0){
+		$("#status").val(selectedParam[0]);
+		$("#teacher").val(selectedParam[1]);
+		var htmlcode="<option value='0'>Select Class</option>"
+		if(selectedParam[1]!="0"){
+			for(var i=0;i<classList.length;i++){
+				if(classList[i].teacherId===parseInt(selectedParam[1])){
+					htmlcode=htmlcode+"<option value='"+classList[i].classId+"'>"+classList[i].descriptionEnglish+" / "+classList[i].descriptionSinhala+"</option>";
+				}
+			}
+			$("#class").html(htmlcode);
+			$("#class").val(selectedParam[2]);
+		}
+	}
+}
+
+
+
+	
+	
+	$("#classJoinTable #dataRow #colAccept").on('click','button',function () {
+	var hiddenClJoinId=$(this).parent().find('input:text').val();
+		$.ajax({
+
+			type : "PUT",
+			url : "/acceptslip",
+			
+			data : JSON.stringify({
+				  
+				clJoinId: hiddenClJoinId
+			}),
+
+			contentType : "application/json; charset=utf-8",
+			cache : false,
+			success : function(data) {
+				
+				//$('#txtStatus'+hiddenClJoinId).text(CL_JOIN_STATUS_COMPLETE);
+				$('#btnAccept'+hiddenClJoinId).replaceWith("<lable>Accepted</lable>");
+			},
+			error : function(err) {
+				alert("not called");
+			}
+		});
+		 });
+
+
+
+
+
+	
+	
+	$("#classJoinTable #dataRow #colAccept").on('click','a',function () {
+	var hiddenClJoinId=$(this).parent().find('input:text').val();
+		$.ajax({
+
+			type : "PUT",
+			url : "/changetopendingslip",
+			
+			data : JSON.stringify({
+				  
+				clJoinId: hiddenClJoinId
+			}),
+
+			contentType : "application/json; charset=utf-8",
+			cache : false,
+			success : function(data) {
+				
+				$('#txtStatus'+hiddenClJoinId).text(CL_JOIN_STATUS_PENDING);
+				$('#btnChange'+hiddenClJoinId).replaceWith("<lable>Changed As Pending</lable>");
+				
+			},
+			error : function(err) {
+				alert("Change Failed");
+			}
+		});
+		 });
+
+
+

@@ -1,0 +1,32 @@
+
+	
+	
+	$("#btnSave").on("click",function(){
+		var startUrl=$("#startUrl").val();
+		var joinUrl=$("#joinUrl").val();
+		var classId=$("#classId").val();
+		$.ajax({
+
+			type : "PUT",
+			url : "/updatezoomurls",
+			
+			data : JSON.stringify({
+				classId:classId,  
+				startUrl:startUrl,
+				joinUrl: joinUrl
+			}),
+
+			contentType : "application/json; charset=utf-8",
+			cache : false,
+			success : function(data) {
+				
+				
+				$('#msg').text("Saved").css('color','green').delay(2000).show();
+			},
+			error : function(err) {
+				alert("not saved");
+			}
+		});
+	});
+	
+	

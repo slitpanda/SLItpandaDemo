@@ -1,0 +1,153 @@
+package com.itpanda.tution.model;
+
+public class ClassModel {
+
+	 private int	classId;
+		
+		private int teacherId;
+		private int clCategoryId;
+		private int subjectId;
+		private String descriptionEnglish;
+		private String descriptionSinhala;
+		private float amount;
+		private String date;
+		private String startTime;
+		private String endTime;
+		private String type	;
+		private String status;
+		private String subjectName;
+		private String startUrl;
+		private String joinUrl;
+		private String paymentType;
+		private String classJoinStatus;
+		private boolean notAvailbale;
+		
+		
+		private String teacher;
+		private byte[] proImage;
+		public int getClassId() {
+			return classId;
+		}
+		public void setClassId(int classId) {
+			this.classId = classId;
+		}
+		public int getTeacherId() {
+			return teacherId;
+		}
+		public void setTeacherId(int teacherId) {
+			this.teacherId = teacherId;
+		}
+		public int getClCategoryId() {
+			return clCategoryId;
+		}
+		public void setClCategoryId(int clCategoryId) {
+			this.clCategoryId = clCategoryId;
+		}
+		public int getSubjectId() {
+			return subjectId;
+		}
+		public void setSubjectId(int subjectId) {
+			this.subjectId = subjectId;
+		}
+		public String getDescriptionEnglish() {
+			return descriptionEnglish;
+		}
+		public void setDescriptionEnglish(String descriptionEnglish) {
+			this.descriptionEnglish = descriptionEnglish;
+		}
+		public String getDescriptionSinhala() {
+			return descriptionSinhala;
+		}
+		public void setDescriptionSinhala(String descriptionSinhala) {
+			this.descriptionSinhala = descriptionSinhala;
+		}
+		public float getAmount() {
+			return amount;
+		}
+		public void setAmount(float amount) {
+			this.amount = amount;
+		}
+		public String getDate() {
+			return date;
+		}
+		public void setDate(String date) {
+			this.date = date;
+		}
+		public String getStartTime() {
+			return startTime;
+		}
+		public void setStartTime(String startTime) {
+			this.startTime = startTime;
+		}
+		public String getEndTime() {
+			return endTime;
+		}
+		public void setEndTime(String endTime) {
+			this.endTime = endTime;
+		}
+		public String getType() {
+			return type;
+		}
+		public void setType(String type) {
+			this.type = type;
+		}
+		public String getStatus() {
+			return status;
+		}
+		public void setStatus(String status) {
+			this.status = status;
+		}
+		public String getTeacher() {
+			return teacher;
+		}
+		public void setTeacher(String teacher) {
+			this.teacher = teacher;
+		}
+		public byte[] getProImage() {
+			return proImage;
+		}
+		public void setProImage(byte[] proImage) {
+			this.proImage = proImage;
+		}
+		public String getSubjectName() {
+			return subjectName;
+		}
+		public void setSubjectName(String subjectName) {
+			this.subjectName = subjectName;
+		}
+		public String getStartUrl() {
+			return startUrl;
+		}
+		public void setStartUrl(String startUrl) {
+			this.startUrl = startUrl;
+		}
+		public String getJoinUrl() {
+			return joinUrl;
+		}
+		public void setJoinUrl(String joinUrl) {
+			this.joinUrl = joinUrl;
+		}
+		public String getPaymentType() {
+			return paymentType;
+		}
+		public void setPaymentType(String paymentType) {
+			this.paymentType = paymentType;
+		}
+		public String getClassJoinStatus() {
+			return classJoinStatus;
+		}
+		public void setClassJoinStatus(String classJoinStatus) {
+			this.classJoinStatus = classJoinStatus;
+		}
+		public boolean isNotAvailbale() {
+			return notAvailbale;
+		}
+		public void setNotAvailbale(boolean notAvailbale) {
+			this.notAvailbale = notAvailbale;
+		}
+		
+		
+		
+		
+		
+}

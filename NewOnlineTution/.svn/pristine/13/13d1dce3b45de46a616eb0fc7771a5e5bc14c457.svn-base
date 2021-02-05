@@ -1,0 +1,23 @@
+
+var list;
+
+
+	function getSubjectByClassCategoryId (){
+		$("#classCategory").on('change',function(){
+			var selectedClassCategoryId=parseInt($(this).val());
+			
+			var htmlCode="";
+			
+			for(var i=0;i<list.length;i++){
+				
+				
+				if(list[i].clCategoryId==selectedClassCategoryId){
+					htmlCode=htmlCode+"<option  value='"+list[i].subjectId+"'>"+list[i].subjectName+"</option>";
+				}
+			}
+			$("#subject").html(htmlCode);
+		});
+		   
+		 //  alert(list[0].stream);
+	     
+	}

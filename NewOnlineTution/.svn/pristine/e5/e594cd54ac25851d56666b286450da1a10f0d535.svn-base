@@ -1,0 +1,72 @@
+@import url('https://fonts.googleapis.com/css2?family=Kanit&display=swap');
+
+html ,body {
+    font-family: 'Kanit', sans-serif;
+    height: 100%;
+    margin: 0;
+}
+
+@media only screen and (min-width: 768px) {
+    .navbar .navbar-header  img {
+        height: 90px;
+    }
+    .navbar {
+        min-height: 90px;
+    }
+
+}
+
+@media   (max-width: 768px) {
+    .navbar .navbar-header  img {
+        height: 55px;
+    }
+    .navbar {
+        min-height: 55px;
+    }
+
+}
+
+#page-content {
+    flex: 1 0 auto;
+}
+
+#sticky-footer {
+    flex-shrink: none;
+}
+
+.notice{
+    background: #035696;
+    color: white;
+    border-radius: 0px 50px 50px 0px;
+    padding: 5px;
+    width: 200px;
+}
+
+.button {
+    height: 50px;
+    padding: 0px 50px 0px 50px;
+    border: none;
+    background-color: #035696;
+    border-radius: 50px;
+    box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease 0s;
+    cursor: pointer;
+    outline: none;
+}
+
+.button:hover {
+
+    box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.1);
+    transform: translateY(-7px);
+}
+
+
+.button:focus {outline:0;}
+
+
+.cardposition{
+    border-radius: 20px;
+    top: 20%;
+    background-color: rgba(0,0,0,0.1) !important;
+}
+

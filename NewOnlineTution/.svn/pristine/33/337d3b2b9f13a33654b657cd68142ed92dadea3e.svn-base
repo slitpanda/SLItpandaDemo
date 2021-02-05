@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="ISO-8859-1">
+<title>Insert title here</title>
+</head>
+<body>
+	<!-- header start -->
+	<div style="width: 100%; background-color: #000; height: 40px;">
+
+	</div>
+
+	<!-- header end -->
+<div style="margin-top:50px;">
+<form action="#" th:action="@{/saveUser}" th:object="${user}"
+			method="post">
+	<div style="float: left; width: 50%;">
+		<center>
+			<table cellpadding="10">
+				<tr>
+					<td>I'am</td>
+					<td><input type="radio" name="a" value="student" th:field="*{userType}">Student</td>
+					<td><input type="radio" name="a" value="teacher"  th:field="*{userType}">Teacher</td>
+				</tr>
+				<tr>
+					<td>First Name</td>
+					<td colspan="2"><input type="text"  th:field="*{firstName}"></td>
+				</tr>
+				<tr>
+					<td>Last Name</td>
+					<td colspan="2"><input type="text"  th:field="*{lastName}"></td>
+				</tr>
+				<tr>
+					<td>Address</td>
+					<td colspan="2"><input type="text"  th:field="*{address}"></td>
+				</tr>
+
+				<tr>
+					<td>city</td>
+					<td colspan="2"><input type="text"  th:field="*{city}"></td>
+				</tr>
+
+
+			</table>
+		</center>
+	</div>
+
+	<div style="float: right; width: 50%;">
+		<center>
+			<table cellpadding="10">
+				<tr>
+					<td>Email</td>
+					<td><input type="email"  th:field="*{email}"></td>
+				</tr>
+				<tr>
+					<td>Password</td>
+					<td><input type="password"  th:field="*{password}"></td>
+				</tr>
+				<tr>
+					<td>Confirm Password</td>
+					<td><input type="password"  th:field="*{confirmPassword}"></td>
+				</tr>
+
+				<tr>
+					<td></td>
+					<td><input style="background-color: green" type="submit" value="Register"></td>
+				</tr>
+
+
+			</table>
+		</center>
+	</div>
+	</form>
+	</div>
+	<!-- footer -->
+
+</body>
+</html>

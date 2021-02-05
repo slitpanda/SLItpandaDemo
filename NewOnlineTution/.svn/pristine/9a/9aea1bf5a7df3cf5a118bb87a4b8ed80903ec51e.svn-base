@@ -1,0 +1,311 @@
+<!doctype html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+
+    <head>
+       <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+
+        <!-- Custom CSS -->
+        <link rel="stylesheet" href="css/style.css">
+        
+          <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+        <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+
+ <script  src="js/teacher.js"></script>
+        <title>Team Work Process</title>
+        
+        <script th:inline="javascript" >
+
+$(document).ready(function() {  
+	
+	checkPassword();
+	checkConfirmPassword();
+ 
+});
+</script>
+    </head>
+
+    <body style="background-image: url('img/a.jpg');">
+        <!-- header -->
+      <div  th:replace="header::header"></div>
+       <!-- / header -->
+       
+         <div class="container-fluid p-5 background_style full_height">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="pl-md-5 pr-md-5">
+                        <div class="card card-body cardposition">
+                            <div class="p-lg-4">
+                                <div class="row no-gutters">
+                                    <div class="d-inline-block pr-3">
+                                        <a href="#">
+                                            <img src="img/logoNew.svg" width="150">
+                                        </a>
+
+                                    </div>
+                                    <div class="d-inline-block">
+                                        <h4 class="text-primary"> සිසු ලියාපදිංචිය</h4>
+                                        <small class="form-text text-muted my-n2">Student Sign Up</small>
+                                        
+                                    </div>
+
+                                </div>
+                               <form action="#" th:action="@{/savestudent}" th:object="${user}" method="post">
+                                <div class="row mt-4">
+                                    <div class="col-md-2 text-md-right">
+                                        <div class="form-row">
+                                            <div class="col-md-12 mt-2">
+                                                Name :
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-10">
+                                        <div class="form-row">
+                                            <div class="col-md-4">
+                                                <div class="form-group">
+                                                    <input type="text" th:field="*{firstName}" class="form-control"  placeholder="First Name" required="">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <input type="text" th:field="*{middlName}" class="form-control"  placeholder="Middle Name" required="">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-5">
+                                                <div class="form-group">
+                                                    <input type="text" th:field="*{lastName}" class="form-control"  placeholder="Last Name" required="">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-2 text-md-right">
+                                        <div class="form-row">
+                                            <div class="col-md-12 mt-2">
+                                                Address Line 1:
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-10">
+                                        <div class="form-row">
+                                            <div class="col-md-12">
+                                                <div class="form-group">
+                                                    <input type="text"  th:field="*{address1}" class="form-control"  placeholder="" required="">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-2 text-md-right">
+                                        <div class="form-row">
+                                            <div class="col-md-12 mt-2">
+                                                Address Line 2:
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-10">
+                                        <div class="form-row">
+                                            <div class="col-md-12">
+                                                <div class="form-group">
+                                                    <input type="text" th:field="*{address2}" class="form-control"  placeholder="" required="">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-2 text-md-right">
+                                        <div class="form-row">
+                                            <div class="col-md-12 mt-2">
+                                                Gender :
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group ">
+                                            <select class="form-control custom-select" th:field="*{gender}">
+                                                <option value="0">--- Select Gender---</option>
+                                                <option value="Male">Male</option>
+                                                <option value="Female">Female</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2 text-md-right">
+                                        <div class="form-row">
+                                            <div class="col-md-12 mt-2" >
+                                                City :
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+
+                                        <div class="form-group">
+                                            <input type="text" th:field="*{city}" class="form-control"  required="">
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div class="row">
+                                    <div class="col-md-2 text-md-right">
+                                        <div class="form-row">
+                                            <div class="col-md-12 mt-2">
+                                                School :
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+
+                                        <div class="form-group">
+                                            <input type="text"  th:field="*{school}" class="form-control"  required="">
+                                        </div>
+                                    </div>
+                                     <div class="col-md-2 text-md-right">
+                                        <div class="form-row">
+                                            <div class="col-md-12 mt-2">
+                                                Grade :
+                                            </div>
+                                        </div>
+                                    </div>
+                                     <div class="col-md-4">
+
+                                        <div class="form-group">
+                                            <input type="text"  th:field="*{grade}" class="form-control"  required="">
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div class="row">
+                                  
+                                    <div class="col-md-2 text-md-right">
+                                        <div class="form-row">
+                                            <div class="col-md-12 mt-2">
+                                                Mobile No. :
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+
+                                        <div class="form-group">
+                                            <input type="number" th:field="*{mobile}" class="form-control"  placeholder="Eg : +94 7* *** ***" required="">
+                                        </div>
+                                    </div>
+                                    
+                                   <div class="col-md-2 text-md-right">
+                                    </div>
+                                    
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <div class="form-check-inline">
+                                                <label class="form-check-label">
+                                                    <input type="checkbox" value="1" th:field="*{viber}" class="form-check-input" >Viber
+                                                </label>
+                                            </div>
+                                            <div class="form-check-inline">
+                                                <label class="form-check-label">
+                                                    <input type="checkbox" value="1" th:field="*{whatsApp}" class="form-check-input" >Whastapp
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-2 text-md-right">
+                                        <div class="form-row">
+                                            <div class="col-md-12 mt-2">
+                                                Email :
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-10">
+                                        <div class="form-group ">
+                                            <input type="email"  th:field="*{username}" class="form-control"  required="">
+                                        </div>
+                                    </div>
+                                    
+                                    
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-2 text-md-right">
+                                        <div class="form-row">
+                                            <div class="col-md-12 mt-2">
+                                                Password :
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group ">
+                                            <input type="password"  th:field="*{password}" class="form-control" id="password" required="">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2 text-md-right">
+                                        <div class="form-row">
+                                            <div class="col-md-12 mt-2">
+                                                Confirm Password :
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+
+                                        <div class="form-group">
+                                            <input type="password"  th:field="*{confirmPassword}" d="confirmPassword" readonly="readonly" class="form-control"  >
+                                        </div>
+                                    </div>
+                                </div>
+
+                             <div class="row">
+                                    <div class="col text-center">
+                                        <button type="submit" class="button mt-4 btn-primary" id="btnUpdate" style="background-color: #035696 ">
+                                            <b> 
+                                                Sign Up |ලියාපදිංචිය
+                                            </b>
+                                        </button>
+                                    </div>
+                                </div>
+                              </form>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+          
+           <!-- footer -->
+            <div  th:replace="footer::footer" >
+                
+            </div>
+            
+            <!-- /footer -->
+     
+
+
+
+       
+        <!-- Optional JavaScript -->
+      
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js">
+        </script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js">
+        </script>
+         <script  th:src="@{/js/scripts.js}"></script>
+    </body>
+
+</html>

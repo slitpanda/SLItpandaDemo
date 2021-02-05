@@ -1,0 +1,236 @@
+package com.itpanda.tution.controller;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import org.omg.CORBA.UserException;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.servlet.view.RedirectView;
+
+import com.itpanda.tution.Constant;
+import com.itpanda.tution.entity.ClassJoin;
+import com.itpanda.tution.entity.Classes;
+import com.itpanda.tution.loginSecurity.entity.User;
+import com.itpanda.tution.loginSecurity.repository.UserRepository;
+import com.itpanda.tution.model.ClassModel;
+import com.itpanda.tution.model.UserDTO;
+import com.itpanda.tution.model.UserModel;
+import com.itpanda.tution.service.ClassJoinService;
+import com.itpanda.tution.service.ClassService;
+import com.itpanda.tution.service.StudentService;
+import com.itpanda.tution.service.TeacherService;
+import com.itpanda.tution.util.TimeFormattor;
+
+@Controller
+public class StudentController {
+
+	@Autowired
+	private StudentService studentService;
+
+	@Autowired
+	private UserRepository userRepository;
+
+	@Autowired
+	private ClassJoinService classJoinService;
+
+	@Autowired
+	private ClassService classService;
+
+	@Autowired
+	private TeacherService teacherService;
+
+	TimeFormattor timeFormattor = new TimeFormattor();
+
+// save new student
+	@RequestMapping(value = "/savestudent", method = RequestMethod.POST)
+	public RedirectView saveStudent(@ModelAttribute("user") UserModel userModel,RedirectAttributes  model) {
+		User user = new User();
+		int enabledUsers = 0;
+	
+		
+		RedirectView redirectView = new RedirectView();
+		try {
+			// copy user model object to user object
+			BeanUtils.copyProperties(userModel, user);
+			
+			
+			redirectView.setContextRelative(true);
+			 
+			model.addFlashAttribute("user", userModel);
+			model.addFlashAttribute("test", "ok");
+		
+			enabledUsers = userRepository.countEnabledUsers(userModel.getUsername());
+
+			if (enabledUsers != 0) {
+				 redirectView.setUrl("/studentregister?register=email");
+				return redirectView;
+			} else {
+				 redirectView.setUrl("/?register=success");
+				user.setUserType(Constant.USER_TYPE_STUDENT);
+				user.setPassword(passGenerator(userModel.getPassword()));
+				user.setEnabled(true);
+				studentService.saveStudent(user);
+				return redirectView;
+			}
+
+		} catch (Exception e) {
+			System.out.println("student register : " + e);
+			redirectView.setUrl("/studentregister?register=error");
+		//	return "redirect:/studentregister?register=error";
+					return redirectView;
+		}
+
+	}
+
+	
+	
+	
+	@RequestMapping(value = "/updateprofile/student", method = RequestMethod.POST)
+	public String editProfile(@ModelAttribute("user") User user) {
+		String password = user.getPassword();
+
+		// get authenticated user details
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		UserDTO u = (UserDTO) authentication.getPrincipal();
+
+		try {
+			user.setId(u.getId());
+			user.setUserType(Constant.USER_TYPE_STUDENT);
+			user.setEnabled(true);
+
+			// check password
+			if (password.equals("")) {
+				// currnt password
+				user.setPassword(u.getPassword());
+
+			} else {
+				// new password
+				user.setPassword(passGenerator(password));
+			}
+
+			userRepository.save(user);
+			return "redirect:/wall?update=success";
+		} catch (Exception e) {
+			System.out.println("student profile edit: " + e);
+			return "redirect:/editprofile/student/" + u.getId() + "?update=error";
+		}
+
+	}
+
+	@RequestMapping("/joinedclasses")
+	public String studentJoinedClasses(Model model) {
+
+		List<ClassModel> joinClassesList = new ArrayList<ClassModel>();
+		Classes classDetails;
+		ClassModel classModel = null;
+		User userDetails;
+		// UserModel userModel=new UserModel();
+		// model.addAttribute("user",userModel);
+		// get authenticated user details
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		UserDTO u = (UserDTO) authentication.getPrincipal();
+
+		if(u!=null) {
+			List<ClassJoin> joinedClassesId = classJoinService.getJoindClassByUserId(u.getId(),
+					Constant.CL_JOIN_STATUS_COMPLETE);
+
+			for (int i = 0; i < joinedClassesId.size(); i++) {
+				classModel = new ClassModel();
+				classDetails = joinedClassesId.get(i).getClasses();
+				userDetails =u.getUser();
+
+				BeanUtils.copyProperties(classDetails, classModel);
+				BeanUtils.copyProperties(classDetails.getClass(), classModel);
+				BeanUtils.copyProperties(classDetails.getTeacher(), classModel);
+				
+				//classModel.setClassId(classDetails.getClassId());
+				classModel.setDate(timeFormattor.dateToString(classDetails.getDate()));
+				classModel.setStartTime(timeFormattor.javaSqlTimeToString(classDetails.getStartTime()));
+				classModel.setEndTime(timeFormattor.javaSqlTimeToString(classDetails.getEndTime()));
+
+				//classModel.setDescriptionEnglish(classDetails.getDescriptionEnglish());
+			//	classModel.setDescriptionSinhala(classDetails.getDescriptionSinhala());
+				//classModel.setTeacherId(classDetails.getTeacher().getTeacherId());
+				//classModel.setAmount(classDetails.getAmount());
+				classModel.setTeacher(userDetails.getFirstName() + " " + userDetails.getMiddlName() + " "
+						+ userDetails.getLastName());
+				classModel.setSubjectName(teacherService.getSubjectById(classDetails.getTeacher().getSubjectId())
+						.get().getSubjectName());
+			//	classModel.setJoinUrl(classDetails.getJoinUrl());
+				//classModel.setTeacherId(classDetails.getTeacher().getTeacherId());
+				joinClassesList.add(classModel);
+
+			}
+
+			model.addAttribute("joinClassesList", joinClassesList);
+			return "studentJoinedClasses";
+		}else {
+			return "redorect:/login";
+		}
+		
+
+	}
+	
+	@GetMapping("/sendmessages")
+	public String sendMessages(Model model) {
+		
+		List<UserModel> userList=new ArrayList<UserModel>();
+		
+		model.addAttribute("users", userList);
+		return "adminSendMessages";
+	}
+	
+	@GetMapping("/searchstudents")
+	public String searchStudentsForSendMessages(@RequestParam("email") String email,@RequestParam("firstName")String firstName,@RequestParam("lastName") String lastName,Model model) {
+		
+		List<User> userList=userRepository.findByUsernameAndFirstNameeAndLastNameUserType("%"+email+"%","%"+firstName+"%","%"+lastName+"%" ,Constant.USER_TYPE_STUDENT);
+		UserModel userModel=null;
+		List<UserModel> userModelList=new ArrayList<UserModel>();
+		List<String> searchedWords=new ArrayList<String>();
+		
+		searchedWords.add(email);
+		searchedWords.add(firstName);
+		searchedWords.add(lastName);
+		
+		
+		if(userList.size()>0) {
+			
+			for(int i=0;i<userList.size();i++) {
+				userModel=new UserModel();
+				BeanUtils.copyProperties(userList.get(i), userModel);
+				userModel.setFullName(userList.get(i).getFirstName()+" "+userList.get(i).getMiddlName()+" "+userList.get(i).getLastName());
+				userModelList.add(userModel);
+			}
+			
+			model.addAttribute("notFound", false);
+		}else {
+			model.addAttribute("notFound", true);
+		}
+		
+        model.addAttribute("users", userModelList);
+        model.addAttribute("searchedWords", searchedWords);
+		return "adminSendMessages";
+		
+		
+	}
+
+//for encode a string
+
+	public String passGenerator(String password) {
+		BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder(4);
+		return bCryptPasswordEncoder.encode(password);
+	}
+}

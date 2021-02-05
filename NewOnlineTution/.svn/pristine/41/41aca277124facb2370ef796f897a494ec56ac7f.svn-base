@@ -1,0 +1,75 @@
+package com.itpanda.tution.service;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.itpanda.tution.entity.ClassCategory;
+import com.itpanda.tution.entity.Subject;
+import com.itpanda.tution.entity.Teacher;
+import com.itpanda.tution.loginSecurity.entity.User;
+import com.itpanda.tution.loginSecurity.repository.UserRepository;
+import com.itpanda.tution.repository.ClassCategoryRepository;
+import com.itpanda.tution.repository.SubjectRepository;
+import com.itpanda.tution.repository.TeacherRepository;
+
+@Service
+@Transactional
+public class TeacherService {
+
+	@Autowired
+	private ClassCategoryRepository classCategoryRepository;
+	
+	@Autowired
+	private SubjectRepository subjectRepository;
+	
+	@Autowired
+	private TeacherRepository teacherRepository;
+	
+	@Autowired
+	UserRepository userRepository;
+	
+	// get All class category from classcategory table 
+	public List<ClassCategory> getAllClassCategories(){
+		
+		return classCategoryRepository.findAll();
+	}
+	
+	//get all subjects  from subject table
+	
+	public List<Subject> getAllSubjects(){
+		return subjectRepository.findAll();
+	}
+	
+	// save new teacher
+	
+	public void saveTacher(Teacher teacher) {
+		teacherRepository.save(teacher);
+		
+	}
+	
+	//find teacher by email
+	public List<User> findTeacherByEmail(String email) {
+		return  userRepository.findByEmail(email);
+	}
+	
+	//find teacher by userId
+	
+	public List<Teacher> findTeacherByUserId(Long userId) {
+		return teacherRepository.findByUserId(userId);
+	}
+	
+	//find Teachers
+	
+	public List<User> findTeachers(){
+		return userRepository.findTeachers();
+	}
+	
+	//find teacher by teacher Id
+	public List<Teacher> getTeacherById(int teacherId){
+		
+		return teacherRepository.findByTeacherId(teacherId);
+	}
+}

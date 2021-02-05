@@ -1,0 +1,463 @@
+package com.itpanda.tution.controller;
+
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.sql.Blob;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
+
+import javax.imageio.ImageIO;
+import javax.sql.rowset.serial.SerialBlob;
+
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.ModelAndView;
+
+import com.itpanda.tution.Constant;
+import com.itpanda.tution.entity.Banks;
+import com.itpanda.tution.entity.ClassCategory;
+import com.itpanda.tution.entity.Classes;
+import com.itpanda.tution.entity.Subject;
+import com.itpanda.tution.entity.Teacher;
+import com.itpanda.tution.loginSecurity.entity.User;
+import com.itpanda.tution.loginSecurity.repository.UserRepository;
+import com.itpanda.tution.model.ClassCategoryModel;
+import com.itpanda.tution.model.SubjectModel;
+import com.itpanda.tution.model.TeacherModel;
+import com.itpanda.tution.model.UserDTO;
+import com.itpanda.tution.model.UserModel;
+import com.itpanda.tution.repository.BankRepository;
+import com.itpanda.tution.service.ClassService;
+import com.itpanda.tution.service.StudentService;
+import com.itpanda.tution.service.TeacherService;
+
+import net.coobird.thumbnailator.Thumbnails;
+
+@Controller
+public class TeacherController {
+
+	@Autowired
+	TeacherService teacherService;
+	
+	@Autowired
+	StudentService studentService;
+	
+	@Autowired
+	ClassService classService;
+	
+	@Autowired
+	UserRepository userRepository;
+	
+	@Autowired
+	BankRepository bankRepository;
+	
+	@Value("${onlinetution.bankslip.derectrory}")
+	String UPLOAD_DIR;
+	//load teacher register page
+	@RequestMapping("/teacherregister")
+	public String teacherRegister(Model model) {
+		
+		
+		UserModel userModel=new UserModel();
+		ClassCategoryModel classCategoryModel=null;
+		SubjectModel subjectModel=null;
+        List<ClassCategoryModel> classCategoryModelList=new ArrayList<ClassCategoryModel>();
+        List<SubjectModel> subjectModelList=new ArrayList<SubjectModel>();
+		
+		// get all class categories
+		List<ClassCategory> classCategoryList=teacherService.getAllClassCategories();
+		//get all subjects
+		List<Subject> subjectList=teacherService.getAllSubjects();
+		
+		if(classCategoryList.size()>0 && subjectList.size()>0) {
+			
+			//copy data to models
+			for(int i=0;i<classCategoryList.size();i++) {
+				classCategoryModel=new ClassCategoryModel();
+				BeanUtils.copyProperties(classCategoryList.get(i), classCategoryModel);
+				classCategoryModelList.add(classCategoryModel);
+			}
+			
+			for(int i=0;i<subjectList.size();i++) {
+				subjectModel=new SubjectModel();
+				BeanUtils.copyProperties(subjectList.get(i), subjectModel);
+				BeanUtils.copyProperties(subjectList.get(i).getClassCategory(), subjectModel);
+				subjectModelList.add(subjectModel);
+			}
+			
+			
+			
+			
+			model.addAttribute("user",userModel);
+			model.addAttribute("classCategoryList",classCategoryModelList);
+			model.addAttribute("subjectList", subjectModelList);
+			return "teacherRegister";
+			
+			
+		}else {
+			return "redirect:errorpage?message=erro_roccurred";
+		}
+		
+		
+		
+		
+		
+	}
+	
+	
+	//save new teacher
+	
+	@RequestMapping(value = "/saveteacher" , method = RequestMethod.POST)
+	public String saveTeacher(@ModelAttribute("user") UserModel userModel) throws IOException {
+		
+		User user=new User();
+		int enabledUsers=0;
+		Teacher teacher=new Teacher();
+		Banks banks=new Banks();
+		
+		try {
+			enabledUsers=userRepository.countEnabledUsers(userModel.getUsername());
+			if(enabledUsers!=0) {
+				return "redirect:/teacherregister?register=email";
+			}else {
+				BeanUtils.copyProperties(userModel, user);
+				
+				user.setUserType(Constant.USER_TYPE_TEACHER);
+				user.setPassword(passGenerator(userModel.getPassword()));
+				user.setEnabled(true);
+				
+			//	banks.setBankId(1);
+				
+			
+				
+				//save user details
+				User newUser=studentService.saveStudent(user);
+				
+
+				// copy user model object to teacher object
+						BeanUtils.copyProperties(userModel, teacher);
+						//teacher.setUserId(newUser.getId());
+						teacher.setUser(newUser);
+						//teacher.setBanks(banks);
+						teacher.setProImage(userModel.getProImage().getBytes());
+						// save teacher details
+						teacherService.saveTacher(teacher);
+						return "redirect:/?register=success";
+			}
+			
+		} catch (Exception e) {
+			System.out.println("teacher register : "+e);
+			return "redirect:/teacherregister?register=error";
+			
+		}
+		
+		// copy user model object to user object
+	
+				
+				//upload pro image
+				
+
+
+
+
+	/*	
+		try {
+        //	byte[] bytes = userModel.getProImage().getBytes();
+            String path = UPLOAD_DIR + newUser.getId()+"_proImage."+userModel.getProImage().getOriginalFilename().split("\\.")[1];
+          //  Files.write(path, bytes);
+           
+            Thumbnails.of(userModel.getProImage().getInputStream()).size(400, 400).toFile(path);
+           
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.out.println(e.getMessage());
+        }
+		*/
+				
+	//	List<User> userList=teacherService.findTeacherByEmail(userModel.getUsername());
+		
+		
+	
+		
+		
+	}
+	
+	
+	@RequestMapping(value = "/updateprofile/teacher", method = RequestMethod.POST)
+	public String editProfile(@ModelAttribute("user") UserModel userModel) throws IOException {
+		
+		User user=new User();
+		Teacher teacher=new Teacher();
+		String password = userModel.getPassword();
+		
+		
+		
+		// get authenticated user details
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		UserDTO u = (UserDTO) authentication.getPrincipal();
+		
+		try {
+			List userList=userRepository.findUserById(u.getId());
+			if(!userList.isEmpty()) {
+				user=(User)userList.get(0);
+				teacher=user.getTeacher();
+				
+			}
+			// copy user model object to user object
+			BeanUtils.copyProperties(userModel, user);
+			BeanUtils.copyProperties(userModel, teacher);
+			//teacher.setLocation("Kandy2"); //For testing
+			
+			//user.setId(u.getId());
+			user.setUserType(Constant.USER_TYPE_TEACHER);
+			user.setEnabled(true);
+			
+			// check password
+			if (password.equals("")) {
+				// currnt password
+				user.setPassword(u.getPassword());
+
+			} else {
+				// new password
+				user.setPassword(passGenerator(password));
+			}
+			
+			
+			
+			// check profile image is empty
+			if(!userModel.getProImage().isEmpty()) {
+				teacher.setProImage(userModel.getProImage().getBytes());
+			}else {
+				
+		       //teacher.setProImage(teacherService.getProImageByUserId(u.getId()));
+			}
+
+			
+			userRepository.save(user);
+			return "redirect:/wall?update=success";
+		} catch (Exception e) {
+			System.out.println("teacher profile edit: "+e);
+			return "redirect:/editprofile/teacher/"+u.getId()+"?update=error";
+		}
+		
+	
+	}
+	
+	//load my classes
+	@RequestMapping("/classes/{id}")
+	public String myClasses(@PathVariable(name = "id") Long id,Model model) {
+		
+		
+		
+		List<Teacher> teacherList=teacherService.findTeacherByUserId(id);
+		List<Classes> classList=classService.getClassByTeacher(teacherList.get(0));
+		
+		model.addAttribute("classList", classList);
+		return "myClasses";
+	}
+	
+	// load teachers on admin panel
+	@RequestMapping("/teacherList")
+	public String getAllTeachers(Model model) {
+		
+		TeacherModel teacherModel=null;
+		ClassCategoryModel classCategoryModel=null;
+		SubjectModel subjectModel=null;
+        List<ClassCategoryModel> classCategoryModelList=new ArrayList<ClassCategoryModel>();
+        List<SubjectModel> subjectModelList=new ArrayList<SubjectModel>();
+		List<TeacherModel> teacherModelList=new ArrayList<TeacherModel>();
+	    
+		List<Teacher> teacherList=teacherService.getAllTeachers();
+		
+		List<String> idList=new ArrayList<String>();
+		idList.add("0");
+		idList.add("0");
+		idList.add("0");
+		
+		// get All Class Categories
+		List<ClassCategory> categoryList = teacherService.getAllClassCategories();
+		
+		// get All Subjects
+	List<Subject> subjectList = teacherService.getAllSubjects();
+	
+	if(teacherList.size()>0 && categoryList.size()>0 && subjectList.size()>0) {
+		
+		//copy data to models
+		for (int i = 0; i < categoryList.size(); i++) {
+			classCategoryModel = new ClassCategoryModel();
+			BeanUtils.copyProperties(categoryList.get(i), classCategoryModel);
+			classCategoryModelList.add(classCategoryModel);
+		}
+
+		for (int i = 0; i < subjectList.size(); i++) {
+			subjectModel = new SubjectModel();
+			BeanUtils.copyProperties(subjectList.get(i), subjectModel);
+			BeanUtils.copyProperties(subjectList.get(i).getClassCategory(), subjectModel);
+			subjectModelList.add(subjectModel);
+		}
+		for (int i = 0; i < teacherList.size(); i++) {
+			teacherModel = new TeacherModel();
+			BeanUtils.copyProperties(teacherList.get(i), teacherModel);
+			BeanUtils.copyProperties(teacherList.get(i).getUser(), teacherModel);
+			teacherModel.setMiddleName(teacherList.get(i).getUser().getMiddlName());
+			teacherModel.setUserId(teacherList.get(i).getUser().getId());
+			teacherModelList.add(teacherModel);
+		}
+			
+			model.addAttribute("teacherList", teacherModelList);
+			model.addAttribute("categoryList", classCategoryModelList);
+			model.addAttribute("subjectList", subjectModelList);
+			model.addAttribute("idList", idList);
+			
+			
+			return "adminTeacherList";
+	}else {
+		return "redirect:errorpage?message=erro_roccurred";
+	}
+	
+						
+	
+	}
+	
+	
+	// search teacher
+	@RequestMapping("/searchteachers")
+	public String searchTeachers(@RequestParam("clCategory") String clCategory, @RequestParam("subject") String subject,
+			@RequestParam("teacher") String teacher, Model model) {
+		
+		TeacherModel teacherModel=null;
+		ClassCategoryModel classCategoryModel=null;
+		SubjectModel subjectModel=null;
+        List<ClassCategoryModel> classCategoryModelList=new ArrayList<ClassCategoryModel>();
+        List<SubjectModel> subjectModelList=new ArrayList<SubjectModel>();
+		List<TeacherModel> teacherModelList=new ArrayList<TeacherModel>();
+		
+		
+		List<String> idList=new ArrayList<String>();
+		
+		
+		idList.add(clCategory);
+		idList.add(subject);
+		
+		
+		List<Teacher> teacherList=teacherService.searchTeachers(Integer.parseInt(clCategory), Integer.parseInt(subject));
+		
+		// get All Class Categories
+				List<ClassCategory> categoryList = teacherService.getAllClassCategories();
+				
+				// get All Subjects
+				List<Subject> subjectList = teacherService.getAllSubjects();
+				
+				if(categoryList.size()>0 && subjectList.size()>0) {
+					
+
+					// copy data to models
+					for (int i = 0; i < categoryList.size(); i++) {
+						classCategoryModel = new ClassCategoryModel();
+						BeanUtils.copyProperties(categoryList.get(i), classCategoryModel);
+						classCategoryModelList.add(classCategoryModel);
+					}
+
+					for (int i = 0; i < subjectList.size(); i++) {
+						subjectModel = new SubjectModel();
+						BeanUtils.copyProperties(subjectList.get(i), subjectModel);
+						BeanUtils.copyProperties(subjectList.get(i).getClassCategory(), subjectModel);
+						subjectModelList.add(subjectModel);
+					}
+
+					for (int i = 0; i < teacherList.size(); i++) {
+						teacherModel = new TeacherModel();
+
+						BeanUtils.copyProperties(teacherList.get(i), teacherModel);
+						BeanUtils.copyProperties(teacherList.get(i).getUser(), teacherModel);
+						teacherModel.setMiddleName(teacherList.get(i).getUser().getMiddlName());
+						teacherModel.setUserId(teacherList.get(i).getUser().getId());
+						teacherModelList.add(teacherModel);
+					}
+					
+					
+					model.addAttribute("teacherList", teacherModelList);
+					model.addAttribute("categoryList", classCategoryModelList);
+					model.addAttribute("subjectList", subjectModelList);
+					model.addAttribute("idList", idList);
+			
+			return "adminTeacherList";
+					
+				}else {
+					return "redirect:errorpage?message=erro_roccurred";
+				}
+				
+	}
+	
+	// get a teacher
+	@RequestMapping("/teacher/{id}")
+	public String getSingleTeacher(@PathVariable(name = "id") int id ,Model model ) {
+		
+		
+		TeacherModel teacherModel=new TeacherModel();
+		List<Banks> bankList=new ArrayList<Banks>();
+		//List<User> userDetails=userRepository.findUserById(id);
+		List<Teacher> teacherDetails=teacherService.getTeacherById(id);
+		Optional<Subject> subject=teacherService.getSubjectById(teacherDetails.get(0).getSubjectId());
+		
+		if(teacherDetails.size()>0 && subject!=null) {
+			
+			bankList=bankRepository.findAll();
+			
+			if(bankList.size()>0) {
+				
+				if(teacherDetails.get(0).getBanks()!=null) {
+					BeanUtils.copyProperties( teacherDetails.get(0).getBanks(),teacherModel);
+				}
+			BeanUtils.copyProperties(teacherDetails.get(0).getUser(),teacherModel);
+			BeanUtils.copyProperties( teacherDetails.get(0),teacherModel);
+			
+			teacherModel.setMiddleName(teacherDetails.get(0).getUser().getMiddlName());
+			teacherModel.setClCategoryName(subject.get().getClassCategory().getStream());
+			teacherModel.setMedium(subject.get().getClassCategory().getMedium());
+			teacherModel.setSubjectName(subject.get().getSubjectName());
+			model.addAttribute("teacher", teacherModel);
+			model.addAttribute("bankList", bankList);
+			
+			
+			
+			return "singleTeacher";
+			
+			}else {
+				return "redirect:errorpage?message=erro_roccurred";
+			}
+			
+		}else {
+			return "redirect:errorpage?message=erro_roccurred";
+		}
+		
+		
+	}
+	
+	
+	
+	
+	//for encode a string
+
+	public String passGenerator(String password) {
+		BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder(4);
+		return bCryptPasswordEncoder.encode(password);
+	}
+	
+}

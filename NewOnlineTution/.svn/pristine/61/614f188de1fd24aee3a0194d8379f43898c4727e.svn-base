@@ -1,0 +1,23 @@
+package com.itpanda.tution.repository;
+
+import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+
+import com.itpanda.tution.entity.Classes;
+
+public interface ClassesRepository extends JpaRepository<Classes, Integer>{
+
+	
+	@Query(value = "select * from class where teacher_id=?1 and cl_category_id=?2 and subject_id=?3 order by date desc ", nativeQuery = true)
+	List<Classes> searchClass(int teacherId,int clCategoryId,int subjectId);
+	
+	List<Classes> findByClassId(int classId);
+	
+	List<Classes> findByTeacherId(int teacherId);
+	
+	@Query(value = "select * from class where class_id=?1" ,nativeQuery = true)
+	Classes getClassByClassId(int classId);
+	
+}

@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <meta name="description" content="" />
+        <meta name="author" content="" />
+        <title>Dashboard -  Admin</title>
+       
+          <!-- Custom CSS -->
+     
+         <link rel="stylesheet" href="/css/style.css">
+          <link href="/css/adminstyles.css" rel="stylesheet" />
+         
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/js/all.min.js" crossorigin="anonymous"></script>
+         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+          <script src="https://code.jquery.com/jquery-3.5.1.min.js" crossorigin="anonymous"></script>
+          
+           <style>
+            body {
+    font-family: 'Kanit', sans-serif;
+          }
+
+            /* Header/Blog Title */
+            
+            .header {
+                padding: 30px;
+                font-size: 40px;
+                text-align: center;
+                background: white;
+            }
+            .card {
+                background-color: white;
+                margin-top: 20px;
+                border-radius: 20px;
+                transition: 0.3s;
+                box-shadow: 0 2px 4px 0 rgba(0,0,0,0.1);
+            }
+            .card:hover {
+                box-shadow: 0 8px 16px 0 rgba(0,0,0,0.1);
+            }
+            h2{
+                color: #65676b;
+            }
+
+
+            /* Clear floats after the columns */
+            .row:after {
+                content: "";
+                display: table;
+                clear: both;
+            }
+
+            .card-style {
+                padding: 2px 16px;
+            }
+            .colwrap {
+                position: absolute; 
+                top: 10px; 
+                background: #eee;
+                background: transparent;
+
+            }
+            .sticky-top { top: 6em; }
+
+            </style>
+          
+             <script th:inline="javascript">
+
+$(document).ready(function() {  
+	
+	 
+	/*<![CDATA[*/
+
+		
+		admin= /*[[${#request.userPrincipal.principal.userType=='admin'}]]*/;
+	   dataEntry= /*[[${#request.userPrincipal.principal.userType=='data_entry'}]]*/;
+		/*]]>*/
+
+        	
+		checkUserType();
+		
+
+	});
+</script>
+    </head>
+    <body class="sb-nav-fixed" style="background-image: url('/img/a.jpg');">
+    
+     
+    <!-- navigation -->
+    <div class="fixed-top">
+    <div th:replace="sidebar::navigation"></div>
+	</div>
+    
+        <div id="layoutSidenav">
+        <!-- side bar -->
+            <div th:replace="sidebar::sidebar"></div>
+            
+            <div id="layoutSidenav_content">
+                <main>
+               
+                   <div class="container-fluid"  style="margin-top:40px">
+                    
+                     <!--start alert message -->	
+					 <div class="alert alert-success mt-2" th:if="${param.upload}" id="alertMsgBox" style="text-align: center;" >
+				 
+                 <span id="alertMsg" >Bank Slip Upload Success</span> 
+                 </div>
+                 <!--end alert message -->	
+                    <div class="row animate__animated animate__fadeIn">
+                    
+                        <div class="col-md-3 order-md-1 order-1" >
+                        
+                            <div class="card card-style text-center pb-3 sticky-top" th:if="${#request.userPrincipal.principal.userType=='student' || #request.userPrincipal.principal.userType=='admin'} " >
+                                <h2>Joined Classes</h2>
+                                <p>Some text about me in culpa qui officia deserunt mollit anim..</p>
+                                <a th:href="@{/joinedclasses}"><button class="button btn-primary btn-block text-light" style="background-color: #035696 ">Joined Classes</button></a>
+                                <hr>
+                                <h2>Find Class</h2>
+                                <p>Some text about me in culpa qui officia deserunt mollit anim..</p>
+                                <a th:href="@{/findclass}"><button class="button btn-primary btn-block text-light" style="background-color: #035696 ">Find Class</button></a>
+
+                            </div>
+                            
+                             <div class="card card-style text-center pb-3 sticky-top" th:if="${#request.userPrincipal.principal.userType=='teacher' }" >
+                                <h2>My Classes</h2>
+                                <p>Some text about me in culpa qui officia deserunt mollit anim..</p>
+                                <a  th:href="@{'/classes/'+${#request.userPrincipal.principal.id}}"><button class="button btn-primary btn-block text-light" style="background-color: #035696 ">My Classes</button></a>
+                                
+                            </div>
+
+                        </div>
+                        <div class="col-md-6  order-md-2 order-3 pb-2">
+                            <div class="card">
+                                <div class="card-body"> <h2>TITLE HEADING</h2>
+                                    <h5>Title description, Dec 7, 2017</h5>
+                                    <div ><img src="img/news01.jpg" class="img-fluid" alt="Responsive image"></div>
+                                    <div class="card-body"> <p>Some text..</p>
+                                        <p>Sunt in culpa qui officia deserunt mollit anim id est laborum consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card">
+                                <div class="card-body"> <h2>TITLE HEADING</h2>
+                                    <h5>Title description, Dec 7, 2017</h5>
+                                    <div ><img src="img/news02.jpg" class="img-fluid" alt="Responsive image"></div>
+                                    <div class="card-body"> <p>Some text..</p>
+                                        <p>Sunt in culpa qui officia deserunt mollit anim id est laborum consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3  order-md-3  order-2">
+                            <div class="card card-style sticky-top">
+                                <h2>About Me</h2>
+                                <div style="height:100px;"></div>
+                            <p>Some text about me in culpa qui officia deserunt mollit anim..</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+                </main>
+                
+                <!-- footer -->
+            <div  th:replace="footer::footer" >
+                
+            </div>
+            
+            <!-- /footer -->
+               
+            </div>
+        </div>
+      
+            
+       
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js">
+        </script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js">
+        </script>
+        <script  th:src="@{/js/scripts.js}"></script>
+     
+      
+    </body>
+</html>

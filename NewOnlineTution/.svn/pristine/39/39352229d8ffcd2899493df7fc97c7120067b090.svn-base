@@ -1,0 +1,159 @@
+var catList;
+var subjectList;
+var teacherList;
+var idList;
+var classList;
+	
+
+$("#clCategory").on('change',function(){
+		var selectedClassCategoryId=parseInt($(this).val());
+		
+		if(selectedClassCategoryId!=0){
+			$("#techers").html("<option value='0'>--- Select Teacher ---</option>");
+			
+			var htmlCode="<option value='0'>--- Select Subject ---</option>";
+			
+			for(var i=0;i<subjectList.length;i++){
+				
+				
+				if(subjectList[i].clCategoryId==selectedClassCategoryId){
+					htmlCode=htmlCode+"<option  value='"+subjectList[i].subjectId+"'>"+subjectList[i].subjectName+"</option>";
+				}
+			}
+			
+			$("#subjects").html(htmlCode);
+		}else{
+			$("#techers").html("<option value='0'>--- Select Teacher ---</option>");
+			
+			$("#subjects").html("<option value='0'>--- Select Subject ---</option>");
+		}
+		
+	});
+
+
+//get Teachers according to class category and subject
+
+	
+	$("#subjects").on('change',function(){
+		var count=0;
+		var selectedSubjectId=parseInt($(this).val());
+		if(selectedSubjectId!=0){
+			var selectedClassCategoryId=parseInt($("#clCategory").val());
+			var htmlCodes="<option value='0'>--- Select Teacher ---</option>";
+			
+			
+			
+				for(var i=0;i<teacherList.length;i++){
+					
+					if(teacherList[i].clCategoryId===selectedClassCategoryId && teacherList[i].subjectId=== selectedSubjectId){
+						count++;
+						htmlCodes=htmlCodes+"<option  value='"+teacherList[i].teacherId+"'>"+teacherList[i].firstName+" "+teacherList[i].middleName+" "+teacherList[i].lastName+"</option>";
+						
+						
+					}
+					
+					
+					
+					
+				}
+				
+				if(count!=0){
+					$("#techers").html(htmlCodes);
+					
+				}else{
+					$("#techers").html("<option value='0'>No Teachers Available</option>");	
+				
+				}
+				
+			
+				
+			
+				
+			
+			
+		}else{
+			$("#techers").html("<option value='0'>--- Select Teacher ---</option>");	
+		}
+		
+	});
+
+	
+	$("#techers").on('change',function(){
+		var selectedTeacher=parseInt($(this).val());
+		
+	});
+	
+	// submit find class form
+	 
+	
+	$("#btnFind").on('click',function(){
+		
+		if($("#clCategory").val()==0){
+			 $("#alertMsgBox").attr("hidden",false);
+			 $("#alertMsg").text('Select At Least Category And Subject');
+			 
+			$("#clCategory").focus();
+		}else{
+			if($("#subjects").val()==0){
+				$("#subjects").focus();
+				$("#alertMsgBox").attr("hidden",false);
+				 $("#alertMsg").text('Select At Least Category And Subject');
+			}else{
+				$("#findClassForm").submit();
+			}
+			
+		}
+		
+	})	; 
+	 
+	
+	//set select box values according to searched ids
+	function searchIds(){
+		
+		
+		var subjecthtmlCode="<option value='0'>--- Select Subject ---</option>";
+		var teacherHtmlCodes="";
+		
+		$("#clCategory").val(idList[0]);
+		
+		if(idList[0]!=0 && idList[1]!=0  ){
+			
+			for(var j=0;j<subjectList.length;j++){
+				if(subjectList[j].clCategoryId===idList[0]){
+					subjecthtmlCode=subjecthtmlCode+"<option  value='"+subjectList[j].subjectId+"'>"+subjectList[j].subjectName+"</option>";
+				}
+			}
+			$("#subjects").html(subjecthtmlCode);
+			$("#subjects").val(idList[1]);
+			
+			if(teacherList.length!=0){
+				
+				
+				var teacherHtmlCodes="<option value='0'>--- Select Teacher ---</option>";
+				for(var x=0;x<teacherList.length;x++){
+					if(teacherList[x].clCategoryId===idList[0] && teacherList[x].subjectId=== idList[1]){
+						teacherHtmlCodes=teacherHtmlCodes+"<option  value='"+teacherList[x].teacherId+"'>"+teacherList[x].firstName+" "+teacherList[x].middleName+" "+teacherList[x].lastName+"</option>";
+					}
+					
+				}
+				$("#techers").html(teacherHtmlCodes);
+				$("#techers").val(idList[2]);
+			
+				if(classList.length===0){
+					$("#noDataMsg").text("No Classes Available").css("color","red").css("text-align","center");
+					
+				}
+			
+			
+			
+		}else{
+			$("#subjects").html("<option value='0'>Select Subject</optioin>");
+			$("#techers").html("<option value='0'>Select Teacher</optioin>");
+		}
+		
+		
+		
+		
+	}
+	}
+	

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="ISO-8859-1">
+<title>Insert title here</title>
+</head>
+<body >
+
+<!-- header start -->
+	<div style="width: 100%; background-color: #000; height: 40px;">
+
+	</div>
+	
+	
+<div th:each="user : ${user}" style="margin-top:30px;">
+
+<div>
+<a  th:if="${user.userType=='teacher'}" th:href="@{'/findClass'}"><button style="float: right; background-color: green; height: 30px;">Add Class</button></a>
+<a  th:unless="${user.userType=='student'}" th:href="@{'/findClass'}"><button style="float: right; background-color: green; height: 30px;">Find Class</button></a>
+</div>
+
+<h1>Welcome <span th:text=" ${user.firstName} ">
+</span> <span th:text="${user.lastName}"></span></h1>
+
+
+
+</div>
+
+</body>
+</html>

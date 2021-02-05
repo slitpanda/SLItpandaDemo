@@ -1,0 +1,161 @@
+package com.itpanda.tution.loginSecurity.controller;
+
+import java.util.Optional;
+
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.ModelAndView;
+
+import com.itpanda.tution.Constant;
+import com.itpanda.tution.entity.ClassCategory;
+import com.itpanda.tution.entity.Subject;
+import com.itpanda.tution.loginSecurity.entity.User;
+import com.itpanda.tution.loginSecurity.repository.UserRepository;
+import com.itpanda.tution.model.UserDTO;
+import com.itpanda.tution.model.UserModel;
+import com.itpanda.tution.repository.ClassCategoryRepository;
+import com.itpanda.tution.repository.SubjectRepository;
+import com.itpanda.tution.service.TeacherService;
+
+@Controller
+public class AppController {
+	
+	@Autowired
+	UserRepository UserRepository;
+	
+	@Autowired
+	TeacherService teacherService;
+	
+	@Autowired
+	ClassCategoryRepository classCategoryRepository;
+	
+	@Autowired
+	SubjectRepository subjectRepository;
+
+	@GetMapping({"/login"})
+	public String index() {
+		return "index";
+	}
+	
+	@GetMapping("/wall")
+	public String menu() {
+		
+		// get authenticated user details
+				Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+				UserDTO u = (UserDTO) authentication.getPrincipal();
+				
+				
+				
+				if(u.getUserType().equals("admin") || u.getUserType().equals("data_entry")) {
+					return "redirect:bankslips";
+				}else {
+					return "wall";
+				}
+		
+	
+	}
+	
+	@GetMapping("/user")
+	public String user() {
+		return "user";
+	}
+	
+	@GetMapping("/admin")
+	public String admin() {
+		return "admin";
+	}
+	
+	@GetMapping("/about")
+	public String aboutus(Model model) {
+		
+		
+		if(isLogged()) {
+			return "about";
+
+			
+		}else {
+			return "aboutUs";
+
+		}
+		
+		
+		}
+	
+	@RequestMapping("/studentregister")
+	public String studentRegister(Model model) {
+		
+		UserModel userModel=new UserModel();
+		model.addAttribute("user",userModel);
+		return "StudentRegister";
+	}
+	
+
+	@GetMapping("/editprofile/{type}/{id}")
+	public ModelAndView editProfile(@PathVariable(name="type") String userType,@PathVariable(name = "id") Long userId,Model model) {
+		
+		UserModel userModel=new UserModel();
+		Optional<ClassCategory> classCategory;
+		Optional<Subject> subject;
+		
+		// get authenticated user details
+				Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+				UserDTO u = (UserDTO) authentication.getPrincipal();
+		//Optional<User> userDetails=UserRepository.findById(userId);
+		if(userType.equals(Constant.USER_TYPE_STUDENT)) {
+			ModelAndView mav = new ModelAndView("studentProfileEdit");
+			
+			
+		
+			//BeanUtils.copyProperties(userDetails.getWrappedInstance(), userModel);
+			//userModel.setConfirmPassword("");
+			mav.addObject("user",u.getUser());
+			return mav;
+		}else {
+			ModelAndView login = new ModelAndView("index");
+			if(u!=null) {
+				BeanUtils.copyProperties(u.getUser(), userModel);
+				BeanUtils.copyProperties(u.getUser().getTeacher(), userModel);
+				classCategory=teacherService.getCategoryById(u.getUser().getTeacher().getClCategoryId());
+				subject=teacherService.getSubjectById(userModel.getSubjectId());
+				userModel.setClCategoryName(classCategory.get().getStream() +" "+classCategory.get().getMedium());
+				userModel.setSubjectName(subject.get().getSubjectName());
+				ModelAndView mav = new ModelAndView("teacherProfileEdit");
+				mav.addObject("user",userModel);
+				return mav;
+			}else {
+				return login;
+			}
+		
+			
+		
+		}
+		
+		
+		
+		
+		
+	}
+	
+	
+
+	
+
+	
+	
+	 public static boolean isLogged() {
+	        final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+	        return null != authentication && !("anonymousUser").equals(authentication.getName());
+	    }
+	    // ...
+	    // Any another methods, for example, logout
+	
+	
+	 
+}

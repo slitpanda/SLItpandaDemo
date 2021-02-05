@@ -1,0 +1,53 @@
+var searchedWords;
+var id;
+function setSerachedWords() {
+
+	if (searchedWords.length > 0) {
+
+		if (searchedWords[0] != null) {
+			$("#email").val(searchedWords[0]);
+		}
+		if (searchedWords[1] != null) {
+			$("#firstName").val(searchedWords[1]);
+		}
+		if (searchedWords[2] != null) {
+			$("#lastName").val(searchedWords[2]);
+		}
+	}
+
+}
+
+
+$("#studentTable #studentRow #studentCol").on('click', 'button', function() {
+	
+	 id= $(this).parent().find('#hiddenUserId').val();
+	var name=$('#userName'+id).text();
+	
+	var modal =$('#myModal'+id);
+	 modal.css('display','block');
+	 
+	 $('#name'+id).text("To :"+name);
+	 
+	 
+	 
+});
+
+$("#closeSpan"+id).on('click', function() {
+	
+		var modal =$('#myModal'+id);
+modal.css('display','none');
+	 
+	 
+	 
+});
+
+
+
+$(window).on('click',function(event){
+	var modal =$('#myModal'+id);
+	  if (event.target == modal) {
+		  
+			 modal.css('display','block');
+	  }
+});
+

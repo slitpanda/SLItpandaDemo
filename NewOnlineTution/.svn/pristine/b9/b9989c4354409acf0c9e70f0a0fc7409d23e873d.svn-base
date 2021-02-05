@@ -1,0 +1,58 @@
+package com.itpanda.tution.loginSecurity.controller;
+
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import com.itpanda.tution.model.UserDTO;
+import com.itpanda.tution.model.UserModel;
+
+@Controller
+public class AppController {
+
+	@GetMapping({"/login"})
+	public String index() {
+		return "index";
+	}
+	
+	@GetMapping("/wall")
+	public String menu() {
+		
+		// get authenticated user details
+				Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+				UserDTO u = (UserDTO) authentication.getPrincipal();
+				
+				if(u.getUserType().equals("admin") || u.getUserType().equals("data_entry")) {
+					return "redirect:bankslips";
+				}else {
+					return "wall";
+				}
+		
+	
+	}
+	
+	@GetMapping("/user")
+	public String user() {
+		return "user";
+	}
+	
+	@GetMapping("/admin")
+	public String admin() {
+		return "admin";
+	}
+	
+	@RequestMapping("/studentregister")
+	public String studentRegister(Model model) {
+		
+		UserModel userModel=new UserModel();
+		model.addAttribute("user",userModel);
+		return "studentRegister";
+	}
+	
+
+	
+	 
+}

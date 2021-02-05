@@ -1,0 +1,300 @@
+-- phpMyAdmin SQL Dump
+-- version 4.7.9
+-- https://www.phpmyadmin.net/
+--
+-- Host: 127.0.0.1:3306
+-- Generation Time: Aug 09, 2020 at 10:28 PM
+-- Server version: 5.7.21
+-- PHP Version: 5.6.35
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET AUTOCOMMIT = 0;
+START TRANSACTION;
+SET time_zone = "+00:00";
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+
+--
+-- Database: `tution`
+--
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `advertisement`
+--
+
+DROP TABLE IF EXISTS `advertisement`;
+CREATE TABLE IF NOT EXISTS `advertisement` (
+  `ad_id` int(11) NOT NULL AUTO_INCREMENT,
+  `image` varchar(255) NOT NULL,
+  `description` varchar(255) NOT NULL,
+  PRIMARY KEY (`ad_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `class`
+--
+
+DROP TABLE IF EXISTS `class`;
+CREATE TABLE IF NOT EXISTS `class` (
+  `class_id` int(11) NOT NULL AUTO_INCREMENT,
+  `teacher_id` int(11) NOT NULL,
+  `cl_category_id` int(11) NOT NULL,
+  `subject_id` int(11) NOT NULL,
+  `description_english` varchar(255) NOT NULL,
+  `description_sinhala` varchar(255) CHARACTER SET utf8 COLLATE utf8_sinhala_ci NOT NULL,
+  `amount` float NOT NULL,
+  `date` varchar(50) NOT NULL,
+  `start_time` varchar(50) NOT NULL,
+  `end_time` varchar(50) NOT NULL,
+  `type` varchar(100) NOT NULL,
+  `status` varchar(100) NOT NULL,
+  PRIMARY KEY (`class_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=60 DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `class`
+--
+
+INSERT INTO `class` (`class_id`, `teacher_id`, `cl_category_id`, `subject_id`, `description_english`, `description_sinhala`, `amount`, `date`, `start_time`, `end_time`, `type`, `status`) VALUES
+(59, 58, 1, 1, 'lesson 1.1', 'පාඩම 1.1', 450, '2020/8/10', '09.00 am', '01.00 pm', 'accepted', 'pending'),
+(29, 19, 1, 2, 'Circle 2', 'වෘර්තය 2', 350, '2020/8/6', '1.00 pm', '5.00 pm', 'accepted', 'pending'),
+(28, 19, 1, 2, 'Circle', 'වෘර්තය', 350, '2020/8/5', '1.00 pm', '5.00 pm', 'accepted', 'pending'),
+(27, 19, 1, 2, 'dfdfd', 'අනුකලනය', 350, '2020/8/5', '1.00 pm', '5.00 pm', 'accepted', 'pending');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `classcategory`
+--
+
+DROP TABLE IF EXISTS `classcategory`;
+CREATE TABLE IF NOT EXISTS `classcategory` (
+  `cl_category_id` int(11) NOT NULL AUTO_INCREMENT,
+  `stream` varchar(100) NOT NULL,
+  `medium` varchar(50) NOT NULL,
+  PRIMARY KEY (`cl_category_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `classcategory`
+--
+
+INSERT INTO `classcategory` (`cl_category_id`, `stream`, `medium`) VALUES
+(1, 'A/L Science', 'Sinhala'),
+(2, 'A/L Science', 'English');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `classjoin`
+--
+
+DROP TABLE IF EXISTS `classjoin`;
+CREATE TABLE IF NOT EXISTS `classjoin` (
+  `cl_join_id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` bigint(20) NOT NULL,
+  `class_id` int(11) NOT NULL,
+  `ammount` float NOT NULL,
+  `payment_date` varchar(20) NOT NULL,
+  `payment_time` varchar(20) NOT NULL,
+  `type` varchar(50) NOT NULL,
+  `status` varchar(50) NOT NULL,
+  `bank_slip` varchar(255) NOT NULL,
+  PRIMARY KEY (`cl_join_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=117 DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `classjoin`
+--
+
+INSERT INTO `classjoin` (`cl_join_id`, `user_id`, `class_id`, `ammount`, `payment_date`, `payment_time`, `type`, `status`, `bank_slip`) VALUES
+(54, 18, 29, 350, '2020/08/08', '13:36:17', 'not payed', 'pending', ''),
+(53, 18, 28, 350, '2020/08/08', '13:33:46', 'not payed', 'pending', ''),
+(52, 18, 28, 350, '2020/08/08', '13:33:12', 'not payed', 'pending', ''),
+(51, 18, 29, 350, '2020/08/08', '13:33:09', 'not payed', 'pending', ''),
+(50, 18, 29, 350, '2020/08/08', '13:33:07', 'not payed', 'pending', ''),
+(49, 18, 29, 350, '2020/08/08', '13:32:32', 'not payed', 'pending', ''),
+(48, 18, 29, 350, '2020/08/08', '13:32:28', 'not payed', 'pending', ''),
+(47, 18, 29, 350, '2020/08/08', '13:30:18', 'not payed', 'pending', ''),
+(46, 8, 29, 350, '2020/08/08', '13:25:06', 'not payed', 'pending', ''),
+(45, 18, 29, 350, '2020/08/08', '13:21:44', 'not payed', 'pending', ''),
+(44, 18, 29, 350, '2020/08/08', '13:20:01', 'not payed', 'pending', ''),
+(43, 8, 29, 350, '2020/08/07', '17:54:50', 'not payed', 'pending', ''),
+(42, 8, 27, 350, '2020/08/07', '01:11:45', 'online payed', 'complete', ''),
+(55, 18, 29, 350, '2020/08/08', '13:41:50', 'not payed', 'pending', ''),
+(56, 18, 29, 350, '2020/08/08', '13:41:59', 'not payed', 'pending', ''),
+(60, 8, 59, 400, '2020/08/08', '19:00:53', 'not payed', 'pending', ''),
+(61, 8, 59, 450, '2020/08/09', '00:33:53', 'online payed', 'complete', ''),
+(63, 62, 29, 350, '2020/08/09', '22:54:04', 'online payed', 'complete', ''),
+(64, 8, 59, 450, '2020/08/10', '00:23:52', 'not payed', 'pending', ''),
+(65, 8, 59, 450, '2020/08/10', '00:27:15', 'not payed', 'pending', ''),
+(66, 8, 59, 450, '2020/08/10', '00:29:19', 'not payed', 'pending', ''),
+(67, 8, 59, 450, '2020/08/10', '00:29:48', 'not payed', 'pending', ''),
+(68, 8, 59, 450, '2020/08/10', '00:29:53', 'not payed', 'pending', ''),
+(69, 8, 59, 450, '2020/08/10', '00:30:43', 'not payed', 'pending', ''),
+(70, 8, 59, 450, '2020/08/10', '00:31:11', 'not payed', 'pending', ''),
+(71, 8, 59, 450, '2020/08/10', '00:31:52', 'not payed', 'pending', ''),
+(72, 8, 59, 450, '2020/08/10', '00:33:10', 'not payed', 'pending', ''),
+(73, 8, 59, 450, '2020/08/10', '00:33:14', 'not payed', 'pending', ''),
+(74, 8, 59, 450, '2020/08/10', '00:33:57', 'not payed', 'pending', ''),
+(75, 8, 59, 450, '2020/08/10', '00:36:57', 'not payed', 'pending', ''),
+(76, 8, 59, 450, '2020/08/10', '00:37:17', 'not payed', 'pending', ''),
+(77, 8, 59, 450, '2020/08/10', '00:37:30', 'not payed', 'pending', ''),
+(78, 8, 59, 450, '2020/08/10', '00:38:12', 'not payed', 'pending', ''),
+(79, 8, 59, 450, '2020/08/10', '00:38:26', 'not payed', 'pending', ''),
+(80, 8, 59, 450, '2020/08/10', '00:39:01', 'not payed', 'pending', ''),
+(81, 8, 59, 450, '2020/08/10', '00:39:43', 'not payed', 'pending', ''),
+(82, 8, 59, 450, '2020/08/10', '00:40:04', 'not payed', 'pending', ''),
+(83, 8, 59, 450, '2020/08/10', '00:40:08', 'not payed', 'pending', ''),
+(84, 8, 59, 450, '2020/08/10', '00:41:03', 'not payed', 'pending', ''),
+(85, 8, 59, 450, '2020/08/10', '00:43:32', 'not payed', 'pending', ''),
+(86, 8, 59, 450, '2020/08/10', '00:44:15', 'not payed', 'pending', ''),
+(87, 8, 59, 450, '2020/08/10', '00:44:33', 'not payed', 'pending', ''),
+(88, 8, 59, 450, '2020/08/10', '00:44:50', 'not payed', 'pending', ''),
+(89, 8, 59, 450, '2020/08/10', '00:45:42', 'not payed', 'pending', ''),
+(90, 8, 59, 450, '2020/08/10', '00:46:45', 'not payed', 'pending', ''),
+(91, 8, 59, 450, '2020/08/10', '00:47:00', 'not payed', 'pending', ''),
+(92, 8, 59, 450, '2020/08/10', '00:47:22', 'not payed', 'pending', ''),
+(93, 8, 59, 450, '2020/08/10', '00:48:10', 'not payed', 'pending', ''),
+(94, 8, 59, 450, '2020/08/10', '00:48:29', 'not payed', 'pending', ''),
+(95, 8, 59, 450, '2020/08/10', '00:48:43', 'not payed', 'pending', ''),
+(96, 8, 59, 450, '2020/08/10', '00:50:16', 'not payed', 'pending', ''),
+(97, 8, 59, 450, '2020/08/10', '02:23:24', 'init', 'pending', '-'),
+(98, 8, 59, 450, '2020/08/10', '03:00:30', 'init', 'pending', '-'),
+(99, 8, 59, 450, '2020/08/10', '03:06:17', 'init', 'pending', '-'),
+(100, 8, 59, 450, '2020/08/10', '03:06:18', 'init', 'pending', '-'),
+(101, 8, 59, 450, '2020/08/10', '03:07:24', 'init', 'pending', '-'),
+(102, 8, 59, 450, '2020/08/10', '03:07:24', 'init', 'pending', '-'),
+(103, 8, 29, 350, '2020/08/10', '03:13:08', 'init', 'pending', '-'),
+(104, 8, 59, 450, '2020/08/10', '03:15:13', 'init', 'pending', '-'),
+(105, 8, 59, 450, '2020/08/10', '03:17:37', 'init', 'pending', '-'),
+(106, 8, 28, 350, '2020/08/10', '03:19:08', 'init', 'pending', '-'),
+(107, 8, 59, 450, '2020/08/10', '03:24:52', 'init', 'pending', '-'),
+(108, 8, 59, 450, '2020/08/10', '03:26:39', 'init', 'pending', '-'),
+(109, 8, 59, 450, '2020/08/10', '03:28:05', 'init', 'pending', '-'),
+(110, 8, 59, 450, '2020/08/10', '03:34:52', 'init', 'pending', '-'),
+(111, 8, 59, 450, '2020/08/10', '03:35:23', 'init', 'pending', '-'),
+(112, 8, 59, 450, '2020/08/10', '03:35:25', 'init', 'pending', '-'),
+(113, 8, 59, 450, '2020/08/10', '03:36:05', 'init', 'pending', '-'),
+(114, 8, 59, 450, '2020/08/10', '03:36:07', 'init', 'pending', '-'),
+(115, 8, 59, 450, '2020/08/10', '03:48:55', 'init', 'pending', 'user_8_class_59_slip.png'),
+(116, 8, 27, 350, '2020/08/10', '03:53:00', 'bank deposit', 'pending', 'user_8_class_27_slip.png');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `hibernate_sequence`
+--
+
+DROP TABLE IF EXISTS `hibernate_sequence`;
+CREATE TABLE IF NOT EXISTS `hibernate_sequence` (
+  `next_val` bigint(20) DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `hibernate_sequence`
+--
+
+INSERT INTO `hibernate_sequence` (`next_val`) VALUES
+(117);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `subject`
+--
+
+DROP TABLE IF EXISTS `subject`;
+CREATE TABLE IF NOT EXISTS `subject` (
+  `subject_id` int(11) NOT NULL AUTO_INCREMENT,
+  `cl_category_id` int(11) NOT NULL,
+  `subject_name` varchar(100) NOT NULL,
+  PRIMARY KEY (`subject_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `subject`
+--
+
+INSERT INTO `subject` (`subject_id`, `cl_category_id`, `subject_name`) VALUES
+(1, 1, 'Chemistry'),
+(2, 1, 'Combind Maths'),
+(3, 2, 'Physics'),
+(4, 2, 'Combind Maths');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `teacher`
+--
+
+DROP TABLE IF EXISTS `teacher`;
+CREATE TABLE IF NOT EXISTS `teacher` (
+  `teacher_id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` bigint(20) NOT NULL,
+  `cl_category_id` int(11) NOT NULL,
+  `subject_id` int(11) NOT NULL,
+  `location` varchar(100) DEFAULT NULL,
+  `ins_charge_percentage` float NOT NULL,
+  PRIMARY KEY (`teacher_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=59 DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `teacher`
+--
+
+INSERT INTO `teacher` (`teacher_id`, `user_id`, `cl_category_id`, `subject_id`, `location`, `ins_charge_percentage`) VALUES
+(19, 18, 1, 2, 'kegalle', 10),
+(58, 57, 1, 1, 'kegalle', 0);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `user`
+--
+
+DROP TABLE IF EXISTS `user`;
+CREATE TABLE IF NOT EXISTS `user` (
+  `id` bigint(20) NOT NULL,
+  `city` varchar(255) DEFAULT NULL,
+  `enabled` bit(1) DEFAULT NULL,
+  `first_name` varchar(255) DEFAULT NULL,
+  `grade` varchar(255) DEFAULT NULL,
+  `last_name` varchar(255) DEFAULT NULL,
+  `mobile` varchar(255) DEFAULT NULL,
+  `password` varchar(255) DEFAULT NULL,
+  `school` varchar(255) DEFAULT NULL,
+  `user_type` varchar(255) DEFAULT NULL,
+  `username` varchar(255) DEFAULT NULL,
+  `viber` int(11) DEFAULT NULL,
+  `whats_app` int(11) DEFAULT NULL,
+  `address1` varchar(255) DEFAULT NULL,
+  `address2` varchar(255) DEFAULT NULL,
+  `gender` varchar(255) DEFAULT NULL,
+  `middl_name` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `user`
+--
+
+INSERT INTO `user` (`id`, `city`, `enabled`, `first_name`, `grade`, `last_name`, `mobile`, `password`, `school`, `user_type`, `username`, `viber`, `whats_app`, `address1`, `address2`, `gender`, `middl_name`) VALUES
+(8, 'kegalle', b'1', 'Dhanushka', '12', 'jayarathna', '0754541891', '$2a$04$fShD6t2nC5WLIycLFE6RbOJ8k8QnlKpYy002SGtxfilaIQE5Uih5O', 'pinnawala c c', 'student', 'dhanushkapradeepcreations@gmail.com', 0, 1, 'd-109.kiripol', ',deewela,pallegama', 'Male', 'pradeep'),
+(9, 'mawanella', b'1', 'sameera', '12', 'mapa', '0774548789', '$2a$04$qcl6J8tLiNW1Uksw3eEQT.KpKFa1s5zw80OOHx6Gnz.yRe/RXzoq6', 'kegalu vidyalya', 'student', 'sameera@gmail.com', 1, 1, 'ganethenna', '', 'Male', 'bhuddi'),
+(18, 'kegalle', b'1', 'Umesh', NULL, 'Abeysunendra', '0711655282', '$2a$04$dQzhGS40./SfEEFPvW9ZwO0BPA0VxMO1t1Ppszb33ppELn0fNSdLe', NULL, 'teacher', 'umesh@gmail.com', 0, 1, 'wekoladeniya', 'molagoda', 'Male', 'Viranga'),
+(57, 'kegalle', b'1', 'Dhanushka', NULL, 'jayarathna', '0754541891', '$2a$04$/ImST3WagS13OBN3k4dX/uxFu1TCLE6NG4PD/P3mCnX669kF.qqLK', NULL, 'teacher', 'mpdpradeep@gmail.com', 0, 1, 'd-109.kiripola', ',deewela,pallegama', 'Male', 'pradeep'),
+(62, 'kegalle', b'1', 'pazindu', '12', 'chanadrasena', '0754541123', '$2a$04$PrDNvdRUZtGT/EsxR4Ql1ueOJAcH7w/pD0xZNlRTr6dhTfWQXS80W', 'pinnawala c c', 'student', 'pasi@gmail.com', 0, 1, 'dedugala', 'bulathkohupitiya', 'Female', 'mangala');
+COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

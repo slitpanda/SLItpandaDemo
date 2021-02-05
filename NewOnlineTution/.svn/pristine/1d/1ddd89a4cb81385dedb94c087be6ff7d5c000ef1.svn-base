@@ -1,0 +1,80 @@
+package com.itpanda.tution;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+
+import org.apache.http.Header;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpHeaders;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
+import org.springframework.stereotype.Service;
+
+@Service
+public class SendSMSMessage {
+	
+	private final CloseableHttpClient httpClient = HttpClients.createDefault();
+	
+	public  String sendClassJoinMessage(String to,String userName,String message) {
+		message="Hi "+userName+", "+message;
+		//TODO format to number like  94773479981  
+		return sendSMS(to,message) ;
+	}
+	
+	
+	private String sendSMS(String to,String message)  {
+		
+		//TODO remove after test START
+		boolean test=true;
+		if(test)
+			return "{\"status\":\"success\",\"data\":\"Sent\"}";
+
+		//TODO remove after test END
+		
+		try {
+		//TODO get SMS sending URL from the application.properties file  	
+		String urlWithParam="https://app.notify.lk/api/v1/send?user_id=12294&api_key=g8gQnBntfGgP4YxdsZ2U&sender_id=NotifyDEMO&to=94773479981&message=";
+        
+		String encodedMessage = null;
+		//remove spacing of the message
+		 encodedMessage = URLEncoder.encode("Test two website", "UTF-8");
+		
+		
+		HttpGet request = new HttpGet(urlWithParam+encodedMessage);
+
+        // add request headers
+     
+
+        try (CloseableHttpResponse response = httpClient.execute(request)) {
+
+            // Get HttpResponse Status
+            System.out.println(response.getStatusLine().toString());
+
+            HttpEntity entity = response.getEntity();
+            Header headers = entity.getContentType();
+            System.out.println(headers);
+
+            if (entity != null) {
+                // return it as a String
+                String result = EntityUtils.toString(entity);
+                
+                //System.out.println(result);
+                return result;
+                //Content-Type: application/json
+               // {"status":"success","data":"Sent"}
+            }
+
+        }
+		}catch(Exception ex) {
+			ex.printStackTrace();
+			return null;
+		}
+        
+       return null; 
+
+    }
+
+}

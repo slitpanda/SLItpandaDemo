@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script >
+
+$(document).ready(function() {  
+	
+
+ 
+});
+</script>
+</head>
+<body>
+
+<center>
+<form th:object="${classes}" th:action="@{/saveclass}" 	method="post">
+<table cellpadding="10" >
+<thead>
+
+<tr>
+<td>
+<input type="text"  th:field="*{teacherId}" hidden="">
+<input type="text" th:field="*{clCategoryId}"  hidden="">
+<input type="text"  th:field="*{subjectId}"  hidden="">
+<input type="text" th:field="*{type}"  hidden="">
+<input type="text"  th:field="*{status}"  hidden="">
+</td>
+</tr>
+<tr>
+<th>Description</th>
+<td><textarea   th:field="*{descriptionEnglish}"></textarea>
+</tr>
+
+<tr>
+<th>Description</th>
+<td><textarea  th:field="*{descriptionSinhala}"></textarea> 
+</tr>
+
+<tr>
+<th >Date</th>
+<td><input type="text"   th:field="*{date}"></td>
+</tr>
+
+<tr>
+<th>Strart Time</th>
+<td ><input type="text"  th:field="*{startTime}"></td>
+</tr>
+
+<tr>
+<th>End Time</th>
+<td ><input type="text" th:field="*{endTime}"></td>
+</tr>
+
+<tr>
+<th  >Ammount Rs:</th>
+<td><input type="text"   th:field="*{amount}"></td>
+</tr>
+
+
+
+
+
+
+
+</thead>
+
+<tbody >
+
+<tr>
+
+<th><input type="text"   th:field="*{classId}" hidden="" >
+
+</th>
+
+<td><button type="submit">Save</button></a>
+
+
+
+</tr>
+
+
+
+
+</tbody>
+
+</table>
+
+</form>
+</center>
+<script  src="js/classes.js"></script>
+</body>
+</html>

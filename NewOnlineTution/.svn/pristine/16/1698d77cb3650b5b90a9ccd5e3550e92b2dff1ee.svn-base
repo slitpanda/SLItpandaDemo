@@ -1,0 +1,45 @@
+package com.itpanda.tution.service;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.itpanda.tution.entity.Classes;
+import com.itpanda.tution.repository.ClassesRepository;
+
+@Service
+@Transactional
+public class ClassService {
+
+	@Autowired
+	ClassesRepository classesRepository;
+	
+	public void saveClass(Classes clasess) {
+		classesRepository.save(clasess);
+	}
+	
+	public List<Classes> searchClass(String teacherId,int clCategoryId,int subjectId){
+		return classesRepository.searchClass(teacherId+"%", clCategoryId, subjectId);
+	}
+	
+	public List<Classes> getClassById(int classId){
+		
+		return classesRepository.findByClassId(classId);
+	}
+	
+	public List<Classes> getClassByTeacherId(int teacherId){
+		return classesRepository.findByTeacherId(teacherId);
+	}
+	
+	public Classes getClassByClassId(int classId) {
+		return classesRepository.getClassByClassId(classId);
+	}
+	
+	public List<Classes> findAllClasses(){
+		return classesRepository.findAll();
+	}
+	
+	
+}

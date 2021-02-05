@@ -1,0 +1,244 @@
+-- phpMyAdmin SQL Dump
+-- version 4.7.9
+-- https://www.phpmyadmin.net/
+--
+-- Host: 127.0.0.1:3306
+-- Generation Time: Aug 14, 2020 at 07:16 PM
+-- Server version: 5.7.21
+-- PHP Version: 5.6.35
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET AUTOCOMMIT = 0;
+START TRANSACTION;
+SET time_zone = "+00:00";
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+
+--
+-- Database: `tution`
+--
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `advertisement`
+--
+
+DROP TABLE IF EXISTS `advertisement`;
+CREATE TABLE IF NOT EXISTS `advertisement` (
+  `ad_id` int(11) NOT NULL AUTO_INCREMENT,
+  `image` varchar(255) NOT NULL,
+  `description` varchar(255) NOT NULL,
+  PRIMARY KEY (`ad_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `class`
+--
+
+DROP TABLE IF EXISTS `class`;
+CREATE TABLE IF NOT EXISTS `class` (
+  `class_id` int(11) NOT NULL AUTO_INCREMENT,
+  `teacher_id` int(11) NOT NULL,
+  `cl_category_id` int(11) NOT NULL,
+  `subject_id` int(11) NOT NULL,
+  `description_english` varchar(255) NOT NULL,
+  `description_sinhala` varchar(255) CHARACTER SET utf8 COLLATE utf8_sinhala_ci NOT NULL,
+  `amount` float NOT NULL,
+  `date` varchar(50) NOT NULL,
+  `start_time` varchar(50) NOT NULL,
+  `end_time` varchar(50) NOT NULL,
+  `type` varchar(100) NOT NULL,
+  `status` varchar(100) NOT NULL,
+  PRIMARY KEY (`class_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=142 DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `class`
+--
+
+INSERT INTO `class` (`class_id`, `teacher_id`, `cl_category_id`, `subject_id`, `description_english`, `description_sinhala`, `amount`, `date`, `start_time`, `end_time`, `type`, `status`) VALUES
+(59, 58, 1, 1, 'lesson 1.1', 'පාඩම 1.1', 450, '2020/8/10', '09.00 am', '01.00 pm', 'accepted', 'pending'),
+(29, 19, 1, 2, 'Circle 2', 'වෘර්තය 2', 350, '2020/8/6', '1.00 pm', '5.00 pm', 'accepted', 'pending'),
+(28, 19, 1, 2, 'Circle', 'වෘර්තය', 350, '2020/8/5', '1.00 pm', '5.00 pm', 'accepted', 'pending'),
+(27, 19, 1, 2, 'dfdfd', 'අනුකලනය', 350, '2020/8/5', '1.00 pm', '5.00 pm', 'accepted', 'pending');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `classcategory`
+--
+
+DROP TABLE IF EXISTS `classcategory`;
+CREATE TABLE IF NOT EXISTS `classcategory` (
+  `cl_category_id` int(11) NOT NULL AUTO_INCREMENT,
+  `stream` varchar(100) NOT NULL,
+  `medium` varchar(50) NOT NULL,
+  PRIMARY KEY (`cl_category_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `classcategory`
+--
+
+INSERT INTO `classcategory` (`cl_category_id`, `stream`, `medium`) VALUES
+(1, 'A/L Science', 'Sinhala'),
+(2, 'A/L Science', 'English');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `classjoin`
+--
+
+DROP TABLE IF EXISTS `classjoin`;
+CREATE TABLE IF NOT EXISTS `classjoin` (
+  `cl_join_id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` bigint(20) NOT NULL,
+  `class_id` int(11) NOT NULL,
+  `teacher_id` int(11) NOT NULL,
+  `ammount` float NOT NULL,
+  `payment_date` varchar(20) NOT NULL,
+  `payment_time` varchar(20) NOT NULL,
+  `type` varchar(50) NOT NULL,
+  `status` varchar(50) NOT NULL,
+  `bank_slip` varchar(255) NOT NULL,
+  PRIMARY KEY (`cl_join_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=139 DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `classjoin`
+--
+
+INSERT INTO `classjoin` (`cl_join_id`, `user_id`, `class_id`, `teacher_id`, `ammount`, `payment_date`, `payment_time`, `type`, `status`, `bank_slip`) VALUES
+(138, 8, 28, 19, 350, '2020/08/14', '03:45:13', 'bank deposit', 'pending', 'user_8_class_28_slip.pdf'),
+(137, 8, 59, 58, 450, '2020/08/14', '03:41:25', 'bank deposit', 'pending', 'user_8_class_59_slip.jpg'),
+(136, 62, 59, 58, 450, '2020/08/13', '02:56:18', 'bank deposit', 'complete', 'user_62_class_59_slip.jpg'),
+(135, 62, 28, 19, 350, '2020/08/13', '02:55:50', 'bank deposit', 'pending', 'user_62_class_28_slip.pdf'),
+(134, 62, 59, 58, 450, '2020/08/13', '02:55:34', 'init', 'pending', '-'),
+(133, 8, 27, 19, 350, '2020/08/13', '01:55:44', 'bank deposit', 'complete', 'user_8_class_27_slip.jpg'),
+(132, 8, 28, 19, 350, '2020/08/13', '01:55:41', 'init', 'pending', '-');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `hibernate_sequence`
+--
+
+DROP TABLE IF EXISTS `hibernate_sequence`;
+CREATE TABLE IF NOT EXISTS `hibernate_sequence` (
+  `next_val` bigint(20) DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `hibernate_sequence`
+--
+
+INSERT INTO `hibernate_sequence` (`next_val`) VALUES
+(154);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `subject`
+--
+
+DROP TABLE IF EXISTS `subject`;
+CREATE TABLE IF NOT EXISTS `subject` (
+  `subject_id` int(11) NOT NULL AUTO_INCREMENT,
+  `cl_category_id` int(11) NOT NULL,
+  `subject_name` varchar(100) NOT NULL,
+  PRIMARY KEY (`subject_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `subject`
+--
+
+INSERT INTO `subject` (`subject_id`, `cl_category_id`, `subject_name`) VALUES
+(1, 1, 'Chemistry'),
+(2, 1, 'Combind Maths'),
+(3, 2, 'Physics'),
+(4, 2, 'Combind Maths');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `teacher`
+--
+
+DROP TABLE IF EXISTS `teacher`;
+CREATE TABLE IF NOT EXISTS `teacher` (
+  `teacher_id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` bigint(20) NOT NULL,
+  `cl_category_id` int(11) NOT NULL,
+  `subject_id` int(11) NOT NULL,
+  `location` varchar(100) DEFAULT NULL,
+  `ins_charge_percentage` float NOT NULL,
+  `pro_image` varchar(255) NOT NULL,
+  PRIMARY KEY (`teacher_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=154 DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `teacher`
+--
+
+INSERT INTO `teacher` (`teacher_id`, `user_id`, `cl_category_id`, `subject_id`, `location`, `ins_charge_percentage`, `pro_image`) VALUES
+(19, 18, 1, 2, 'kegalle', 10, ''),
+(58, 57, 1, 1, 'kegalle', 15, ''),
+(140, 139, 2, 4, 'kegalle', 0, ''),
+(153, 152, 1, 1, 'kegalle', 0, '152_proImage.jpg');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `user`
+--
+
+DROP TABLE IF EXISTS `user`;
+CREATE TABLE IF NOT EXISTS `user` (
+  `id` bigint(20) NOT NULL,
+  `city` varchar(255) DEFAULT NULL,
+  `enabled` bit(1) DEFAULT NULL,
+  `first_name` varchar(255) DEFAULT NULL,
+  `grade` varchar(255) DEFAULT NULL,
+  `last_name` varchar(255) DEFAULT NULL,
+  `mobile` varchar(255) DEFAULT NULL,
+  `password` varchar(255) DEFAULT NULL,
+  `school` varchar(255) DEFAULT NULL,
+  `user_type` varchar(255) DEFAULT NULL,
+  `username` varchar(255) DEFAULT NULL,
+  `viber` int(11) DEFAULT NULL,
+  `whats_app` int(11) DEFAULT NULL,
+  `address1` varchar(255) DEFAULT NULL,
+  `address2` varchar(255) DEFAULT NULL,
+  `gender` varchar(255) DEFAULT NULL,
+  `middl_name` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `user`
+--
+
+INSERT INTO `user` (`id`, `city`, `enabled`, `first_name`, `grade`, `last_name`, `mobile`, `password`, `school`, `user_type`, `username`, `viber`, `whats_app`, `address1`, `address2`, `gender`, `middl_name`) VALUES
+(8, 'kegalle', b'1', 'Dhanushka', '12', 'jayarathna', '0754541891', '$2a$04$fShD6t2nC5WLIycLFE6RbOJ8k8QnlKpYy002SGtxfilaIQE5Uih5O', 'pinnawala c c', 'student', 'dhanushkapradeepcreations@gmail.com', 0, 1, 'd-109.kiripol', ',deewela,pallegama', 'Male', 'pradeep'),
+(9, 'mawanella', b'1', 'sameera', '12', 'mapa', '0774548789', '$2a$04$qcl6J8tLiNW1Uksw3eEQT.KpKFa1s5zw80OOHx6Gnz.yRe/RXzoq6', 'kegalu vidyalya', 'student', 'sameera@gmail.com', 1, 1, 'ganethenna', '', 'Male', 'bhuddi'),
+(18, 'kegalle', b'1', 'Umesh', NULL, 'Abeysunendra', '0711655282', '$2a$04$dQzhGS40./SfEEFPvW9ZwO0BPA0VxMO1t1Ppszb33ppELn0fNSdLe', NULL, 'teacher', 'umesh@gmail.com', 0, 1, 'wekoladeniya', 'molagoda', 'Male', 'Viranga'),
+(57, 'kegalle', b'1', 'Dhanushka', NULL, 'jayarathna', '0754541891', '$2a$04$/ImST3WagS13OBN3k4dX/uxFu1TCLE6NG4PD/P3mCnX669kF.qqLK', NULL, 'teacher', 'mpdpradeep@gmail.com', 0, 1, 'd-109.kiripola', ',deewela,pallegama', 'Male', 'pradeep'),
+(62, 'kegalle', b'1', 'pazindu', '12', 'chanadrasena', '0754541123', '$2a$04$PrDNvdRUZtGT/EsxR4Ql1ueOJAcH7w/pD0xZNlRTr6dhTfWQXS80W', 'pinnawala c c', 'student', 'pasi@gmail.com', 0, 1, 'dedugala', 'bulathkohupitiya', 'Female', 'mangala'),
+(6, 'kegalle', b'1', 'Lasantha', NULL, 'Abeyrathna', '0711315614', '$2a$04$/ImST3WagS13OBN3k4dX/uxFu1TCLE6NG4PD/P3mCnX669kF.qqLK', NULL, 'admin', 'admin@gmail.com', 1, 1, 'molagoda', 'kegalle', 'kegalle', 'Bandara'),
+(7, 'kegalle', b'1', 'chamra', NULL, 'silva', '0725859563', '$2a$04$/ImST3WagS13OBN3k4dX/uxFu1TCLE6NG4PD/P3mCnX669kF.qqLK', 'dfdfdf', 'data_entry', 'dataentry@gmail.com', 1, 1, 'sds', 'wrqr', 'ewrwe', 'fsadf'),
+(139, 'kegalle', b'1', 'jagath', NULL, 'kumara', '0754541891', '$2a$04$1rZIYng.3SBJa0pSoQVrY.Fg6jQJy7qo51SIcbBeuTHX4GODrnljK', NULL, 'teacher', 'englishteacher@gmail.com', 1, 1, 'ssdsds', 'gfgdg', 'Male', 'namal'),
+(152, 'kegalle', b'1', 'sdsadasd', NULL, 'erer', '0754541891', '$2a$04$5EW/nxfAf5WQFQZn4SZ2rOvIp5xr8dyR18/vc7zTGnF4QPBEdjwEy', NULL, 'teacher', 'xxx@gmail.com', 1, 0, 'fgefwq', 'wewe', 'Male', 'wew');
+COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script >
+
+$(document).ready(function() {  
+	
+
+ 
+});
+</script>
+</head>
+<body>
+
+<center>
+<table cellpadding="10" th:object="${class}">
+<thead>
+
+
+<tr>
+<th>Description</th>
+<td><span  th:text="*{descriptionEnglish}"></span> / <span th:text="*{descriptionSinhala}"></span></td>
+</tr>
+
+<tr>
+<th >Date</th>
+<td th:text="*{date}"></td>
+</tr>
+
+<tr>
+<th>Time Frame</th>
+<td th:text="*{startTime +' - '+endTime}"></td>
+</tr>
+
+<tr>
+<th  >Ammount</th>
+<td th:text="*{'Rs:'+amount}"></td>
+</tr>
+
+<tr>
+<th  >Class Joined</th>
+<td th:text="${numberOfJoined}"></td>
+</tr>
+
+<tr>
+<th  >Total Ammount</th>
+<td th:text="${'Rs:'+totalAmmount}"></td>
+</tr>
+
+<tr>
+<th  >Institue Charge</th>
+<td th:text="${'Rs:'+instituteCharge}"></td>
+</tr>
+
+<tr>
+<th  > Profit</th>
+<td th:text="${'Rs:'+profite}"></td>
+</tr>
+
+</thead>
+
+<tbody >
+<form th:action="@{/singleclass/edit}" th:method="get">
+<tr>
+
+<th><input type="text" th:value="*{classId}" hidden="" th:name="classId">
+
+</th>
+
+<td><button type="submit">Edit</button>
+
+
+
+</tr>
+</form>
+
+
+
+</tbody>
+<tr>
+<td>
+
+						
+
+
+</form>
+</td>
+</tr>
+
+</table>
+</center>
+<script  src="js/classes.js"></script>
+</body>
+</html>

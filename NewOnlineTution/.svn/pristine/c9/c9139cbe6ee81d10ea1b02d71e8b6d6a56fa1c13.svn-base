@@ -1,0 +1,17 @@
+package com.itpanda.tution;
+
+public class Constant {
+
+	public static String  USER_TYPE_ADMIN="admin";
+	public static String USER_TYPE_DATA_ENTRY="data_entry";
+	public static String USER_TYPE_STUDENT="student";
+	public static String USER_TYPE_TEACHER="teacher";
+	
+	public static String CL_JOIN_STATUS_COMPLETE = "complete";
+	public static String CL_JOIN_STATUS_PENDING = "pending";
+	public static String CL_JOIN_TYPE_ONLINE = "online paid";
+	public static String Cl_JOIN_TYPE_BANK_DEPOSIT = "bank deposit";
+	public static String Cl_JOIN_TYPE_INIT = "init";
+	
+	public static String CANCEL_CLASS="canceled"; 
+}

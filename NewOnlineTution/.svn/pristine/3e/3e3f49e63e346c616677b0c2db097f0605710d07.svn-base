@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+
+<script>
+$(document).ready(function() { 
+	
+	changePaymentBody();
+});
+</script>
+</head>
+<body>
+
+<center>
+<table cellpadding="10">
+<thead>
+<tr>
+<td>Payemnt Type</td>
+<td><select id="paymentType">
+<option value="1">Online pay</option>
+<option value="2">Bank Deposit</option>
+</select></td>
+</tr>
+</thead>
+<tbody id="onlinePay">
+
+<tr>
+<td>Card Number</td>
+<td><input type="text"></td>
+</tr>
+
+<tr>
+<td>Expire Date</td>
+<td><input type="text"></td>
+</tr>
+
+<tr>
+<td>CSS</td>
+<td><input type="text"></td>
+</tr>
+<tr>
+<td></td>
+<td><input type="submit" value="Pay"></td>
+</tr>
+</tbody>
+
+<tbody id="bankDiposit" style="display: none;">
+<tr>
+<td>Upload Slip</td>
+<td><input type="file"></td>
+</tr>
+
+<tr>
+<td></td>
+<td><input type="submit" value="Submit"></td>
+</tr>
+</tbody>
+</table>
+</center>
+
+<script src="js/payment.js"></script>
+</body>
+</html>

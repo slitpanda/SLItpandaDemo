@@ -1,0 +1,42 @@
+package com.itpanda.tution.restController;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.itpanda.tution.Constant;
+import com.itpanda.tution.entity.ClassJoin;
+import com.itpanda.tution.service.ClassJoinService;
+
+@RestController
+public class mainRestController {
+
+	@Autowired
+	ClassJoinService classJoinService;
+	
+	// accept bank slips 
+	@CrossOrigin
+	@PutMapping("/acceptslip")
+	public void acceptBankSlips(@RequestBody ClassJoin classJoin) {
+		
+		
+		classJoinService.updateBankSlipStatus(Constant.CL_JOIN_STATUS_COMPLETE, classJoin.getClJoinId());
+		
+		//System.out.println(classJoin.getClJoinId());
+	}
+	
+	@CrossOrigin
+	@PutMapping("/changetopendingslip")
+	public void changeToPendingtBankSlips(@RequestBody ClassJoin classJoin) {
+		
+		
+		classJoinService.updateBankSlipStatus(Constant.CL_JOIN_STATUS_PENDING, classJoin.getClJoinId());
+		
+		//System.out.println(classJoin.getClJoinId());
+	}
+}

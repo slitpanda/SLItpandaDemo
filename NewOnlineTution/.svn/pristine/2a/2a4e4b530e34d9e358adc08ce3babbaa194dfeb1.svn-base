@@ -1,0 +1,23 @@
+package com.itpanda.tution.service;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.itpanda.tution.loginSecurity.entity.User;
+import com.itpanda.tution.loginSecurity.repository.UserRepository;
+
+@Service
+@Transactional
+public class StudentService {
+	
+	@Autowired
+	private UserRepository userRepo;
+	
+	public User saveStudent(User user) {
+	
+		return userRepo.save(user);
+	}
+	
+
+}

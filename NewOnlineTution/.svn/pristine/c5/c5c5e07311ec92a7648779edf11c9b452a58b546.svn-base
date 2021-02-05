@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8">
+<title>Side  bar</title>
+</head>
+<body>
+<!-- navigation -->
+<nav class="navbar navbar-expand-lg navbar-dark p-0" style="background-color: #035696; z-index: 1039; right: 0; left: 0" th:fragment="navigation">
+            <a class="navbar-header" href="#"><img src="/img/logoNew.svg"  class="animate__animated animate__fadeInLeft"></a>
+            
+              <button th:if="${#request.userPrincipal.principal.userType=='admin' || #request.userPrincipal.principal.userType=='data_entry'}" class="btn btn-link btn-sm  mr-2 " id="sidebarToggle" ><i class="fas fa-bars" style="color: #fff"></i></button>
+              
+            <button  class="navbar-toggler  mr-2 order-lg-0" type="button" data-toggle="collapse" data-target="#navbarText" >
+                <span class="navbar-toggler-icon"></span>
+            </button>
+          
+           
+            <div class="collapse navbar-collapse" id="navbarText">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item active pl-3 pt-1 pr-3 pb-1">
+                        <a class="nav-link text-light" th:href="@{/wall}">Home</a>
+                    </li>
+                    <li class="nav-item  pl-3 pt-1 pr-3 pb-1">
+                        <a class="nav-link text-light" th:href="@{/about}">About Us</a>
+                    </li>
+                   
+                    <li class="nav-item  pl-3 pt-1 pr-3 pb-1">
+                        <a class="nav-link text-light" href="#">Contact Us</a>
+                    </li>
+                </ul>
+               
+                
+                <ul class="navbar-nav ml-auto nav-flex-icons">
+      
+      <li class="nav-item dropdown ml-3 mr-3">
+        <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink-333" data-toggle="dropdown"
+          aria-haspopup="true" aria-expanded="false">
+          <i class="fas fa-user"></i>
+        </a>
+        <div class="dropdown-menu dropdown-menu-right dropdown-default"
+          aria-labelledby="navbarDropdownMenuLink-333">
+          <a class="dropdown-item" th:unless="${#request.userPrincipal.principal.userType=='admin' || #request.userPrincipal.principal.userType=='data_entry'}"  th:href="@{'/editprofile/'+${#request.userPrincipal.principal.userType} +'/'+${#request.userPrincipal.principal.id}}">Edit Profile</a>
+         <div class="dropdown-divider"></div>
+                       <a class="dropdown-item"  id="logOutLink" th:href="@{/logout}">Logout</a>
+                    </div>
+        
+        
+      </li>
+    </ul>
+            </div>
+        
+        </nav>
+
+<!-- side bar -->
+<div id="layoutSidenav_nav" th:fragment="sidebar" th:if="${#request.userPrincipal.principal.userType=='admin' || #request.userPrincipal.principal.userType=='data_entry'}">
+                <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
+                    <div class="sb-sidenav-menu">
+                        <div class="nav mt-4">
+                            <div class="sb-sidenav-menu-heading">Menu</div>
+                            <a class="nav-link" id="bankSlips" th:href="@{/bankslips}" >
+                                <div class="sb-nav-link-icon"><i class="fas fa-money-check-alt"></i></div>
+                                Bank Deposit
+                            </a>
+                           
+                             <a class="nav-link" th:href="@{/findclass}" id="findClass"  th:if="${#request.userPrincipal.principal.userType=='admin'}">
+                                 <div class="sb-nav-link-icon"><i class="fas fa-search"></i></div>
+                                Find Class
+                            </a>
+                           
+                           <a class="nav-link" th:href="@{/teacherList}" id="teacherList" th:if="${#request.userPrincipal.principal.userType=='admin'}">
+                                <div class="sb-nav-link-icon"><i class="fas fa-chalkboard-teacher"></i></div>
+                              Teachers
+                            </a>
+                        
+                            
+                           
+                            
+                        </div>
+                    </div>
+                    <div class="sb-sidenav-footer">
+                        <div class="small">Logged in as:</div>
+                        Admin
+                    </div>
+                </nav>
+            </div>
+            
+            
+</body>
+</html>

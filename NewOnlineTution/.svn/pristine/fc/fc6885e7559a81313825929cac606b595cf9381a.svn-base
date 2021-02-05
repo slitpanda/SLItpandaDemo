@@ -1,0 +1,11 @@
+function changePaymentBody(){
+	$("#paymentType").on('change',function(){
+		if($(this).val()==="2"){
+			$("#bankDiposit").css('display','block');
+			$("#onlinePay").css('display','none');
+		}else{
+			$("#onlinePay").css('display','block');
+			$("#bankDiposit").css('display','none');
+		}
+	});
+}

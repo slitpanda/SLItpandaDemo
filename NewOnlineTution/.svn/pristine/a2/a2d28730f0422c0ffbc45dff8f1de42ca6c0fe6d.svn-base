@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <meta name="description" content="" />
+        <meta name="author" content="" />
+        <title>Dashboard -  Admin</title>
+       
+         
+          
+         
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.0.0/animate.min.css"/>
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/js/all.min.js" crossorigin="anonymous"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <script src="https://code.jquery.com/jquery-3.5.1.min.js" crossorigin="anonymous"></script>
+        <link href="css/adminstyles.css" rel="stylesheet" />
+        
+         <!-- Custom CSS -->
+     
+         <link rel="stylesheet" href="css/style.css">
+        <script th:inline="javascript">
+
+$(document).ready(function() {  
+	
+	 
+	/*<![CDATA[*/
+           
+		
+		classList = /*[[${classList}]]*/"classList";
+		admin= /*[[${#request.userPrincipal.principal.userType=='admin'}]]*/;
+	   dataEntry= /*[[${#request.userPrincipal.principal.userType=='data_entry'}]]*/;
+		/*]]>*/
+
+        	
+		checkUserType();
+		
+
+		
+		
+		
+		
+
+	});
+</script>
+    </head>
+    <body class="sb-nav-fixed">
+    
+     
+    <!-- navigation -->
+	<div class="fixed-top">
+		<div th:replace="sidebar::navigation"></div>
+		<div class="row">
+			<div class="col-md-12 shadow-sm" style="background-color: white">
+				<nav aria-label="breadcrumb" class="second ">
+					<ol class="breadcrumb pl-4 pr-4 pb-0"
+						style="background-color: white">
+						<li class="breadcrumb-item "><a class="black-text  "
+							th:href="@{/wall}"><span class="mr-md-3 mr-2">Home</span></a><i
+							class="fa fa-angle-double-right mt-1" aria-hidden="true"></i></li>
+						<li class="breadcrumb-item "><a class="black-text  active-2"
+							href="#"><span>Joined Classes</span></a></li>
+					</ol>
+				</nav>
+			</div>
+		</div>
+	</div>
+
+	<div id="layoutSidenav">
+        <!-- side bar -->
+            <div th:replace="sidebar::sidebar"></div>
+            
+            <div id="layoutSidenav_content">
+                <main>
+                    <div class="container-fluid topSize">
+                     <!-- <div class="col-md-12 mt-2"><a th:href="@{/wall}">Home </a>/<span style="font-size: 16px; font-weight: bold;"> Joined Classes</span></div> -->
+					
+            <div class="row">
+               
+
+                <div class="col-md-12">
+                    <div class="card">
+                        <table class="table table-hover" id="classJoinTable">
+                            <thead class="text-muted">
+                                <tr>
+                                    <th scope="col" >Teacher <span style="margin-left: 50px">Description</span></th>
+                                    <th scope="col"  width="120">Date</th>
+                                    <th scope="col"  width="150">Time</th>
+                                    <th scope="col"  width="120">Amount</th>
+                                    <th scope="col"  width="120" class="text-right"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="classes:${joinClassesList}">
+                                    <td>
+                                        <figure class="media">
+                                            <div class="img-wrap">
+                                                <img th:src="@{'teacher/image/'+${classes.teacherId}}" class="img-thumbnail img-sm">
+                                            </div>
+                                            <figcaption class="media-body">
+                                                <h6 class="title text-truncate" th:text="${classes.teacher}">Teacher Details </h6>
+                                                <dl class="param param-inline small">
+                                                    <dt>Subject </dt>
+                                                    <dd th:text="${classes.subjectName}">Maths</dd>
+                                                </dl>
+                                                <dl class="param param-inline small">
+                                                    <dd th:text="${classes.descriptionEnglish +' / '+classes.descriptionSinhala}">A math circle is a social structure where participants engage in 
+                                                        the depths and intricacies of mathematical thinking 
+                                                        propagate the culture of doing mathematics</dd>
+                                                </dl>
+                                            </figcaption>
+                                        </figure>
+                                    </td>
+                                    <td> 
+                                        <div class="price-wrap"> 
+                                            <var class="price"  th:text="${classes.date}">16 July 2020</var> 
+                                           
+                                        </div> 
+                                    </td>
+                                    <td> 
+                                        <div class="price-wrap"> 
+                                            <var class="price" th:text="${classes.startTime +' - '+classes.endTime}">08.00 AM - 10.00 AM</var> 
+                                           
+                                        </div> 
+                                    </td>
+                                    <td> 
+                                        <div class="price-wrap"> 
+                                            <var class="price" th:text="${ 'Rs: '+classes.amount}">Rs. 350.00/=</var> 
+                                            
+                                        </div> 
+                                    </td>
+                                    <td class="text-right"> 
+                                    
+                                   
+                                     <a th:href="${classes.joinUrl}" target="_blank"> <button  class="btn btn-outline-danger">Join <i class="fa fa-hand-pointer" aria-hidden="true"></i></button> </a> 
+                                    
+                                    </td>
+                                </tr>
+                               
+
+                            </tbody>
+                        </table>
+                    </div> <!-- card.// -->
+
+
+                </div>
+            </div>
+        
+
+				</div>
+                </main>
+                  <!-- footer -->
+            <div  th:replace="footer::footer" >
+                
+            </div>
+            
+            <!-- /footer -->
+            </div>
+            </div>
+        </div>
+      
+       
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js">
+        </script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js">
+        </script>
+        <script  th:src="@{/js/scripts.js}"></script>
+         <script src="js/classes.js"></script>
+         <script src="js/constant.js"></script>
+      
+    </body>
+</html>

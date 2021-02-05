@@ -1,0 +1,16 @@
+<!doctype html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="ISO-8859-1">
+
+</head>
+<body>
+ 
+ <footer id="sticky-footer" class="py-2 bg-dark text-white-50" th:fragment="footer">
+            <div class="container text-center">
+                <small>Copyright &copy; IT Panda.lk</small>
+            </div>
+        </footer>
+</body>
+</html>

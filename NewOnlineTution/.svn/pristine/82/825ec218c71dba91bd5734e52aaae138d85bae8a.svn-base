@@ -1,0 +1,285 @@
+package com.itpanda.tution.model;
+
+import java.io.File;
+
+import org.springframework.web.multipart.MultipartFile;
+
+public class UserModel {
+
+
+	
+	private String username;
+
+	
+	private String password;
+
+	
+	private boolean enabled;
+	
+	
+	private String userType;
+
+	
+	private String firstName;
+	
+	
+	private String middlName;
+	
+	
+	private String lastName;
+	
+	
+	private String gender;
+	
+	
+	private String address1;
+	
+	
+	private String address2;
+	
+	
+	private String city;
+	
+	
+	private String mobile;
+	
+	
+	private String school;
+	
+	
+	private String grade;
+	
+	
+	private boolean whatsApp;
+	
+	
+	private boolean viber;
+	
+	
+	private String confirmPassword;
+	
+	private int clCategoryId;
+	
+	private int subjectId;
+	
+	private String clCategoryName;
+	
+	private String subjectName;
+	
+	
+	private String location;
+	
+	private MultipartFile proImage;
+	
+	public UserModel() {
+		
+	}
+
+
+	public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+	public boolean isEnabled() {
+		return enabled;
+	}
+
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
+	}
+
+	public String getUserType() {
+		return userType;
+	}
+
+	public void setUserType(String userType) {
+		this.userType = userType;
+	}
+
+	public String getFirstName() {
+		return firstName;
+	}
+
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
+
+	public String getMiddlName() {
+		return middlName;
+	}
+
+	public void setMiddlName(String middlName) {
+		this.middlName = middlName;
+	}
+
+	public String getLastName() {
+		return lastName;
+	}
+
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
+	}
+
+	public String getGender() {
+		return gender;
+	}
+
+	public void setGender(String gender) {
+		this.gender = gender;
+	}
+
+	public String getAddress1() {
+		return address1;
+	}
+
+	public void setAddress1(String address1) {
+		this.address1 = address1;
+	}
+
+	public String getAddress2() {
+		return address2;
+	}
+
+	public void setAddress2(String address2) {
+		this.address2 = address2;
+	}
+
+	public String getCity() {
+		return city;
+	}
+
+	public void setCity(String city) {
+		this.city = city;
+	}
+
+	public String getMobile() {
+		return mobile;
+	}
+
+	public void setMobile(String mobile) {
+		this.mobile = mobile;
+	}
+
+	public String getSchool() {
+		return school;
+	}
+
+	public void setSchool(String school) {
+		this.school = school;
+	}
+
+	public String getGrade() {
+		return grade;
+	}
+
+	public void setGrade(String grade) {
+		this.grade = grade;
+	}
+
+	public boolean getWhatsApp() {
+		return whatsApp;
+	}
+
+	public void setWhatsApp(boolean whatsApp) {
+		this.whatsApp = whatsApp;
+	}
+
+	public boolean getViber() {
+		return viber;
+	}
+
+	public void setViber(boolean viber) {
+		this.viber = viber;
+	}
+
+	public String getConfirmPassword() {
+		return confirmPassword;
+	}
+
+	public void setConfirmPassword(String confirmPassword) {
+		this.confirmPassword = confirmPassword;
+	}
+
+
+	public int getClCategoryId() {
+		return clCategoryId;
+	}
+
+
+	public void setClCategoryId(int clCategoryId) {
+		this.clCategoryId = clCategoryId;
+	}
+
+
+	public int getSubjectId() {
+		return subjectId;
+	}
+
+
+	public void setSubjectId(int subjectId) {
+		this.subjectId = subjectId;
+	}
+
+
+	public String getLocation() {
+		return location;
+	}
+
+
+	public void setLocation(String location) {
+		this.location = location;
+	}
+
+
+	public MultipartFile getProImage() {
+		return proImage;
+	}
+
+
+	public void setProImage(MultipartFile proImage) {
+		this.proImage = proImage;
+	}
+
+
+	public String getClCategoryName() {
+		return clCategoryName;
+	}
+
+
+	public void setClCategoryName(String clCategoryName) {
+		this.clCategoryName = clCategoryName;
+	}
+
+
+	public String getSubjectName() {
+		return subjectName;
+	}
+
+
+	public void setSubjectName(String subjectName) {
+		this.subjectName = subjectName;
+	}
+
+
+	
+
+
+	
+
+	
+	
+	
+	
+}

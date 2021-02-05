@@ -1,0 +1,387 @@
+
+var catList;
+var subjectList;
+var teacherList;
+var idList;
+var classList;
+
+
+
+// set date format to yyyy-mm-dd
+function setDateFormat(){
+	$("#date").on('change',function(){
+		
+		var  d = new Date(document.getElementById("date").value);
+		var  dt =new String(d.getDate()) ;
+		 var mn = new String(d.getMonth()+1);
+		 
+		 
+		
+		 var yy = d.getFullYear();
+		  
+		 if(dt.length!=2){
+			 dt="0"+dt;
+		 }
+		 
+		 if(mn.length!=2){
+			mn="0"+mn; 
+		 }
+		 
+		  var newDate=yy + "/"+ mn + "/" +dt ;
+		
+		 
+		  $("#hiddenDate").val(newDate);
+		
+		
+});
+}
+
+// set default class category and subject of currant user
+function setUserDefaultCategoryAndSubject(){
+	
+	$("#hiddenTeacherId").val(teacherList[0].teacherId);
+	$("#clCategory").val(teacherList[0].clCategoryId);
+	$("#hiddenCatId").val(teacherList[0].clCategoryId);
+	
+	var defaultCategoryId=teacherList[0].clCategoryId;
+	var defaultSubjectId=teacherList[0].subjectId;
+	var htmlCodes="";
+	
+	for(var i=0;i<subjectList.length;i++){
+		if(subjectList[i].clCategoryId===defaultCategoryId){
+			htmlCodes=htmlCodes+"<option  value='"+subjectList[i].subjectId+"'>"+subjectList[i].subjectName+"</option>";
+		}
+	}
+	
+	$("#subjects").html(htmlCodes);
+	
+	$("#subjects").val(defaultSubjectId);
+	$("#hiddenSubjectId").val(defaultSubjectId);
+}
+
+
+// get subject according to selected category
+
+function getSubjectByCategoryId(){
+	$("#clCategory").on('change',function(){
+		var selectedClassCategoryId=parseInt($(this).val());
+		
+		if(selectedClassCategoryId!=0){
+			$("#techers").html("<option value='0'>--- Select Teacher ---</option>");
+			
+			var htmlCode="<option value='0'>--- Select Subject ---</option>";
+			
+			for(var i=0;i<subjectList.length;i++){
+				
+				
+				if(subjectList[i].clCategoryId==selectedClassCategoryId){
+					htmlCode=htmlCode+"<option  value='"+subjectList[i].subjectId+"'>"+subjectList[i].subjectName+"</option>";
+				}
+			}
+			
+			$("#subjects").html(htmlCode);
+		}else{
+			$("#techers").html("<option value='0'>--- Select Teacher ---</option>");
+			
+			$("#subjects").html("<option value='0'>--- Select Subject ---</option>");
+		}
+		
+	});
+	
+}
+
+//get Teachers according to class category and subject
+function getTeachersByClCategoryIdAndSubjectId(){
+	
+	$("#subjects").on('change',function(){
+		var count=0;
+		var selectedSubjectId=parseInt($(this).val());
+		if(selectedSubjectId!=0){
+			var selectedClassCategoryId=parseInt($("#clCategory").val());
+			var htmlCodes="<option value='0'>--- Select Teacher ---</option>";
+			
+			
+			
+				for(var i=0;i<teacherList.length;i++){
+					
+					if(teacherList[i].clCategoryId===selectedClassCategoryId && teacherList[i].subjectId=== selectedSubjectId){
+						count++;
+						htmlCodes=htmlCodes+"<option  value='"+teacherList[i].teacherId+"'>"+teacherList[i].firstName+" "+teacherList[i].middleName+" "+teacherList[i].lastName+"</option>";
+						
+						
+					}
+					
+					
+					
+					
+				}
+				
+				if(count!=0){
+					$("#techers").html(htmlCodes);
+					
+				}else{
+					$("#techers").html("<option value='0'>No Teachers Available</option>");	
+				
+				}
+				
+			
+				
+			
+				
+			
+			
+		}else{
+			$("#techers").html("<option value='0'>--- Select Teacher ---</option>");	
+		}
+		
+	});
+}
+
+function onChangeTeachers(){
+	$("#techers").on('change',function(){
+		var selectedTeacher=parseInt($(this).val());
+		
+	});
+}
+
+//set select box values according to searched ids
+function searchIds(){
+	
+	
+	var subjecthtmlCode="<option value='0'>--- Select Subject ---</option>";
+	var teacherHtmlCodes="";
+	
+	$("#clCategory").val(idList[0]);
+	
+	if(idList[0]!=0 && idList[1]!=0  ){
+		
+		for(var j=0;j<subjectList.length;j++){
+			if(subjectList[j].clCategoryId===idList[0]){
+				subjecthtmlCode=subjecthtmlCode+"<option  value='"+subjectList[j].subjectId+"'>"+subjectList[j].subjectName+"</option>";
+			}
+		}
+		$("#subjects").html(subjecthtmlCode);
+		$("#subjects").val(idList[1]);
+		
+		if(teacherList.length!=0){
+			
+			
+			var teacherHtmlCodes="<option value='0'>--- Select Teacher ---</option>";
+			for(var x=0;x<teacherList.length;x++){
+				if(teacherList[x].clCategoryId===idList[0] && teacherList[x].subjectId=== idList[1]){
+					teacherHtmlCodes=teacherHtmlCodes+"<option  value='"+teacherList[x].teacherId+"'>"+teacherList[x].firstName+" "+teacherList[x].middleName+" "+teacherList[x].lastName+"</option>";
+				}
+				
+			}
+			$("#techers").html(teacherHtmlCodes);
+			$("#techers").val(idList[2]);
+		
+			if(classList.length===0){
+				$("#noDataMsg").text("No Classes Available").css("color","red").css("text-align","center");
+				
+			}
+		
+		
+		
+	}else{
+		$("#subjects").html("<option value='0'>Select Subject</optioin>");
+		$("#techers").html("<option value='0'>Select Teacher</optioin>");
+	}
+	
+	
+	
+	
+}
+}
+
+function addZoomUrls(){
+	
+	
+	$("#btnSave").on("click",function(){
+		var startUrl=$("#startUrl").val();
+		var joinUrl=$("#joinUrl").val();
+		var classId=$("#classId").val();
+		$.ajax({
+
+			type : "PUT",
+			url : "/updatezoomurls",
+			
+			data : JSON.stringify({
+				classId:classId,  
+				startUrl:startUrl,
+				joinUrl: joinUrl
+			}),
+
+			contentType : "application/json; charset=utf-8",
+			cache : false,
+			success : function(data) {
+				
+				
+				$('#msg').text("Saved").css('color','green').delay(2000).show();
+			},
+			error : function(err) {
+				alert("not saved");
+			}
+		});
+	});
+	
+	
+}
+
+
+ // validate add class form 
+ function validateStartTime(){
+	 $("#startTime").on('keydown blur',function(){
+		 var startTime = /^\(?([0-2]{1})\)?([0-9]{1})?[:]?([0-9]{2})[ ]?([A,P]{1})[]?([M]{1})$/;
+		  var key = event.keyCode || event.charCode;
+		  if( key == 8 || key == 46 ){
+			  
+		  
+		  }else{
+			  if($(this).val()!=""){
+					
+					 
+					 if($(this).val().length==5){
+						 if($(this).val().split(":")[1].length==2){
+							 
+							 if(parseInt($(this).val().split(":")[0])==12){
+								 $(this).val("12:"+$(this).val().split(":")[1]+" PM");
+							 }
+							 else if(parseInt($(this).val().split(":")[0])>12 && parseInt($(this).val().split(":")[0])<24){
+								 $(this).val("0"+(parseInt($(this).val().split(":")[0])-12)+":"+$(this).val().split(":")[1]+" PM");
+							 }
+							 else if(parseInt($(this).val().split(":")[0])==00){
+								 $(this).val("12:"+$(this).val().split(":")[1]+" AM");
+							 }
+							 else{
+								 $(this).val($(this).val()+" AM");
+							 }
+							
+						
+					 }
+						 
+					 }
+					
+				 if($(this).val().match(startTime)){
+					 $(this).css('border','solid 1px green');
+					 $("#btnAdd").attr("hidden",false);
+					 $("#endTime").attr("readonly", false);
+				 }else{
+					 $(this).css('border','solid 1px red');
+					 $("#endTime").attr("readonly", true);
+					 $("#btnAdd").attr("hidden",true);
+				 }
+			  
+				 }else{
+					 $(this).css('border','solid 1px #e5e0e0');
+					 $("#btnAdd").attr("hidden",false);
+					 $("#endTime").attr("readonly", true);
+				 }
+		  }
+		
+	 });
+ }
+ 
+ function validateEndTime(){
+	 $("#endTime").on('keydown blur',function(){
+		 var startTime = /^\(?([0-2]{1})\)?([0-9]{1})?[:]?([0-9]{2})[ ]?([A,P]{1})[]?([M]{1})$/;
+		  var key = event.keyCode || event.charCode;
+		
+		 if( key == 8 || key == 46 ){
+			  
+			  
+		  }else{
+			  
+			 
+				 if($(this).val().length==5){
+					 if($(this).val().split(":")[1].length==2){
+						 
+						 if(parseInt($(this).val().split(":")[0])==12){
+							 $(this).val("12:"+$(this).val().split(":")[1]+" PM");
+						 }
+						 else if(parseInt($(this).val().split(":")[0])>12 && parseInt($(this).val().split(":")[0])<24){
+							 $(this).val("0"+(parseInt($(this).val().split(":")[0])-12)+":"+$(this).val().split(":")[1]+" PM");
+						 }
+						 else if(parseInt($(this).val().split(":")[0])==00){
+							 $(this).val("12:"+$(this).val().split(":")[1]+" AM");
+						 }
+						 else{
+							 $(this).val($(this).val()+" AM");
+						 }
+						
+					
+				 }
+					 
+				 }
+			  
+			  if($(this).val()!=""){
+					 if($(this).val().match(startTime)){
+						 $(this).css('border','solid 1px green');
+						 $("#btnAdd").attr("hidden",false);
+						 $("#startTime").attr("readonly", false);
+					 }else{
+						 $(this).css('border','solid 1px red');
+						 $("#startTime").attr("readonly", true);
+						 $("#btnAdd").attr("hidden",true);
+					 }
+					 }else{
+						 $(this).css('border','solid 1px #e5e0e0');
+						 $("#btnAdd").attr("hidden",false);
+						 $("#startTime").attr("readonly", false);
+					 } 
+		  }
+		 
+		 
+	 });
+ }
+ 
+ // submit find class form
+ 
+ function findClass(){
+$("#btnFind").on('click',function(){
+	
+	if($("#clCategory").val()==0){
+		 $("#alertMsgBox").attr("hidden",false);
+		 $("#alertMsg").text('Select At Least Category And Subject');
+		 
+		$("#clCategory").focus();
+	}else{
+		if($("#subjects").val()==0){
+			$("#subjects").focus();
+			$("#alertMsgBox").attr("hidden",false);
+			 $("#alertMsg").text('Select At Least Category And Subject');
+		}else{
+			$("#findClassForm").submit();
+		}
+		
+	}
+	
+})	; 
+ }
+ 
+ // payment bbuttons
+ 
+ function paymentOnlin(){
+	 $("#paymentOnlin").on('change',function(){
+			$("#btnUpload").css('display','none');
+			$("#btnLocal").css('display','block');
+			$("#btnOnline").css('display','block');
+			$("#bankSlip").prop("disabled",true);
+			
+		});
+ }
+ 
+ function paymentBank(){
+	 $("#paymentBank").on('change',function(){
+			$("#btnUpload").css('display','block');
+			$("#btnLocal").css('display','none');
+			$("#btnOnline").css('display','none');
+			$("#bankSlip").prop("disabled",false);
+			
+		});
+ }
+ 
+
+	
+	
+ 

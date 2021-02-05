@@ -1,0 +1,55 @@
+package com.itpanda.tution.util;
+
+import java.sql.Time;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+public class TimeFormattor {
+
+	public Time stringToJavaSqlTime(String time) throws ParseException {
+
+		Date date = null;
+		SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
+
+		date = sdf.parse(time);
+		java.sql.Time newTime = new java.sql.Time(date.getTime());
+
+		return newTime;
+	}
+
+	public String javaSqlTimeToString(Time time) {
+		
+		SimpleDateFormat dtf = new SimpleDateFormat("HH:mm");
+		String newTime = dtf.format(time);
+		return newTime;
+	}
+	
+	public Date stringToDate(String date) throws ParseException {
+		
+		Date newDate = null;
+		SimpleDateFormat dtf = new SimpleDateFormat("yyyy-MM-dd");
+		newDate=dtf.parse(date);
+		
+		return newDate;
+		
+		
+	}
+	
+	public String dateToString(Date date) {
+		
+		SimpleDateFormat dtf = new SimpleDateFormat("yyyy-MM-dd");
+		String newDate=dtf.format(date);
+		
+		return newDate;
+		
+	}
+	
+	public Date curruntDate() {
+		
+		Date date=new Date();
+		
+		return date;
+	}
+
+}

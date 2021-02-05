@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script type="text/javascript">
+
+$(document).ready(function() {  
+	
+
+		$("#paymentOnlin").on('click',function(){
+			$("#onlinePaymentSection").css('display','block');
+			$("#uploadBankSlipSection").css('display','none');
+		});
+	
+
+	
+		$("#paymentBank").on('click',function(){
+			$("#onlinePaymentSection").css('display','none');
+			$("#uploadBankSlipSection").css('display','block');
+		});
+	
+ 
+});
+</script>
+</head>
+<body>
+
+<center>
+<table cellpadding="10" th:each="class:${classList}">
+<thead>
+<tr>
+<td colspan="2"><img style="width: 100px; height: 100px;" th:src="@{'/teacher/image/'+${class.teacherId}}"></td>
+</tr>
+<tr>
+<th>Teacher</th>
+<td th:text="${teacherName}"></td>
+</tr>
+
+<tr>
+<th>Description</th>
+<td><span th:text="${class.descriptionEnglish}"></span> / <span th:text="${class.descriptionSinhala}"></span></td>
+</tr>
+
+<tr>
+<th >Date</th>
+<td th:text="${class.date}"></td>
+</tr>
+
+<tr>
+<th>Time Frame</th>
+<td th:text="${class.startTime +' - '+class.endTime}"></td>
+</tr>
+
+<tr>
+<th  >Ammount</th>
+<td th:text="${'Rs:'+class.amount}"></td>
+</tr>
+
+<tr>
+<th  >Payment Method</th>
+<td ><input type="radio" value="online" name="payment" id="paymentOnlin" checked="checked">Online <input type="radio" value="bankDeposit" id="paymentBank" name="payment">Bank Deposit </td>
+</tr>
+</thead>
+<tbody style="display: none;" id="uploadBankSlipSection">
+<form th:action="@{/upload}"  enctype="multipart/form-data" method="post">
+<tr>
+<td></td>
+<td><input type="file" name="file"></td>
+<td><input type="text" th:value="${class.classId}" th:name="classId" hidden=""></td>
+<input type="text" th:value="${classJoinId}" th:name="clJoinId" hidden="" >
+</tr>
+<tr>
+<td></td>
+<td><input type="submit" value="Upload"></td>
+</tr>
+</form>
+</tbody>
+<tbody id="onlinePaymentSection">
+<form th:action="@{/join}"  th:method="post">
+<tr>
+
+<th><input type="text" th:value="${class.classId}" hidden="" th:name="classId">
+<input type="text" th:value="${classJoinId}" th:name="clJoinId" hidden="" >
+</th>
+
+<td><button type="submit" th:if="${class.status=='pending'}">Pay Local</button></a>
+
+<th></th>
+
+</tr>
+</form>
+<tr>
+
+<td>
+<form th:action="@{https://sandbox.payhere.lk/pay/checkout}" method="post">
+<button type="submit" th:if="${class.status=='pending'}">Pay Online</button> 
+						
+						<input type="hidden" name="merchant_id" th:value="1215118"  />
+						<input type="hidden" name="return_url" th:value="@{http://34.87.68.184:8080/wall}"  />
+						<input type="hidden" name="cancel_url" th:value="@{http://34.87.68.184:8080/wall}"/>
+						<input type="hidden" name="notify_url" th:value="@{http://34.87.68.184:8080/paymentNotify}"  />
+						<input type="hidden" name="first_name" th:value="${userDto.user.firstName}"  />
+						<input type="hidden" name="last_name" th:value="${userDto.user.lastName}"  />
+						<input type="hidden" name="email" th:value="${userDto.user.username}"  />
+						<input type="hidden" name="phone" th:value="${userDto.user.mobile}"  />
+						<input type="hidden" name="address" th:value="${userDto.user.address1}"  />
+						<input type="hidden" name="city" th:value="${userDto.user.city}"  />
+						<input type="hidden" name="country" th:value="@{Sri Lanka}"  />
+						<input type="hidden" name="order_id" th:value="${classJoinId}"  /> <!-- replace with classjoinid -->
+						<input type="hidden" name="items" th:value="@{Tution Class}"  />
+						<input type="hidden" name="currency" th:value="LKR"  />
+						<input type="hidden" name="amount" th:value="${class.amount}"  />
+						
+						</form>
+						
+
+
+
+</td>
+</tr>
+<!-- </form> -->
+
+
+
+</tbody>
+
+</table>
+</center>
+
+</body>
+</html>

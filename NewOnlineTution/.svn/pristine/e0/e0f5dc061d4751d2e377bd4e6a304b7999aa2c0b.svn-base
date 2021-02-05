@@ -1,0 +1,1053 @@
+package com.itpanda.tution.controller;
+
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.Duration;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import org.apache.tomcat.util.http.fileupload.IOUtils;
+//import org.joda.time.DateTime;
+//import org.joda.time.format.DateTimeFormat;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.mail.MailException;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.util.StreamUtils;
+import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.ModelAndView;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.itpanda.tution.Constant;
+import com.itpanda.tution.SendEmail;
+import com.itpanda.tution.SendSMSMessage;
+import com.itpanda.tution.SmsResult;
+import com.itpanda.tution.ZoomCaller;
+import com.itpanda.tution.ZoomResult;
+import com.itpanda.tution.entity.ClassCategory;
+import com.itpanda.tution.entity.ClassJoin;
+import com.itpanda.tution.entity.Classes;
+import com.itpanda.tution.entity.Subject;
+import com.itpanda.tution.entity.Teacher;
+import com.itpanda.tution.loginSecurity.entity.User;
+import com.itpanda.tution.loginSecurity.repository.UserRepository;
+import com.itpanda.tution.model.ClassCategoryModel;
+import com.itpanda.tution.model.ClassJoinModel;
+import com.itpanda.tution.model.ClassModel;
+import com.itpanda.tution.model.SubjectModel;
+import com.itpanda.tution.model.TeacherModel;
+import com.itpanda.tution.model.UserDTO;
+import com.itpanda.tution.model.UserModel;
+import com.itpanda.tution.repository.ClassesRepository;
+import com.itpanda.tution.repository.TeacherRepository;
+import com.itpanda.tution.service.ClassJoinService;
+import com.itpanda.tution.service.ClassService;
+import com.itpanda.tution.service.CommonServiceUtil;
+import com.itpanda.tution.service.TeacherService;
+import com.itpanda.tution.util.DataLoader;
+import com.itpanda.tution.util.TimeFormattor;
+
+import ch.qos.logback.classic.Logger;
+import sun.nio.ch.IOUtil;
+
+@Controller
+public class ClassController {
+
+	@Autowired
+	private TeacherService teacherService;
+
+	@Autowired
+	private ClassService classService;
+
+	@Autowired
+	private UserRepository userRepository;
+
+	@Autowired
+	private ClassJoinService classJoinService;
+
+	@Autowired
+	SendEmail sendEmail;
+
+	@Autowired
+	ZoomCaller zoomCaller;
+
+	@Autowired
+	SendSMSMessage sendSMSMessage;
+
+	@Value("${onlinetution.bankslip.derectrory}")
+	String UPLOAD_DIR;
+	
+	@Autowired
+	CommonServiceUtil commonServiceUtil;
+
+	TimeFormattor timeFormattor = new TimeFormattor();
+	
+	DataLoader dataLoader=new DataLoader();
+
+	// load add class html file
+	@SuppressWarnings("unchecked")
+	@RequestMapping("/addnewclass")
+	public String addNewClass(Model model, HttpSession session) {
+
+		ClassModel classes = new ClassModel();
+
+		
+		TeacherModel teacherModel = new TeacherModel();
+		
+		try {
+			// get authenticated user details
+			Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+			UserDTO u = (UserDTO) authentication.getPrincipal();
+
+			// get currant teacher details
+			// List<User> userList = userRepository.findUserById(u.getId());
+
+			
+	        BeanUtils.copyProperties(u.getUser().getTeacher(), teacherModel, "user");
+
+			if (session.getAttribute("classCategoryList") != null && session.getAttribute("subjectList") != null) {
+
+				// get All Class Categories
+				List<ClassCategoryModel> categoryList = (List<ClassCategoryModel>) session.getAttribute("classCategoryList");
+
+				// get All Subjects
+				List<SubjectModel> subjectList = (List<SubjectModel>) session.getAttribute("subjectList");
+
+				if (categoryList.size() > 0 && subjectList.size() > 0 && teacherModel!=null) {
+
+					
+					// set attributes
+					model.addAttribute("classes", classes);
+					model.addAttribute("teacherList", teacherModel);
+					model.addAttribute("categoryList", categoryList);
+					model.addAttribute("subjectList", subjectList);
+					// Teacher teacherTest=teacherList.get(0);
+
+					return "addClass";
+
+				} else {
+					return "redorect:/login";
+				}
+
+				// categoryList=null;
+
+			} else {
+				return "redirect:errorpage?statuscode=500";
+			}
+
+		} catch (Exception e) {
+			System.out.println("addnewclass: " + e);
+			return "redirect:errorpage?statuscode=500";
+		}
+
+	}
+
+	// save new class
+	@SuppressWarnings("unchecked")
+	@RequestMapping(value = "/saveclass", method = RequestMethod.POST)
+	public String saveClass(@ModelAttribute("classes") ClassModel classes,HttpSession session) {
+
+		// String zoomResult=
+		// zoomCaller.createZoomMeeting("onlinetution.lk@gmail.com","Java
+		// 1.8","2020-12-01","08:30:00",120); //TODO implement properly
+		Classes newClass = new Classes();
+		boolean isCreatedMeeting = false;
+		ZoomResult zoomResultObj = null;
+		String zoomResult = null;
+		List<Classes> classList = new ArrayList<Classes>();
+		String teacherName = "";
+		String startTime = "";
+		String endTime = "";
+		
+		//List<Teacher> teacher=new ArrayList<Teacher>();;
+		Teacher teacher=new Teacher();
+
+		// org.joda.time.format.DateTimeFormatter formatter =
+		// DateTimeFormat.forPattern("HH:mm:ss");
+		
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		UserDTO u = (UserDTO) authentication.getPrincipal();
+
+		try {
+
+			classList = classService.findExistingClasses(classes.getSubjectId(), classes.getClCategoryId(),
+					timeFormattor.stringToDate(classes.getDate()),
+					timeFormattor.stringToJavaSqlTime(classes.getStartTime()),
+					timeFormattor.stringToJavaSqlTime(classes.getEndTime()), Constant.CANCEL_CLASS);
+
+			if (classList.size() > 0) {
+				User user = classList.get(classList.size() - 1).getTeacher().getUser();
+				teacherName = user.getFirstName() + " " + user.getMiddlName() + " " + user.getLastName();
+				startTime = timeFormattor.javaSqlTimeToString(classList.get(classList.size() - 1).getStartTime());
+				endTime = timeFormattor.javaSqlTimeToString(classList.get(classList.size() - 1).getEndTime());
+
+				return "redirect:/addnewclass?class=notavilable&teacher=" + teacherName + "&stime=" + startTime
+						+ "&etime=" + endTime;
+			} else {
+				//List<Teacher> teacher = teacherService.getTeacherById(classes.getTeacherId());
+				
+				if(u!=null) {
+					teacher=u.getUser().getTeacher();
+				}else {
+					return "redirect:/login";
+				}
+				
+			    
+				
+
+				boolean isZoomUserExists = false;
+				
+				String topic="";
+				if(classes.getDescriptionEnglish()!=null && classes.getDescriptionEnglish().length()>150)
+					topic=classes.getDescriptionEnglish().substring(0, 150)+"...";
+				else
+					topic=classes.getDescriptionEnglish();
+				
+				//SimpleDateFormat simpleDateFormatter=
+				long classDuration=240; // Set to default four hours TODO change later
+				/*try {
+					Duration tempDuration = Duration.between(
+							timeFormattor.stringToJavaSqlTime(classes.getStartTime()).toInstant(),
+							timeFormattor.stringToJavaSqlTime(classes.getEndTime()).toInstant());
+					classDuration = tempDuration.toMinutes();
+				} catch (Exception ex) {
+					ex.printStackTrace();
+					classDuration = 240; // Set to default four hours
+				} */
+				
+				if (teacher != null && teacher.getUser() != null) {
+					isZoomUserExists = zoomCaller.isZoomUserExists(teacher.getUser().getUsername());
+				}
+				if (isZoomUserExists) {
+					// Create Zoom meeting
+					zoomResult = zoomCaller.createZoomMeeting(teacher.getUser().getUsername(),
+							classes.getDescriptionEnglish(), classes.getDate(), classes.getStartTime()+":00", classDuration); 
+
+				} else {
+					// Creat Zoom User
+					String createRes = zoomCaller.createZoomUser(teacher.getUser().getUsername(),
+							teacher.getUser().getFirstName(), teacher.getUser().getLastName());
+					if (createRes != null && "Success".equals(createRes)) {
+						zoomResult = zoomCaller.createZoomMeeting(teacher.getUser().getUsername(),
+								classes.getDescriptionEnglish(),  classes.getDate(), classes.getStartTime()+":00", classDuration); 
+																									// properly
+					} else {
+						System.out.println("Error occured while creating new Zoom user");
+						return "redirect:/addnewclass?class=error";
+					}
+				}
+
+				///
+
+				try {
+					ObjectMapper objectMapper = new ObjectMapper();
+
+					// read json file and convert to customer object
+					zoomResultObj = objectMapper.readValue(zoomResult, ZoomResult.class);
+					if (zoomResultObj != null && zoomResultObj.getId() != null && zoomResultObj.getId() > 0) {
+						isCreatedMeeting = true;
+					}
+				} catch (Exception ex) {
+					isCreatedMeeting = false;
+					ex.printStackTrace();
+					System.out.println("Error occured while creating Zoom meeting");
+					return "redirect:/addnewclass?class=error";
+				}
+
+				////
+
+				classes.setType("accepted");
+				classes.setStatus("pending");
+				// classes.setJoinUrl("https://us04web.zoom.us/j/73067662327?pwd=K3lJbHIrZElIM0JrSndjQlFra0VwZz09");
+				// classes.setStartUrl("https://us04web.zoom.us/s/73067662327#success");
+				if (isCreatedMeeting) {
+					classes.setJoinUrl(zoomResultObj.getJoin_url());
+					classes.setStartUrl(zoomResultObj.getStart_url());
+				}else {
+					System.out.println("Zoom meeting creation failed");
+					return "redirect:/addnewclass?class=error";
+				}
+				BeanUtils.copyProperties(classes, newClass);
+
+				// long ms = sdf.parse();
+
+				// SimpleDate df = new SimpleDateFormat("HH:mm:ss");
+				newClass.setEndTime(timeFormattor.stringToJavaSqlTime(classes.getEndTime()));
+				newClass.setStartTime(timeFormattor.stringToJavaSqlTime(classes.getStartTime()));
+				newClass.setSubject(teacherService.findSubjectById(classes.getSubjectId()));
+				newClass.setDate(timeFormattor.stringToDate(classes.getDate()));
+				newClass.setTeacher(teacher);
+
+				classService.saveClass(newClass);
+
+				// return "redirect:/classes/"+teacher.get(0).getUserId()+"?class=saved";
+				return "redirect:/classes/" + teacher.getUser().getId() + "?class=saved";
+			}
+
+		} catch (Exception e) {
+			System.out.println("save class: " + e);
+			return "redirect:/addnewclass?class=error";
+		}
+
+	}
+
+	@RequestMapping(value = "/editclass", method = RequestMethod.POST)
+	public String updateExistingClasss(@ModelAttribute("classes") ClassModel classModel) {
+
+		Classes classes = new Classes();
+		Teacher teacher=new Teacher();
+		// get authenticated user details
+				Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+				UserDTO u = (UserDTO) authentication.getPrincipal();
+
+		try {
+
+			
+			
+
+			classes = classService.getClassByClassId(classModel.getClassId());
+             
+
+			if (classes != null) {
+				 teacher=classes.getTeacher();
+				BeanUtils.copyProperties(classModel, classes);
+				classes.setEndTime(timeFormattor.stringToJavaSqlTime(classModel.getEndTime()));
+				classes.setStartTime(timeFormattor.stringToJavaSqlTime(classModel.getStartTime()));
+				classes.setDate(timeFormattor.stringToDate(classModel.getDate()));
+				classService.saveClass(classes);
+				return "redirect:/classes/" + teacher.getUser().getId() + "?class=saved";
+			} else {
+				return "redirect:/singleclass/edit?classId=" + classModel.getClassId() + "&class=error";
+			}
+
+		} catch (Exception e) {
+			System.out.println("update class : " + e);
+			return "redirect:/singleclass/edit?classId=" + classModel.getClassId() + "&class=error";
+		}
+
+	}
+
+	// load search class page
+
+	@SuppressWarnings("unchecked")
+	@RequestMapping("/findclass")
+	public String findClass(Model model,HttpSession session) {
+
+		
+		
+		
+		
+		try {
+			
+			if(session.getAttribute("classCategoryList")!=null && session.getAttribute("subjectList")!=null ) {
+				// get All Class Categories
+				List<ClassCategoryModel> categoryList = (List<ClassCategoryModel>) session.getAttribute("classCategoryList");
+
+				// get All Subjects
+				List<SubjectModel> subjectList = (List<SubjectModel>) session.getAttribute("subjectList");
+				
+
+				// String result=zoomCaller.createZoomUser("testonline1111@gmail.com", "Sanath",
+				// "jayasuriya"); //TODO remove after test
+
+				if (categoryList.size() > 0 && subjectList.size() > 0) {
+
+					// set attributes
+					model.addAttribute("categoryList", categoryList);
+					model.addAttribute("subjectList", subjectList);
+					
+
+					if(session.getAttribute("teacherList")!=null) {
+						model.addAttribute("teacherModelList", session.getAttribute("teacherList"));
+					}else {
+						List<User> userList = teacherService.findTeachers(Constant.USER_TYPE_TEACHER);
+						session.setAttribute("teacherList", dataLoader.getAllTeachers(userList));
+						model.addAttribute("teacherModelList", dataLoader.getAllTeachers(userList));
+					}
+					
+					// model.addAttribute("classList", classModelList);
+
+					return "searchclass";
+
+				} else {
+					return "redirect:errorpage?statuscode=500";
+				}
+				
+			}else {
+				return "redirect:/login";
+			}
+			
+		
+
+		} catch (Exception e) {
+			System.out.println("find class :" + e);
+
+			return "redirect:errorpage?statuscode=500";
+		}
+
+	}
+
+	// find classes
+
+	@SuppressWarnings("unchecked")
+	@RequestMapping("/searchclass")
+	public String searchClass(@RequestParam("clCategory") int clCategory, @RequestParam("subject") int subject,
+			@RequestParam("teacher") int teacherId, Model model,HttpSession session) {
+
+		ClassModel classModel;
+		List<ClassModel> classModelList = new ArrayList<ClassModel>();
+		//List<User> userList = teacherService.findTeachers(Constant.USER_TYPE_TEACHER);
+		List<TeacherModel> teacherModelList = new ArrayList<TeacherModel>();
+		
+
+		
+
+		List<Classes> classList = classService.searchClass(teacherId, subject, Constant.CANCEL_CLASS);
+
+		List<Integer> idList = new ArrayList<Integer>();
+		idList.add(clCategory);
+		idList.add(subject);
+		idList.add(teacherId);
+		
+		
+		
+
+		if(session.getAttribute("classCategoryList")!=null && session.getAttribute("subjectList")!=null) {
+			// get All Class Categories
+			List<ClassCategoryModel> categoryList = (List<ClassCategoryModel>) session.getAttribute("classCategoryList");
+
+			// get All Subjects
+			List<SubjectModel> subjectList = (List<SubjectModel>) session.getAttribute("subjectList");
+
+
+			if(session.getAttribute("teacherList")!=null) {
+				teacherModelList=(List<TeacherModel>) session.getAttribute("teacherList");
+				
+			}else {
+				List<User> userList = teacherService.findTeachers(Constant.USER_TYPE_TEACHER);
+				teacherModelList=dataLoader.getAllTeachers(userList);
+				//List<TeacherModel> teacherModelList = dataLoader.getAllTeachers(userList);
+				session.setAttribute("teacherList", teacherModelList);
+				
+				
+			}
+			
+			if (classList.size() != 0) {
+				for (int i = 0; i < classList.size(); i++) {
+					classModel = new ClassModel();
+					// copy user model object to teacher object
+					BeanUtils.copyProperties(classList.get(i), classModel);
+					for (int j = 0; j < teacherModelList.size(); j++) {
+
+						if (classList.get(i).getTeacher().getTeacherId() == teacherModelList.get(j).getTeacherId()) {
+
+							classModel.setTeacher(
+									teacherModelList.get(j).getFirstName() + " " + teacherModelList.get(j).getMiddleName()
+											+ " " + teacherModelList.get(j).getLastName());
+							classModel.setSubjectName(teacherService
+									.getSubjectById(classList.get(i).getSubject().getSubjectId()).get().getSubjectName());
+							classModel.setTeacherId(classList.get(i).getTeacher().getTeacherId());
+							if(classList.get(i).getStartTime()!=null) {
+								classModel.setStartTime(timeFormattor.javaSqlTimeToString(classList.get(i).getStartTime()));
+							}else {
+								classModel.setStartTime("");
+							}
+							
+							if(classList.get(i).getEndTime()!=null) {
+								classModel.setEndTime(timeFormattor.javaSqlTimeToString(classList.get(i).getEndTime()));
+							}else {
+								classModel.setEndTime("");
+							}
+							
+							if(classList.get(i).getDate()!=null) {
+								classModel.setDate(timeFormattor.dateToString(classList.get(i).getDate()));
+							}else {
+								classModel.setDate("");
+							}
+							
+						
+							
+
+						}
+					}
+					classModelList.add(classModel);
+				}
+			}
+			
+			if (categoryList.size() > 0 && subjectList.size() > 0) {
+
+				// set attributes
+				model.addAttribute("categoryList", categoryList);
+				model.addAttribute("subjectList", subjectList);
+				
+				
+			     model.addAttribute("teacherModelList", teacherModelList);
+				model.addAttribute("idList", idList);
+				model.addAttribute("classList", classModelList);
+				// model.addAttribute("teacherTest", "123456");
+
+				return "searchclass";
+
+			} else {
+				return "redirect:errorpage?statuscode=500";
+			}
+
+		}else {
+			return "redirect:/login";
+		}
+		
+		
+
+		
+
+	}
+
+	// display teacher profile image by teacher Id
+	@GetMapping(value = "/teacher/image/{teacherId}", produces = MediaType.IMAGE_PNG_VALUE)
+	public ResponseEntity<byte[]> displayProImageBYTeacherId(@PathVariable(name = "teacherId") int teacherId)
+			throws IOException {
+
+		List<Teacher> teacher = teacherService.getTeacherById(teacherId);
+		byte[] imageContent;
+		try {
+
+			if (teacher.get(0).getProImage() != null) {
+				imageContent = teacher.get(0).getProImage();
+			} else {
+
+				File file = new File("/img/propic.jpg");
+				imageContent = new byte[(int) file.length()];
+			}
+
+			final HttpHeaders headers = new HttpHeaders();
+			headers.setContentType(MediaType.IMAGE_PNG);
+			return new ResponseEntity<byte[]>(imageContent, headers, HttpStatus.OK);
+
+		} catch (Exception e) {
+			System.out.println("load image :" + e);
+			return new ResponseEntity<byte[]>(null, null, HttpStatus.OK);
+		}
+
+	}
+
+	// display teacher profile image by user Id
+	@GetMapping(value = "/user/image/{userId}", produces = MediaType.IMAGE_PNG_VALUE)
+	public ResponseEntity<byte[]> displayProImageByUserId(@PathVariable(name = "userId") Long userId)
+			throws IOException {
+
+		List<Teacher> teacher = teacherService.findTeacherByUserId(userId);
+
+		byte[] imageContent;
+
+		if (teacher.get(0).getProImage() != null) {
+			imageContent = teacher.get(0).getProImage();
+		} else {
+
+			File file = new File("/img/propic.jpg");
+			imageContent = new byte[(int) file.length()];
+		}
+
+		final HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.IMAGE_PNG);
+		return new ResponseEntity<byte[]>(imageContent, headers, HttpStatus.OK);
+	}
+
+	// load single class page student point of view
+	@RequestMapping("/singleclass/student")
+	public String getSingleClassById(@RequestParam("classId") int classId, @RequestParam("teacherId") int teacherId,
+			Model model) {
+
+		ClassJoin classJoin = new ClassJoin();
+		ClassModel classModel = new ClassModel();
+		List<ClassModel> classmodelList = new ArrayList<ClassModel>();
+
+		// get currant date
+		Date currentUtilDate = new Date();
+		// SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy/MM/dd");
+		//SimpleDateFormat time1Formatter = new SimpleDateFormat("HH:mm:ss");
+
+		// String paymentDate = dateFormatter.format(currentUtilDate);
+	//	String paymentTime = time1Formatter.format(currentUtilDate.getTime());
+
+		List<Classes> classList = classService.getClassById(classId);
+
+		if (classList.size() > 0) {
+			Teacher teacher = classList.get(0).getTeacher();
+			Optional<User> user = Optional.ofNullable(teacher.getUser());
+			String teacherName = user.get().getFirstName() + " " + user.get().getMiddlName() + " "
+					+ user.get().getLastName();
+
+			BeanUtils.copyProperties(classList.get(0), classModel);
+			classModel.setTeacherId(classList.get(0).getTeacher().getTeacherId());
+			
+			if(classList.get(0).getStartTime()!=null) {
+				classModel.setStartTime(timeFormattor.javaSqlTimeToString(classList.get(0).getStartTime()));	
+			}else {
+				classModel.setStartTime("");
+			}
+			
+			
+			if(classList.get(0).getEndTime()!=null) {
+				classModel.setEndTime(timeFormattor.javaSqlTimeToString(classList.get(0).getEndTime()));	
+			}else {
+				classModel.setEndTime("");
+			}
+			
+			if(classList.get(0).getDate()!=null) {
+				classModel.setDate(timeFormattor.dateToString(classList.get(0).getDate()));
+			}else {
+				classModel.setDate("");
+			}
+			
+
+			classmodelList.add(classModel);
+
+			model.addAttribute("teacherName", teacherName);
+			model.addAttribute("classList", classmodelList);
+
+			Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+			UserDTO userDto = (UserDTO) authentication.getPrincipal();
+			
+			model.addAttribute("userDto", userDto);
+			// Add record to classjoin table and make the status="PENDING"
+
+			// set data to class join object
+			classJoin.setClasses(classList.get(0));
+			classJoin.setType(Constant.Cl_JOIN_TYPE_INIT);
+			classJoin.setStatus(Constant.CL_JOIN_STATUS_PENDING);
+			classJoin.setAmmount(classList.get(0).getAmount());
+			classJoin.setPaymentDate(currentUtilDate);
+
+			classJoin.setUser(userDto.getUser());
+			classJoin.setBankSlip("-");
+			// classJoin.setTeacherId(teacherId);
+
+			// save payment details
+			ClassJoin newClassJoin = classJoinService.saveClassJoin(classJoin);
+
+			// Return the classjoin table's cl_join_id like
+			// model.addAttribute("classjoinid", cl_join_id);
+
+			model.addAttribute("classJoinId", newClassJoin.getClJoinId());
+			return "singleClass";
+		} else {
+			return "redirect:errorpage?statuscode=500";
+		}
+
+	}
+
+	// join class
+
+	@RequestMapping("/join")
+	public String joinToClass(@RequestParam("classId") int classId, @RequestParam("clJoinId") int clJoinId) {
+
+		// get authenticated user details
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		UserDTO u = (UserDTO) authentication.getPrincipal();
+
+		// get currant date
+		//Date currentUtilDate = new Date();
+	//	SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy/MM/dd ");
+		//SimpleDateFormat timeFormatter = new SimpleDateFormat("HH:mm:ss");
+
+		//String paymentDate = dateFormatter.format(currentUtilDate);
+	//	String paymentTime = timeFormatter.format(currentUtilDate.getTime());
+
+		// set user name
+		//String userName = u.getFirstName() + " " + u.getMiddleName() + " " + u.getLastName();
+
+		// get class details using class id
+		//List<Classes> classList = classService.getClassById(classId);
+
+		try {
+			// send email
+			// sendEmail.sendEmail(u.getUsername(), userName);
+			// TODO set correct mobile number of the user
+		
+			/*
+			User user=u.getUser();
+			String mobileNumber=user.getMobile();
+			String smsResultJson=null;
+			//classService.getClassByClassId(classId);
+			List<Classes> classList=classService.getClassById(classId);
+			Classes joiningClass=null;
+			if(classList!=null && classList.size()>0)
+				joiningClass=classList.get(0);
+			
+			String smsMessage="";
+			if(joiningClass!=null)
+				smsMessage="Please use the following URL for joining the class : "+joiningClass.getDescriptionEnglish()+ "  \n"+joiningClass.getJoinUrl();
+			
+			if(mobileNumber!=null && joiningClass!=null)
+				smsResultJson = sendSMSMessage.sendClassJoinMessage(mobileNumber, u.getFirstName(),smsMessage);
+			// String smsResultJson=sendSMSMessage.sendSMS();
+			boolean isSMSSent = false;
+			try {
+				ObjectMapper objectMapper = new ObjectMapper();
+				// read json file and convert to customer object
+				SmsResult smsResultObj = objectMapper.readValue(smsResultJson, SmsResult.class);
+				if (smsResultObj != null && "success".equals(smsResultObj.getStatus())) {
+					isSMSSent = true;
+				}
+			} catch (Exception ex) {
+				isSMSSent = false;
+			}
+			// save payment details
+			// TODO update isSMSSent flag on classJoin table
+			classJoinService.updateClassJoin(Constant.CL_JOIN_STATUS_COMPLETE, Constant.CL_JOIN_TYPE_ONLINE, clJoinId);
+			
+			
+			*/
+			
+
+			Optional<ClassJoin> optClassJoin = classJoinService.findById(clJoinId);
+
+			ClassJoin classJoin=null;
+			if (optClassJoin.isPresent()) {
+				classJoin = optClassJoin.get();
+				// TODO we may have to put this(Updating class join) after sending SMS and Email if we records SMS
+				// and Email sending status/details.
+				classJoinService.updateClassJoin(Constant.CL_JOIN_STATUS_COMPLETE, Constant.CL_JOIN_TYPE_ONLINE,
+						clJoinId);
+				commonServiceUtil.sendClassJoinMessages(classJoin);
+			}
+			
+		
+		} catch (MailException e) {
+			System.out.println(e.getMessage());
+		}
+
+		return "redirect:/wall";
+	}
+
+	// load single class page teacher point of view
+	@SuppressWarnings("unchecked")
+	@RequestMapping("/singleclass/teacher")
+	public ModelAndView getTeacherSingleClassById(@RequestParam("classId") int classId, Model model,HttpSession session) {
+
+		float institutePresentage = 0;
+		int numOfJoined = 0;
+		float ammount = 0;
+		float totalAmmount = 0;
+		float instituteCharge = 0;
+		float profite;
+		
+	
+
+		ClassModel classModel = new ClassModel();
+		
+
+		ModelAndView mav = new ModelAndView("singleClassTeacher");
+		ModelAndView mavError = new ModelAndView("errorPage");
+		ModelAndView login = new ModelAndView("index");
+		
+		// get class details according to class id
+		
+		Classes classList = classService.getClassByClassId(classId);
+
+		
+
+		// get authenticated user details
+				Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+				UserDTO u = (UserDTO) authentication.getPrincipal();
+		
+		if (classList != null  ) {
+
+			BeanUtils.copyProperties(classList, classModel);
+			classModel.setTeacherId(classList.getTeacher().getTeacherId());
+			if(classList.getStartTime()!=null) {
+				classModel.setStartTime(timeFormattor.javaSqlTimeToString(classList.getStartTime()));
+			}else {
+				classModel.setStartTime("");
+			}
+			
+			if(classList.getEndTime()!=null) {
+				classModel.setEndTime(timeFormattor.javaSqlTimeToString(classList.getEndTime()));
+			}else {
+				classModel.setEndTime("");
+			}
+			
+			if(classList.getDate()!=null) {
+				classModel.setDate(timeFormattor.dateToString(classList.getDate()));
+			}else {
+				classModel.setDate("");
+			}
+			
+
+			// get class join list according class id and status=complete
+			numOfJoined = classJoinService.getClassesByStatus(classId, Constant.CL_JOIN_STATUS_COMPLETE);
+
+			if(u!=null) {
+				
+				if(u.getUser().getUserType()==Constant.USER_TYPE_TEACHER) {
+					institutePresentage = u.getUser().getTeacher().getInsChargePercentage();
+				}else {
+					institutePresentage=classList.getTeacher().getInsChargePercentage();
+				}
+			}else {
+				return login;
+			}
+			
+			ammount = classList.getAmount();
+
+			totalAmmount = numOfJoined * ammount;
+			instituteCharge = (totalAmmount * institutePresentage) / 100;
+			profite = totalAmmount - instituteCharge;
+
+			mav.addObject("class", classModel);
+			model.addAttribute("numberOfJoined", numOfJoined);
+			model.addAttribute("totalAmmount", totalAmmount);
+			model.addAttribute("profite", profite);
+			model.addAttribute("instituteCharge", instituteCharge);
+			return mav;
+		} else {
+			return mavError;
+		}
+
+	}
+
+	// load edit single class page
+	@RequestMapping("/singleclass/edit")
+	public ModelAndView getSingleClassToEdit(@RequestParam("classId") int classId) {
+
+		ClassModel classModel = new ClassModel();
+
+		ModelAndView mav = new ModelAndView("editSingleClass");
+		ModelAndView mavError = new ModelAndView("errorPage");
+
+		Classes classList = classService.getClassByClassId(classId);
+
+		if (classList != null) {
+
+			BeanUtils.copyProperties(classList, classModel);
+			classModel.setTeacherId(classList.getTeacher().getTeacherId());
+			
+			
+			if(classList.getStartTime()!=null) {
+				classModel.setStartTime(timeFormattor.javaSqlTimeToString(classList.getStartTime()));
+			}else {
+				classModel.setStartTime("");
+			}
+			
+			if(classList.getEndTime()!=null) {
+				classModel.setEndTime(timeFormattor.javaSqlTimeToString(classList.getEndTime()));
+			}else {
+				classModel.setEndTime("");
+			}
+			
+			if(classList.getDate()!=null) {
+				classModel.setDate(timeFormattor.dateToString(classList.getDate()));
+			}else {
+				classModel.setDate("");
+			}
+			
+			
+
+			classModel.setSubjectId(classList.getSubject().getSubjectId());
+			classModel.setClCategoryId(classList.getSubject().getClassCategory().getClCategoryId());
+
+			mav.addObject("classes", classModel);
+			return mav;
+		} else {
+			return mavError;
+		}
+
+	}
+
+	@PostMapping("/upload")
+	public String uploadFile(@RequestParam("file") MultipartFile file, @RequestParam("classId") int classId,
+			@RequestParam("clJoinId") int clJoinId, @RequestParam("teacherId") int teacherId) {
+
+		// get authenticated user details
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		UserDTO u = (UserDTO) authentication.getPrincipal();
+		String filename = "user_" + u.getId().toString() + "_class_" + classId + "_slip."
+				+ file.getOriginalFilename().split("\\.")[1];
+
+		// save the file on the local file system
+		try {
+			byte[] bytes = file.getBytes();
+			Path path = Paths.get(UPLOAD_DIR + filename);
+			Files.write(path, bytes);
+
+		} catch (IOException e) {
+			System.out.println("bank slip upload : " + e);
+			return "redirect:singleclass/student?classId=" + classId + "&teacherId=" + teacherId + "&upload=error";
+		}
+
+		classJoinService.updateBankSlip("bank deposit", filename, clJoinId);
+		return "redirect:wall?upload=success";
+
+	}
+
+	@PostMapping("/singleclass/cancel")
+	public String cancelClass(@RequestParam("classId") int classId) {
+
+		List<Classes> classList = classService.getClassById(classId);
+		Classes classes = new Classes();
+		Long userId;
+		if (classList.size() > 0) {
+
+			BeanUtils.copyProperties(classList.get(0), classes);
+			classes.setStatus(Constant.CANCEL_CLASS);
+
+			userId = classes.getTeacher().getUser().getId();
+			classService.saveClass(classes);
+
+			return "redirect:/classes/" + userId + "?class=canceled";
+		} else {
+			return "redirect:/singleclass/teacher?classId=" + classId + "&class=notcanceled";
+		}
+
+	}
+	
+	@GetMapping("/adminjoinstudent")
+	public String adminJoinStudentToClass(Model model,@RequestParam("classId") int classId,HttpSession session) {
+		List<UserModel> userModelList=new ArrayList<UserModel>();
+		List<String> searchedWords=new ArrayList<String>();
+
+		model.addAttribute("users", userModelList);
+		 if(session.getAttribute("addminSelectedClass")!=null) {
+        	 model.addAttribute("classList", session.getAttribute("addminSelectedClass"));
+        }else {
+        	session.setAttribute("addminSelectedClass", getClassById(classId));
+        	 model.addAttribute("classList", session.getAttribute("addminSelectedClass"));
+        }
+		 model.addAttribute("classId", classId);
+		 model.addAttribute("notFount", false);
+		 model.addAttribute("searchedWords", searchedWords);
+		return "adminJoinNewStudent.html";
+	}
+	
+	@GetMapping("/adminsearchstudentbyemail")
+	public String adminSearchStudentByEmail(@RequestParam("email") String email,@RequestParam("firstName")String firstName,@RequestParam("lastName") String lastName, @RequestParam("classId") int classId ,Model model,HttpSession session) {
+		
+		List<User> userList=userRepository.findByUsernameAndFirstNameeAndLastNameUserType("%"+email+"%","%"+firstName+"%","%"+lastName+"%" ,Constant.USER_TYPE_STUDENT);
+		UserModel userModel=null;
+		List<UserModel> userModelList=new ArrayList<UserModel>();
+		List<String> searchedWords=new ArrayList<String>();
+		
+		searchedWords.add(email);
+		searchedWords.add(firstName);
+		searchedWords.add(lastName);
+		
+		
+		if(userList.size()>0) {
+			
+			for(int i=0;i<userList.size();i++) {
+				userModel=new UserModel();
+				BeanUtils.copyProperties(userList.get(i), userModel);
+				userModel.setFullName(userList.get(i).getFirstName()+" "+userList.get(i).getMiddlName()+" "+userList.get(i).getLastName());
+				userModelList.add(userModel);
+			}
+			
+			model.addAttribute("notFound", false);
+		}else {
+			model.addAttribute("notFound", true);
+		}
+		
+        model.addAttribute("users", userModelList);
+        
+        if(session.getAttribute("addminSelectedClass")!=null) {
+        	 model.addAttribute("classList", session.getAttribute("addminSelectedClass"));
+        }else {
+        	session.setAttribute("addminSelectedClass", getClassById(classId));
+        	 model.addAttribute("classList", session.getAttribute("addminSelectedClass"));
+        }
+       
+        model.addAttribute("classId", classId);
+        model.addAttribute("searchedWords", searchedWords);
+		return "adminJoinNewStudent.html";
+	}
+	
+	
+	public List<ClassModel> getClassById(int classId){
+
+		List<ClassModel> classModelList=new ArrayList<ClassModel>();
+		ClassModel classModel=new ClassModel();
+		Teacher teacher=new Teacher();
+		List<Classes> classList=classService.getClassById(classId);
+		
+		if(classList.size()>0) {
+		BeanUtils.copyProperties(classList.get(0).getTeacher(), teacher);	
+		BeanUtils.copyProperties(classList.get(0), classModel);
+		BeanUtils.copyProperties(classList.get(0).getTeacher(), classModel);
+		classModel.setSubjectName(teacherService
+									.getSubjectById(classList.get(0).getSubject().getSubjectId()).get().getSubjectName());
+		classModel.setTeacher(teacher.getUser().getFirstName()+" "+teacher.getUser().getMiddlName()+" "+teacher.getUser().getLastName() );
+		
+		if(classList.get(0).getStartTime()!=null) {
+			classModel.setStartTime(timeFormattor.javaSqlTimeToString(classList.get(0).getStartTime()));
+		}else {
+			classModel.setEndTime("");
+		}
+		
+		if(classList.get(0).getEndTime()!=null) {
+			classModel.setEndTime(timeFormattor.javaSqlTimeToString(classList.get(0).getEndTime()));
+		}else {
+			classModel.setEndTime("");
+		}
+		
+		if(classList.get(0).getDate()!=null) {
+			classModel.setDate(timeFormattor.dateToString(classList.get(0).getDate()));
+		}else {
+			classModel.setDate("");
+		}
+		classModelList.add(classModel);
+		
+		}
+		
+		return classModelList;
+	}
+	
+	
+	
+			       
+		
+		
+	}
+
+	// get all teachers
+
+	
+
+

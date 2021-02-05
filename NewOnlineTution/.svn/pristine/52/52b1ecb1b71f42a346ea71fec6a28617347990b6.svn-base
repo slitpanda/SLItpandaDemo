@@ -1,0 +1,57 @@
+// payment bbuttons
+ 
+ 
+	 $("#paymentOnlin").on('change',function(){
+			$("#btnUpload").css('display','none');
+			$("#btnLocal").css('display','block');
+			$("#bankSlip").css('display','none');
+			$("#btnOnline").css('display','block');
+			$("#bankSlip").prop("disabled",true);
+			
+			$("#bankDetailsection").css('display','none');
+			
+			
+		});
+ 
+ 
+
+	 $("#paymentBank").on('change',function(){
+			$("#btnUpload").css('display','block');
+			$("#bankSlip").css('display','block');
+			$("#btnLocal").css('display','none');
+			$("#btnOnline").css('display','none');
+			$("#bankSlip").prop("disabled",false);
+			
+			$("#bankDetailsection").css('display','block');
+			
+			
+		});
+	 
+	 
+	 function checkSelectedPaymentMeyhod(){
+		 
+		 if($("#paymentBank").is(":checked")){
+			 $("#btnUpload").css('display','block');
+				$("#bankSlip").css('display','block');
+				$("#btnLocal").css('display','none');
+				$("#btnOnline").css('display','none');
+				$("#bankSlip").prop("disabled",false);
+				$("#bankDetailsection").css('display','none');
+				
+		 }
+		 
+	 }
+	 
+	 $("#bankSlipFile").change(function() {
+			//readURL(this);
+			var fileName= this.files[0].name;
+			var extension = this.files[0].name.split('.').pop().toLowerCase();
+			if(fileName.length>20){
+				 $("#imgLable").text(fileName.substring(0,20)+"......."+extension);
+			}else{
+				 $("#imgLable").text(this.files[0].name);
+			}
+			
+			
+		});
+ 

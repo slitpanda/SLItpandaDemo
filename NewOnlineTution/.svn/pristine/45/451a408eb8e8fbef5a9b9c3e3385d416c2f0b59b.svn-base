@@ -1,0 +1,130 @@
+var subjectList;
+var teacherList;
+
+
+$('#datepicker').datepicker({
+    uiLibrary: 'bootstrap4',
+    format: 'yyyy-mm-dd',
+    
+});
+
+// set default class category and subject of currant user
+function setUserDefaultCategoryAndSubject() {
+
+	$("#hiddenTeacherId").val(teacherList.teacherId);
+	$("#clCategory").val(teacherList.clCategoryId);
+	$("#hiddenCatId").val(teacherList.clCategoryId);
+
+	var defaultCategoryId = teacherList.clCategoryId;
+	var defaultSubjectId = teacherList.subjectId;
+	var htmlCodes = "";
+
+	for (var i = 0; i < subjectList.length; i++) {
+		if (subjectList[i].clCategoryId === defaultCategoryId) {
+			htmlCodes = htmlCodes + "<option  value='"
+					+ subjectList[i].subjectId + "'>"
+					+ subjectList[i].subjectName + "</option>";
+		}
+	}
+
+	$("#subjects").html(htmlCodes);
+
+	$("#subjects").val(defaultSubjectId);
+	$("#hiddenSubjectId").val(defaultSubjectId);
+}
+
+
+
+
+// validate add class form ///////////////////////
+
+	 $("#startTime").on(
+		'blur',
+		function() {
+			var isValid = /^(?:[01][0-9]|2[0-3]):[0-5][0-9](?::[0-5][0-9])?$/.test($(this).val());
+
+			var key = event.keyCode || event.charCode;
+			if (key == 8 || key == 46) {
+
+			} else {
+				if ($(this).val() != "") {
+
+					if (isValid === false) {
+						$(this).css('border', 'solid 1px red');
+					}else{
+						$(this).css('border', 'solid 1px green');
+					}
+					
+					
+				} else {
+					$(this).css('border', 'solid 1px #e5e0e0');
+
+				}
+			}
+
+		});
+
+
+	 $("#endTime").on(
+				'blur',
+				function() {
+					var isValid = /^(?:[01][0-9]|2[0-3]):[0-5][0-9](?::[0-5][0-9])?$/.test($(this).val());
+
+					var key = event.keyCode || event.charCode;
+					if (key == 8 || key == 46) {
+
+					} else {
+						if ($(this).val() != "") {
+
+							if (isValid === false) {
+								$(this).css('border', 'solid 1px red');
+							}else{
+								$(this).css('border', 'solid 1px green');
+							}
+							
+							
+						} else {
+							$(this).css('border', 'solid 1px #e5e0e0');
+
+						}
+					}
+
+				});
+
+
+
+
+	 // save class
+	 
+
+	 $("#btnSave").on('click', function() {
+	var validate = true;
+
+	if ($("#paymentType").val() != "0") {
+		$(".form-control").each(function() {
+			if ($.trim($(this).val()).length == 0) {
+
+				$("#alertMsgValid").text("Please fill all details !");
+				$("#validmsgBox").css('display', 'block');
+				validate = false;
+			}else if($("#amount").val()=="0.0"){
+				$("#alertMsgValid").text("Ammount can't be Rs:0.00");
+				$("#validmsgBox").css('display', 'block');
+				validate = false;
+			}
+
+		});
+	} else {
+		validate = false;
+		$("#alertMsgValid").text("Please select payment type !");
+		$("#validmsgBox").css('display', 'block');
+
+	}
+
+	if (validate != false) {
+
+		$("#validmsgBox").css('display', 'none');
+		$("#classform").submit();
+	}
+
+});

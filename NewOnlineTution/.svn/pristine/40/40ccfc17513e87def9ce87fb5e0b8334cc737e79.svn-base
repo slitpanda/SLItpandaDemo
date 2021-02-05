@@ -1,0 +1,22 @@
+$('#datepicker').datepicker({
+    uiLibrary: 'bootstrap4',
+    format: 'yyyy-mm-dd',
+    defaultDate: 0
+    
+});
+
+$("#paymentForm").on('submit',function(e){
+	
+//	 cat.prop('required', true);
+	  /* Check if there is no selected value on ready if not mark select as invalid */
+	  
+	
+	 if($("#amount").val()=='0.0'){
+		// $("#amount").setCustomValidity("Passwords Don't Match");
+		 $("#alertMsgBoxAmmount").css('display','block');
+		  e.preventDefault();	
+		
+				
+	}
+
+});

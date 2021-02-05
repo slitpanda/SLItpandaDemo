@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <meta name="description" content="" />
+        <meta name="author" content="" />
+        <title>Dashboard -  Admin</title>
+       
+          <!-- Custom CSS -->
+     
+         <link rel="stylesheet" href="/css/style.css">
+          <link href="/css/adminstyles.css" rel="stylesheet" />
+         
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.0.0/animate.min.css"/>
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/js/all.min.js" crossorigin="anonymous"></script>
+         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+          <script src="https://code.jquery.com/jquery-3.5.1.min.js" crossorigin="anonymous"></script>
+          
+          <style type="text/css">
+       @import url('https://fonts.googleapis.com/css2?family=Kanit&display=swap');
+       body {
+    font-family: 'Kanit', sans-serif;
+          }
+       </style>
+             <script th:inline="javascript">
+
+$(document).ready(function() {  
+	
+	 
+	/*<![CDATA[*/
+
+		admin= /*[[${#request.userPrincipal.principal.userType=='admin'}]]*/;
+	   dataEntry= /*[[${#request.userPrincipal.principal.userType=='data_entry'}]]*/;
+		/*]]>*/
+
+        	
+		checkUserType();
+		
+
+	});
+</script>
+    </head>
+    <body class="sb-nav-fixed">
+    
+     
+    <!-- navigation -->
+	<div class="fixed-top" style="z-index: 1039">
+		<div th:replace="sidebar::navigation"></div>
+		<div class="row"  th:unless="${#request.userPrincipal.principal.userType=='data_entry' || #request.userPrincipal.principal.userType=='admin'} ">
+			<div class="col-md-12 shadow-sm" style="background-color: white">
+				<nav aria-label="breadcrumb" class="second ">
+					<ol class="breadcrumb pl-4 pr-4 pb-0"
+						style="background-color: white">
+						<li class="breadcrumb-item " th:unless="${#request.userPrincipal.principal.userType=='admin'}">
+						<a class="black-text"
+							th:href="@{/wall}"><span class="mr-md-3 mr-2">Home</span></a><i
+							class="fa fa-angle-double-right mt-1" aria-hidden="true"></i></li>
+						<li class="breadcrumb-item "><a class="black-text  active-2"
+							href="#"><span>Financial Details</span></a></li>
+					</ol>
+				</nav>
+			</div>
+		</div>
+	</div>
+	
+	<div id="layoutSidenav">
+        <!-- side bar -->
+            <div th:replace="sidebar::sidebar"></div>
+            
+            <div id="layoutSidenav_content">
+                <main>
+                    <div class="container-fluid "  id="mainDiv" >
+                  <!--   <div class="col-md-12 mt-2" th:unless="${#request.userPrincipal.principal.userType=='admin'}"><a th:href="@{/wall}">Home </a>/<span style="font-size: 16px; font-weight: bold;"> My Classes</span></div> -->
+                    <a class="btn btn-primary mt-2" th:href="@{'/newpayment/'+${userId}}" th:if="${#request.userPrincipal.principal.userType=='admin'}" style="background-color: #035696 ">Add New Payment</a>
+                    <a class="btn btn-primary mt-2 col-md-2" th:href="@{'/bankdetails/'+${userId}}" th:if="${#request.userPrincipal.principal.userType=='teacher'}" style="background-color: #035696 ">Bank Details</a>
+                    <div class="alert alert-danger mt-2" th:if="${#httpServletRequest.getParameter('message')=='error'}" id="alertMsgBox" style="text-align: center;" >
+				 
+                 <span id="alertMsg" >Please Update Bank Details </span> 
+                 </div>
+					<div class="container mt-2">
+					
+					<div class="row " >
+					
+					<div class="card col-md-5 m-auto p-2">
+					<div class="col-md-12 font-weight-bold" style="text-align: center;">Total Earned </div>
+					<div class="col-md-12" style="font-size: 20px; text-align: center;" th:text="${'Rs: '+totalErned}" >Rs: 4560000 </div>
+					</div>
+					
+					<div class="card col-md-5 m-auto p-2">
+					<div class="col-md-12 font-weight-bold" style="text-align: center;" th:if="${#request.userPrincipal.principal.userType=='admin'}">Total Share </div>
+					<div class="col-md-12 font-weight-bold" style="text-align: center;" th:if="${#request.userPrincipal.principal.userType=='teacher'}">My Share </div>
+					<div class="col-md-12" style="font-size: 20px; text-align: center;"  th:text="${'Rs: '+totalShare}">Rs: 45600 </div>
+					</div>
+					
+					<div class="card col-md-3 m-auto  p-2 mr-auto">
+					<div class="col-md-12 font-weight-bold" style="text-align: center;">Institute Charge </div>
+					<div class="col-md-12" style="font-size:20px; text-align: center;"  th:text="${'Rs: '+instituteCharge}">Rs: 45600 </div>
+					</div>
+					
+					<div class="card col-md-3  m-auto p-2" >
+					<div class="col-md-12 font-weight-bold" style="text-align: center;">Total Paid </div>
+					<div class="col-md-12" style="font-size: 20px; text-align: center;"  th:text="${'Rs: '+totalPaid}">Rs: 45600 </div>
+					</div>
+					
+					
+					
+					
+					<div class="card col-md-3 m-auto  p-2 ">
+					<div class="col-md-12 font-weight-bold" style="text-align: center;">Balance </div>
+					<div class="col-md-12" style="font-size:20px; text-align: center;"  th:text="${'Rs: '+balance}">Rs: 45600 </div>
+					</div>
+					
+					</div>
+					
+					</div>
+					
+            <div class="row mt-2">
+             
+
+                <div class="col-md-12 mt-3">
+                    <div class="card ">
+                    
+                    <!--start alert message -->	
+					 <div class="alert alert-success mt-2" th:if="${#httpServletRequest.getParameter('payment')=='success'}" id="alertMsgBox" style="text-align: center;" >
+				 
+                 <span id="alertMsg" >Payment Success</span> 
+                 </div>
+                 
+                 
+                 
+                 
+                 <!--end alert message -->	
+                    
+                        <table class="table table"   >
+                            <thead class="text-muted">
+                                <tr>
+                                    <th scope="col"  width="120">Date</th>
+                                    <th scope="col"  width="150">Bank Name</th>
+                                    <th scope="col"  width="120">Branch</th>
+                                    <th scope="col"  width="120">Account Number</th>
+                                    <th scope="col"  width="120" >Amount</th>
+                                </tr>
+                            </thead>
+                           <tbody class=" table-borderless col-md-12">
+                                <tr th:each="teacherPayment:${teacherPaymentList}" class="tb" style="">
+                                    <td class=""> 
+                                        <div class="price-wrap"> 
+                                            <var class="price"  th:text="${teacherPayment.date}"></var> 
+                                           
+                                        </div> 
+                                    </td>
+                                    <td> 
+                                        <div class="price-wrap"> 
+                                            <var class="price"  th:text="${teacherPayment.bank}"></var> 
+                                            
+                                        </div> 
+                                    </td>
+                                    <td> 
+                                        <div class="price-wrap"> 
+                                            <var class="price" th:text="${teacherPayment.branch}"></var> 
+                                           
+                                        </div> 
+                                    </td>
+                                    <td> 
+                                        <div class="price-wrap"> 
+                                            <var class="price" th:text="${teacherPayment.accountNumber}"></var> 
+                                           
+                                        </div> 
+                                    </td>
+                                    <td class="" style=""> 
+                                        <div class="price-wrap tdBorderBottom"> 
+                                            <var class="price"  th:text="'Rs: '+${teacherPayment.amount}"></var> 
+                                            
+                                        </div> 
+                                    </td>
+                                   
+                                </tr>
+                               <tr>
+                               
+                               </tr>
+
+                            </tbody>
+                        </table>
+                    </div> <!-- card.// -->
+
+
+                </div>
+            </div>
+        
+
+				</div>
+                </main>
+                  <!-- footer -->
+            <div  th:replace="footer::footer" >
+                
+            </div>
+            
+            <!-- /footer -->
+            </div>
+            </div>
+        </div>
+      
+       
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js">
+        </script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js">
+        </script>
+        <script  th:src="@{/js/scripts.js}"></script>
+        
+         <script src="/js/constant.js"></script>
+      
+    </body>
+</html>

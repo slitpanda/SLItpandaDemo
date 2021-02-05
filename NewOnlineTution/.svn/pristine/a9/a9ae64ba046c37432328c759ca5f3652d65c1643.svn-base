@@ -1,0 +1,676 @@
+package com.itpanda.tution.controller;
+
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.tomcat.util.http.fileupload.IOUtils;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.mail.MailException;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.util.StreamUtils;
+import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.ModelAndView;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.itpanda.tution.Constant;
+import com.itpanda.tution.SendEmail;
+import com.itpanda.tution.SendSMSMessage;
+import com.itpanda.tution.SmsResult;
+import com.itpanda.tution.ZoomCaller;
+import com.itpanda.tution.ZoomResult;
+import com.itpanda.tution.entity.ClassCategory;
+import com.itpanda.tution.entity.ClassJoin;
+import com.itpanda.tution.entity.Classes;
+import com.itpanda.tution.entity.Subject;
+import com.itpanda.tution.entity.Teacher;
+import com.itpanda.tution.loginSecurity.entity.User;
+import com.itpanda.tution.loginSecurity.repository.UserRepository;
+import com.itpanda.tution.model.ClassCategoryModel;
+import com.itpanda.tution.model.ClassJoinModel;
+import com.itpanda.tution.model.ClassModel;
+import com.itpanda.tution.model.SubjectModel;
+import com.itpanda.tution.model.TeacherModel;
+import com.itpanda.tution.model.UserDTO;
+import com.itpanda.tution.repository.TeacherRepository;
+import com.itpanda.tution.service.ClassJoinService;
+import com.itpanda.tution.service.ClassService;
+
+import com.itpanda.tution.service.TeacherService;
+
+
+import ch.qos.logback.classic.Logger;
+
+@Controller
+public class ClassController {
+
+	@Autowired
+	private TeacherService teacherService;
+
+	@Autowired
+	private ClassService classService;
+
+	@Autowired
+	private UserRepository userRepository;
+
+	@Autowired
+	private ClassJoinService classJoinService;
+
+	@Autowired
+	SendEmail sendEmail;
+	
+	@Autowired
+	ZoomCaller zoomCaller;
+	
+	@Autowired
+	SendSMSMessage sendSMSMessage;
+	
+	@Value("${onlinetution.bankslip.derectrory}")
+	String UPLOAD_DIR;
+
+	// load add class html file
+	@RequestMapping("/addnewclass")
+	public String addNewClass(Model model) {
+
+		ClassModel classes = new ClassModel();
+		Teacher teacher=new Teacher(); 
+		ClassCategoryModel classCategoryModel=null;
+		SubjectModel subjectModel=null;
+		TeacherModel teacherModel=null;
+        List<ClassCategoryModel> classCategoryModelList=new ArrayList<ClassCategoryModel>();
+        List<SubjectModel> subjectModelList=new ArrayList<SubjectModel>();
+        List<TeacherModel> teacherModelLidt=new ArrayList<TeacherModel>();
+		List<Teacher> teacherList=new ArrayList<Teacher>();
+
+		try {
+			// get authenticated user details
+			Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+			UserDTO u = (UserDTO) authentication.getPrincipal();
+			
+			
+
+			// get currant teacher details
+			List<User> userList = userRepository.findUserById(u.getId());
+			
+			BeanUtils.copyProperties(userList.get(0).getTeacher(), teacher,"user");
+			teacherList.add(teacher);
+
+			// get All Class Categories
+			List<ClassCategory> categoryList = teacherService.getAllClassCategories();
+
+			
+			// get All Subjects
+						List<Subject> subjectList = teacherService.getAllSubjects();
+			
+						//copy data to models
+						for(int i=0;i<categoryList.size();i++) {
+							classCategoryModel=new ClassCategoryModel();
+							BeanUtils.copyProperties(categoryList.get(i), classCategoryModel);
+							classCategoryModelList.add(classCategoryModel);
+						}
+						
+						for(int i=0;i<subjectList.size();i++) {
+							subjectModel=new SubjectModel();
+							BeanUtils.copyProperties(subjectList.get(i), subjectModel);
+							BeanUtils.copyProperties(subjectList.get(i).getClassCategory(), subjectModel);
+							subjectModelList.add(subjectModel);
+						}
+						
+						for(int i=0;i<teacherList.size();i++) {
+						     teacherModel=new TeacherModel();
+							BeanUtils.copyProperties(teacherList.get(i), teacherModel);
+
+
+							
+							teacherModelLidt.add(teacherModel);
+						}
+						
+			
+			
+		
+
+			// set attributes
+			model.addAttribute("classes", classes);
+		   model.addAttribute("teacherList", teacherModelLidt);
+			model.addAttribute("categoryList", classCategoryModelList);
+			model.addAttribute("subjectList", subjectModelList);
+			// Teacher teacherTest=teacherList.get(0);
+		} catch (Exception e) {
+			System.out.println("addnewclass: "+e);
+		}
+
+		return "addClass";
+
+	}
+
+	// save new class
+	@RequestMapping(value = "/saveclass", method = RequestMethod.POST)
+	public String saveClass(@ModelAttribute("classes") ClassModel classes) {
+
+		String zoomResult= zoomCaller.createZoomMeeting(); //TODO implement properly 
+		Classes newClass=new Classes();
+		
+		boolean isCreatedMeeting=false;
+		ZoomResult zoomResultObj=null;
+		try {
+			ObjectMapper objectMapper = new ObjectMapper();
+			
+	        //read json file and convert to customer object
+			zoomResultObj = objectMapper.readValue(zoomResult, ZoomResult.class);
+			if(zoomResultObj!=null && zoomResultObj.getId()!= null && zoomResultObj.getId()>0){
+				isCreatedMeeting=true;
+			}
+		}catch(Exception ex) {
+			isCreatedMeeting=false;
+		}
+		
+		
+		try {
+			List<Teacher> teacher=teacherService.getTeacherById(classes.getTeacherId());
+			
+			/* TODO uncomment after test
+			boolean isZoomUserExists=false;
+			if(teacher.get(0)!=null && teacher.get(0).getUser()!=null) {
+				isZoomUserExists=zoomCaller.isZoomUserExists(teacher.get(0).getUser().getUsername());
+			}
+			if(isZoomUserExists) {
+				//Create Zoom meeting 
+			}else {
+				//Creat Zoom  User
+			} */
+			
+			classes.setType("accepted");
+			classes.setStatus("pending");
+			//classes.setJoinUrl("https://us04web.zoom.us/j/73067662327?pwd=K3lJbHIrZElIM0JrSndjQlFra0VwZz09");
+			//classes.setStartUrl("https://us04web.zoom.us/s/73067662327#success");
+			if(isCreatedMeeting) {
+				classes.setJoinUrl(zoomResultObj.getJoin_url());
+				classes.setStartUrl(zoomResultObj.getStart_url());
+			}
+			BeanUtils.copyProperties(classes, newClass);
+			newClass.setSubject(teacherService.findSubjectById(classes.getSubjectId()));
+			newClass.setTeacher(teacher.get(0));
+			
+			classService.saveClass(newClass);
+
+			//return "redirect:/classes/"+teacher.get(0).getUserId()+"?class=saved";
+			return "redirect:/classes/"+teacher.get(0).getUser().getId()+"?class=saved";
+		} catch (Exception e) {
+			System.out.println("save class: "+e);
+			return "redirect:/addnewclass?class=error";
+		}
+		
+
+	}
+
+	
+	
+	@RequestMapping(value = "/editclass", method = RequestMethod.POST)
+	public String updateExistingClasss(@ModelAttribute("classes") Classes classes) {
+		
+		
+		try {
+			
+			List<Teacher> teacher=teacherService.getTeacherById(classes.getTeacher().getTeacherId());
+			
+			
+			classService.saveClass(classes);
+			return "redirect:/classes/"+teacher.get(0).getUser().getId()+"?class=saved";
+		} catch (Exception e) {
+			System.out.println("update class : " +e);
+			return "redirect:/singleclass/edit?classId="+classes.getClassId()+"&class=error";
+		}
+		
+	}
+
+	
+	
+	// load search class page
+
+	@RequestMapping("/findclass")
+	public String findClass(Model model) {
+
+		ClassCategoryModel classCategoryModel=null;
+		SubjectModel subjectModel=null;
+		ClassModel classModel=null;
+        List<ClassCategoryModel> classCategoryModelList=new ArrayList<ClassCategoryModel>();
+        List<SubjectModel> subjectModelList=new ArrayList<SubjectModel>();
+        List<ClassModel> classModelList=new ArrayList<ClassModel>();
+	try {
+		// get All Class Categories
+				List<ClassCategory> categoryList = teacherService.getAllClassCategories();
+
+				// get All Subjects
+				List<Subject> subjectList = teacherService.getAllSubjects();
+
+				List<Classes> classList = new ArrayList<Classes>();
+				
+				
+
+				//copy data to models
+				for(int i=0;i<categoryList.size();i++) {
+					classCategoryModel=new ClassCategoryModel();
+					BeanUtils.copyProperties(categoryList.get(i), classCategoryModel);
+					classCategoryModelList.add(classCategoryModel);
+				}
+				
+				for(int i=0;i<subjectList.size();i++) {
+					subjectModel=new SubjectModel();
+					BeanUtils.copyProperties(subjectList.get(i), subjectModel);
+					BeanUtils.copyProperties(subjectList.get(i).getClassCategory(), subjectModel);
+					subjectModelList.add(subjectModel);
+				}
+				
+				for(int i=0;i<classList.size();i++) {
+					classModel=new ClassModel();
+					BeanUtils.copyProperties(classList.get(i), classModel);
+					BeanUtils.copyProperties(classList.get(i).getSubject(), classModel);
+					
+					classModelList.add(classModel);
+				}
+				
+			
+
+				// set attributes
+				model.addAttribute("categoryList", classCategoryModelList);
+				model.addAttribute("subjectList", subjectModelList);
+				 model.addAttribute("teacherModelList", getAllTeachers());
+				model.addAttribute("classList", classModelList);
+	} catch (Exception e) {
+	 System.out.println("find class :" +e);
+	}
+
+		return "searchclass";
+	}
+
+	// find classes
+
+	@RequestMapping("/searchclass")
+	public String searchClass(@RequestParam("clCategory") int clCategory, @RequestParam("subject") int subject,
+			@RequestParam("teacher") int teacherId, Model model) {
+
+		
+		ClassModel classModel;
+		List<ClassModel> classModelList=new ArrayList<ClassModel>();
+		List<TeacherModel> teacherModelList=getAllTeachers();
+		ClassCategoryModel classCategoryModel=null;
+		SubjectModel subjectModel=null;
+		
+        List<ClassCategoryModel> classCategoryModelList=new ArrayList<ClassCategoryModel>();
+        List<SubjectModel> subjectModelList=new ArrayList<SubjectModel>();
+       
+				
+		
+		
+		List<Classes> classList = classService.searchClass(teacherId, subject);
+
+	
+		List<Integer> idList = new ArrayList<Integer>();
+		idList.add(clCategory);
+		idList.add(subject);
+		idList.add(teacherId);
+
+		// get All Class Categories
+		List<ClassCategory> categoryList = teacherService.getAllClassCategories();
+
+		// get All Subjects
+		List<Subject> subjectList = teacherService.getAllSubjects();
+		
+		
+
+		
+		
+		
+					if(classList.size()!=0) {
+		for(int i=0;i<classList.size();i++) {
+			classModel=new ClassModel();
+			// copy user model object to teacher object
+			BeanUtils.copyProperties(classList.get(i), classModel);
+			for(int j=0;j<teacherModelList.size();j++) {
+				
+				if(classList.get(i).getTeacher().getTeacherId()==teacherModelList.get(j).getTeacherId()) {
+					
+					classModel.setTeacher(teacherModelList.get(j).getFirstName()+" "+teacherModelList.get(j).getMiddleName()+" "+teacherModelList.get(j).getLastName());
+				    classModel.setSubjectName(teacherService.getSubjectById(classList.get(i).getSubject().getSubjectId()).get().getSubjectName());
+					classModel.setTeacherId(classList.get(i).getTeacher().getTeacherId());
+					
+				}
+			}
+			classModelList.add(classModel);
+		}
+					}
+					
+					
+					
+		
+					//copy data to models
+					for(int i=0;i<categoryList.size();i++) {
+						classCategoryModel=new ClassCategoryModel();
+						BeanUtils.copyProperties(categoryList.get(i), classCategoryModel);
+						classCategoryModelList.add(classCategoryModel);
+					}
+					
+					for(int i=0;i<subjectList.size();i++) {
+						subjectModel=new SubjectModel();
+						BeanUtils.copyProperties(subjectList.get(i), subjectModel);
+						BeanUtils.copyProperties(subjectList.get(i).getClassCategory(), subjectModel);
+						subjectModelList.add(subjectModel);
+					}
+					
+					
+					
+		
+		
+
+		// set attributes
+		model.addAttribute("categoryList", classCategoryModelList);
+		model.addAttribute("subjectList", subjectModelList);
+		model.addAttribute("teacherModelList", teacherModelList);
+		model.addAttribute("idList", idList);
+		model.addAttribute("classList", classModelList);
+		// model.addAttribute("teacherTest", "123456");
+
+		return "searchclass";
+	}
+	
+	// display teacher profile image by teacher Id
+	@GetMapping( value = "/teacher/image/{teacherId}" ,  produces = MediaType.IMAGE_PNG_VALUE)
+	public ResponseEntity<byte[]> displayProImageBYTeacherId(@PathVariable(name="teacherId") int teacherId) throws IOException {
+
+
+	
+	List<Teacher> teacher=teacherService.getTeacherById(teacherId);
+
+	 try {
+		 byte[] imageContent = teacher.get(0).getProImage();
+	        final HttpHeaders headers = new HttpHeaders();
+	        headers.setContentType(MediaType.IMAGE_PNG);
+	        return new ResponseEntity<byte[]>(imageContent, headers, HttpStatus.OK);
+	} catch (Exception e) {
+		System.out.println("load image :"+e);
+		return new ResponseEntity<byte[]>(null, null, HttpStatus.OK);
+	}
+		        
+		
+	}	
+	
+	
+	
+	// display teacher profile image by user Id
+		@GetMapping( value = "/user/image/{userId}" ,  produces = MediaType.IMAGE_PNG_VALUE)
+		public ResponseEntity<byte[]> displayProImageByUserId(@PathVariable(name="userId") Long userId) throws IOException {
+
+
+		
+		List<Teacher> teacher=teacherService.findTeacherByUserId(userId);
+
+		 byte[] imageContent = teacher.get(0).getProImage();
+			        final HttpHeaders headers = new HttpHeaders();
+			        headers.setContentType(MediaType.IMAGE_PNG);
+			        return new ResponseEntity<byte[]>(imageContent,headers , HttpStatus.OK);
+		}		
+
+	// load single class page student point of view
+	@RequestMapping("/singleclass/student")
+	public String getSingleClassById(@RequestParam("classId") int classId,@RequestParam("teacherId") int teacherId, Model model) {
+
+		ClassJoin classJoin = new ClassJoin();
+
+		// get currant date
+		Date currentUtilDate = new Date();
+		SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy/MM/dd");
+		SimpleDateFormat timeFormatter = new SimpleDateFormat("HH:mm:ss");
+
+		String paymentDate = dateFormatter.format(currentUtilDate);
+		String paymentTime = timeFormatter.format(currentUtilDate.getTime());
+
+		List<Classes> classList = classService.getClassById(classId);
+
+		List<Teacher> teacher = teacherService.getTeacherById(classList.get(0).getTeacher().getTeacherId());
+		Optional<User> user = Optional.ofNullable(teacher.get(0).getUser());
+		String teacherName = user.get().getFirstName() + " " + user.get().getMiddlName() + " "
+				+ user.get().getLastName();
+
+		model.addAttribute("teacherName", teacherName);
+		model.addAttribute("classList", classList);
+
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		UserDTO userDto = (UserDTO) authentication.getPrincipal();
+		model.addAttribute("userDto", userDto);
+		// Add record to classjoin table and make the status="PENDING"
+
+		// set data to class join object
+		classJoin.setClasses(classList.get(0));
+		classJoin.setType(Constant.Cl_JOIN_TYPE_INIT);
+		classJoin.setStatus(Constant.CL_JOIN_STATUS_PENDING);
+		classJoin.setAmmount(classList.get(0).getAmount());
+		classJoin.setPaymentDate(paymentDate);
+		classJoin.setPaymentTime(paymentTime);
+		classJoin.setUser(userDto.getUser());
+		classJoin.setBankSlip("-");
+		//classJoin.setTeacherId(teacherId);
+
+		// save payment details
+		ClassJoin newClassJoin = classJoinService.saveClassJoin(classJoin);
+
+		// Return the classjoin table's cl_join_id like
+		// model.addAttribute("classjoinid", cl_join_id);
+
+		model.addAttribute("classJoinId", newClassJoin.getClJoinId());
+		return "singleClass";
+	}
+
+	// join class
+
+	@RequestMapping("/join")
+	public String joinToClass(@RequestParam("classId") int classId, @RequestParam("clJoinId") int clJoinId) {
+
+		// get authenticated user details
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		UserDTO u = (UserDTO) authentication.getPrincipal();
+
+		// get currant date
+		Date currentUtilDate = new Date();
+		SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy/MM/dd");
+		SimpleDateFormat timeFormatter = new SimpleDateFormat("HH:mm:ss");
+
+		String paymentDate = dateFormatter.format(currentUtilDate);
+		String paymentTime = timeFormatter.format(currentUtilDate.getTime());
+
+		// set user name
+		String userName = u.getFirstName() + " " + u.getMiddleName() + " " + u.getLastName();
+
+		// get class details using class id
+		List<Classes> classList = classService.getClassById(classId);
+
+		try {
+			// send email
+			//sendEmail.sendEmail(u.getUsername(), userName);
+			//TODO set correct mobile number of the user
+			String smsResultJson =sendSMSMessage.sendClassJoinMessage("94773479981",u.getFirstName(),"Test message");
+			//String smsResultJson=sendSMSMessage.sendSMS();
+			boolean isSMSSent=false;
+			try {
+				ObjectMapper objectMapper = new ObjectMapper();
+		        //read json file and convert to customer object
+				SmsResult smsResultObj = objectMapper.readValue(smsResultJson, SmsResult.class);
+				if(smsResultObj!=null && "success".equals(smsResultObj.getStatus())){
+					isSMSSent=true;
+				}
+			}catch(Exception ex) {
+				isSMSSent=false;
+			}
+			// save payment details
+			//TODO update isSMSSent flag on classJoin table
+			classJoinService.updateClassJoin(Constant.CL_JOIN_STATUS_COMPLETE, Constant.CL_JOIN_TYPE_ONLINE, clJoinId);
+
+		} catch (MailException e) {
+			System.out.println(e.getMessage());
+		}
+
+		return "redirect:/wall";
+	}
+
+	// load single class page teacher point of view
+	@RequestMapping("/singleclass/teacher")
+	public ModelAndView getTeacherSingleClassById(@RequestParam("classId") int classId, Model model) {
+
+		float institutePresentage=0;
+		int numOfJoined=0;
+		float ammount=0;
+		float totalAmmount=0;
+		float instituteCharge=0;
+		float profite;
+		
+		ModelAndView mav = new ModelAndView("singleClassTeacher");
+		// get class details according to class id
+		Classes classList = classService.getClassByClassId(classId);
+		
+		// get teacher details according to teacher id;
+		List<Teacher> teacheList=teacherService.getTeacherById(classList.getTeacher().getTeacherId());
+		
+		//get class join list according class id and status=complete
+		 numOfJoined=classJoinService.getClassesByStatus(classId, Constant.CL_JOIN_STATUS_COMPLETE);
+		
+		
+		institutePresentage=teacheList.get(0).getInsChargePercentage();
+		ammount=classList.getAmount();
+		
+		
+		totalAmmount=numOfJoined*ammount;
+		instituteCharge=(totalAmmount*institutePresentage)/100;
+		profite=totalAmmount-instituteCharge;
+		
+		mav.addObject("class", classList);
+	    model.addAttribute("numberOfJoined", numOfJoined);
+	    model.addAttribute("totalAmmount", totalAmmount);
+	    model.addAttribute("profite", profite);
+	    model.addAttribute("instituteCharge", instituteCharge);
+
+		return mav;
+	}
+
+	// load edit single class page
+	@RequestMapping("/singleclass/edit")
+	public ModelAndView getSingleClassToEdit(@RequestParam("classId") int classId) {
+
+		ModelAndView mav = new ModelAndView("editSingleClass");
+
+		Classes classList = classService.getClassByClassId(classId);
+
+		mav.addObject("classes", classList);
+
+		return mav;
+	}
+	
+	 @PostMapping("/upload")
+	    public String uploadFile(@RequestParam("file") MultipartFile file,@RequestParam("classId") int classId,@RequestParam("clJoinId") int clJoinId,@RequestParam("teacherId") int teacherId) {
+
+		 
+		// get authenticated user details
+			Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+			UserDTO u = (UserDTO) authentication.getPrincipal();
+         String filename="user_"+u.getId().toString()+"_class_"+classId+"_slip."+file.getOriginalFilename().split("\\.")[1];
+	        
+       
+
+	        // save the file on the local file system
+	        try {
+	        	byte[] bytes = file.getBytes();
+	            Path path = Paths.get(UPLOAD_DIR + filename);
+	            Files.write(path, bytes);
+	            
+	           
+	        } catch (IOException e) {
+	            System.out.println("bank slip upload : "+e);
+	            return "redirect:singleclass/student?classId="+classId+"&teacherId="+teacherId+"&upload=error";
+	        }
+
+	        classJoinService.updateBankSlip("bank deposit",filename, clJoinId);
+            return "redirect:wall?upload=success";
+
+	      
+	    }
+	 
+	 
+	 
+	 
+	
+	
+	 
+	 
+	//get all teachers
+		
+	public List<TeacherModel> getAllTeachers() {
+		TeacherModel teacherModel = null;
+		List<TeacherModel> teacherModelList = new ArrayList<TeacherModel>();
+		//List<Classes> classList = new ArrayList<Classes>();
+		//List<Teacher> teacherList = new ArrayList<Teacher>();
+
+		// get all teachers
+		List<User> userList = teacherService.findTeachers(Constant.USER_TYPE_TEACHER);
+		
+		
+
+		for (int i = 0; i < userList.size(); i++) {
+			teacherModel = new TeacherModel();
+			
+			// copy user model object to teacher object
+			BeanUtils.copyProperties(userList.get(i).getTeacher(), teacherModel);
+			teacherModel.setFirstName(userList.get(i).getFirstName());
+			teacherModel.setMiddleName(userList.get(i).getMiddlName());
+			teacherModel.setLastName(userList.get(i).getLastName());
+			teacherModel.setSubjectId(userList.get(i).getTeacher().getSubjectId());
+			
+			teacherModelList.add(teacherModel);
+		
+
+		}
+
+		return teacherModelList;
+	}
+		
+	 
+	
+	 
+
+	
+	
+
+}

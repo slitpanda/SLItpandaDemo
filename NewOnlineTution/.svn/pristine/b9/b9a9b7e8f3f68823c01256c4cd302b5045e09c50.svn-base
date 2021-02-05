@@ -1,0 +1,31 @@
+package com.itpanda.tution.model;
+
+public class SubjectModel {
+
+	private int subjectId;
+    private int clCategoryId;
+	private String subjectName;
+	public int getSubjectId() {
+		return subjectId;
+	}
+	public void setSubjectId(int subjectId) {
+		this.subjectId = subjectId;
+	}
+	public int getClCategoryId() {
+		return clCategoryId;
+	}
+	public void setClCategoryId(int clCategoryId) {
+		this.clCategoryId = clCategoryId;
+	}
+	public String getSubjectName() {
+		return subjectName;
+	}
+	public void setSubjectName(String subjectName) {
+		this.subjectName = subjectName;
+	}
+	
+	
+	
+	
+	
+}

@@ -1,0 +1,284 @@
+package com.itpanda.tution.controller;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.tomcat.util.http.fileupload.IOUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.MailException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.itpanda.tution.Constant;
+import com.itpanda.tution.entity.ClassJoin;
+import com.itpanda.tution.entity.Classes;
+import com.itpanda.tution.entity.Teacher;
+import com.itpanda.tution.loginSecurity.entity.User;
+import com.itpanda.tution.loginSecurity.repository.UserRepository;
+import com.itpanda.tution.model.ClassJoinModel;
+import com.itpanda.tution.model.PaymentNotify;
+import com.itpanda.tution.model.TeacherModel;
+import com.itpanda.tution.model.UserDTO;
+import com.itpanda.tution.service.ClassJoinService;
+import com.itpanda.tution.service.ClassService;
+import com.itpanda.tution.service.TeacherService;
+
+@Controller
+public class PaymentController {
+
+	
+	@Autowired
+	private ClassJoinService classJoinService;
+
+	@Autowired
+	private TeacherService teacherService;
+
+	@Autowired
+	private ClassService classService;
+
+	@Autowired
+	private UserRepository userRepository;
+	
+	@Value("${onlinetution.bankslip.derectrory}")
+	String UPLOAD_DIR;
+
+	
+	//load payment page
+	@RequestMapping("/payment")
+	public String payment() {
+		return "payment";
+	}
+	
+	
+	@CrossOrigin
+	@RequestMapping(value = "/paymentNotify", method = RequestMethod.POST)
+	public String getPaymentParams(@ModelAttribute("paymentNotify") PaymentNotify paymentNotify) {
+		System.out.println("******************"+paymentNotify.getPayment_id());
+		
+		//return "redirect:/";
+		///////////////////
+		try {
+			// send email
+			//sendEmail.sendEmail(u.getUsername(), userName);
+
+			if(paymentNotify.getOrder_id()!=null) {
+				int clJoinId=Integer.parseInt(paymentNotify.getOrder_id());
+			// save payment details
+				classJoinService.updateClassJoin("complete", "online payed", clJoinId);
+			}
+
+		} catch (MailException e) {
+			System.out.println(e.getMessage());
+		}
+
+		//return "redirect:/wall";
+		////////////////////////
+		
+		
+		///return "redirect:/findClass";
+		return "/";
+	}
+	
+	// bank deposit functions ------------------------------------------------------------------------------------------------------->
+	 @RequestMapping("/bankslips")
+	 public String classRequset(Model model) {
+		 
+		 ClassJoinModel classJoinModel=null;
+		 List<ClassJoinModel> pendingSlipLsit=new ArrayList<ClassJoinModel>();
+		 List<Classes> classList=new ArrayList<Classes>();
+		 List<String> selectedParam=new ArrayList<String>();
+		 
+			// get authenticated user details
+				Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+				UserDTO u = (UserDTO) authentication.getPrincipal();
+		 
+				//get all classes
+				   classList=classService.findAllClasses();
+				   
+				if(u.getUserType().equals(Constant.USER_TYPE_ADMIN)|| u.getUserType().equals(Constant.USER_TYPE_DATA_ENTRY) ) {
+					
+					  model.addAttribute("teacherModelList", getAllTeachers());
+					 model.addAttribute("pendingSlipLsit", pendingSlipLsit);
+					 model.addAttribute("classList", classList);
+					 model.addAttribute("selectedParam", selectedParam);
+					 return "admin";
+				}else {
+					return "redirect:login";
+				}
+		
+		 
+	 }
+	
+	 @RequestMapping("/filterslips")
+	 public String filterBankSlips(@RequestParam("status") String status,@RequestParam("teacherId") int teacherId ,@RequestParam("classId") int classId,Model model) {
+		 
+		 
+			String selectedTeacher;
+			String selectedClass;
+			 ClassJoinModel classJoinModel=null;
+			 List<ClassJoinModel> pendingSlipLsit=new ArrayList<ClassJoinModel>();
+			 List<Classes> classList=new ArrayList<Classes>();
+			 
+			 List<String> selectedParam=new ArrayList<String>();
+			 
+			 selectedParam.add(status);
+			 selectedParam.add(String.valueOf(teacherId));
+			 selectedParam.add(String.valueOf(classId));
+			 
+			// get authenticated user details
+				Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+				UserDTO u = (UserDTO) authentication.getPrincipal();
+		 
+		 
+			// check status
+
+			if (status.equals("all")) {
+				status = "";
+			}
+
+			// check teacher
+			if (teacherId == 0) {
+				selectedTeacher = "";
+			} else {
+				selectedTeacher = String.valueOf(teacherId);
+			}
+			// check class
+			if (classId == 0) {
+				selectedClass = "";
+			} else {
+				selectedClass = String.valueOf(classId);
+			}
+		 
+		//get all classes
+	   classList=classService.findAllClasses();
+		 
+		
+	 
+			if(u.getUserType().equals(Constant.USER_TYPE_ADMIN)|| u.getUserType().equals(Constant.USER_TYPE_DATA_ENTRY) ) {
+				// filter
+				 List<ClassJoin> bankSlips=classJoinService.filterBankSlips(Constant.Cl_JOIN_TYPE_BANK_DEPOSIT, status, selectedTeacher,selectedClass);
+				 Optional<User> user=null;
+				 List<Classes> classes=null;
+				 List<Teacher> teacher=null;
+				 for(int i=0;i<bankSlips.size();i++) {
+					 classJoinModel=new ClassJoinModel();
+					 user=userRepository.findById(bankSlips.get(i).getUserId());
+					 classes=classService.getClassById(bankSlips.get(i).getClassId());
+					 teacher=teacherService.getTeacherById(classes.get(0).getTeacherId());
+					 
+					 
+					 classJoinModel.setClJoinId(bankSlips.get(i).getClJoinId());
+					 classJoinModel.setStudentName(user.get().getFirstName()+" "+user.get().getMiddlName()+" "+user.get().getLastName());
+					 classJoinModel.setBankSlip(bankSlips.get(i).getBankSlip());
+					 classJoinModel.setDate(bankSlips.get(i).getPaymentDate());
+					 classJoinModel.setClassName(classes.get(0).getDescriptionEnglish()+" / "+classes.get(0).getDescriptionSinhala());
+					 classJoinModel.setAmmount(bankSlips.get(i).getAmmount());
+					 classJoinModel.setStatus(bankSlips.get(i).getStatus());
+					 
+					 pendingSlipLsit.add(classJoinModel);
+					
+				 }
+				 
+				 model.addAttribute("teacherModelList", getAllTeachers());
+				 model.addAttribute("classList", classList);
+				 model.addAttribute("pendingSlipLsit", pendingSlipLsit);
+				 model.addAttribute("selectedParam", selectedParam);
+				 return "admin";
+			}else {
+				return "redirect:login";
+			}
+	 
+		 
+		
+		 
+		
+	
+	 }
+	 
+	 // View Slip
+	 @RequestMapping(value="/displayslip",method = RequestMethod.GET)
+	   public @ResponseBody void affichimage(@RequestParam("bankSlip")String bankSlip,HttpServletResponse response,HttpServletRequest request) throws 
+	      IOException,NullPointerException
+	       {
+	       
+		 // get file extension from file name
+          String slipType=bankSlip.split("\\.")[1];		 
+          
+          
+          
+          if(slipType.equals("pdf")) {
+        	  
+        	response.setContentType("application/pdf");
+  	        
+  	        InputStream inputStream = new FileInputStream(new File(UPLOAD_DIR+bankSlip));
+  	        int nRead;
+  	        while ((nRead = inputStream.read()) != -1) {
+  	            response.getWriter().write(nRead);
+  	        }
+        	  
+          }else {
+        	  File imageFile = new File(UPLOAD_DIR+bankSlip);
+   	       response.setContentType("image/jpeg");
+   	        InputStream in=new FileInputStream(imageFile);
+   	       IOUtils.copy(in, response.getOutputStream());
+          }
+		
+	      
+          
+	       }
+	 
+		
+	
+		
+		//get all teachers
+		
+	public List<TeacherModel> getAllTeachers(){
+			TeacherModel teacherModel = null;
+			List<TeacherModel> teacherModelList = new ArrayList<TeacherModel>();
+			List<Classes> classList = new ArrayList<Classes>();
+			List<Teacher> teacherList = new ArrayList<Teacher>();
+		 
+			// get all teachers
+			List<User> userList = teacherService.findTeachers(Constant.USER_TYPE_TEACHER);
+
+			
+
+			
+
+			for (int i = 0; i < userList.size(); i++) {
+				teacherModel = new TeacherModel();
+				teacherList = teacherService.findTeacherByUserId(userList.get(i).getId());
+				teacherModel.setUserId(userList.get(i).getId());
+				teacherModel.setFirstName(userList.get(i).getFirstName());
+				
+				teacherModel.setMiddleName(userList.get(i).getMiddlName());
+				teacherModel.setLastName(userList.get(i).getLastName());
+				teacherModel.setTeacherId(teacherList.get(0).getTeacherId());
+				teacherModel.setClCategoryId(teacherList.get(0).getClCategoryId());
+				teacherModel.setSubjectId(teacherList.get(0).getSubjectId());
+
+				teacherModelList.add(teacherModel);
+
+			}
+			
+			return teacherModelList;
+		}
+	
+}

@@ -1,0 +1,159 @@
+@import url('https://fonts.googleapis.com/css2?family=Kanit&display=swap');
+
+html ,body {
+    font-family: 'Kanit', sans-serif;
+    height: 100%;
+    margin: 0;
+}
+
+@media only screen and (min-width: 768px) {
+    .navbar .navbar-header  img {
+        height: 90px;
+    }
+    .navbar {
+        min-height: 90px;
+    }
+
+}
+
+@media   (max-width: 768px) {
+    .navbar .navbar-header  img {
+        height: 55px;
+    }
+    .navbar {
+        min-height: 55px;
+    }
+
+}
+
+#page-content {
+    flex: 1 0 auto;
+}
+
+#sticky-footer {
+    flex-shrink: none;
+}
+
+.notice{
+    background: #035696;
+    color: white;
+    border-radius: 0px 50px 50px 0px;
+    padding: 5px;
+    width: 200px;
+}
+
+.button {
+    height: 50px;
+    padding: 0px 50px 0px 50px;
+    border: none;
+    margin: 5px;
+    border-radius: 50px;
+    box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease 0s;
+    cursor: pointer;
+    outline: none;
+}
+
+.button:hover {
+
+    box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.1);
+    transform: translateY(-7px);
+}
+
+
+.button:focus {outline:0;}
+
+
+.cardposition{
+    border-radius: 20px;
+    background-color: rgba(0,0,0,0.1) !important;
+}
+.param {
+    margin-bottom: 7px;
+    line-height: 1.4;
+}
+.param-inline dt {
+    display: inline-block;
+}
+.param dt {
+    margin: 0;
+    margin-right: 7px;
+    font-weight: 600;
+}
+.param-inline dd {
+    vertical-align: baseline;
+    display: inline-block;
+}
+
+.param dd {
+    margin: 0;
+    vertical-align: baseline;
+} 
+
+.shopping-cart-wrap .price {
+    color: #007bff;
+    font-size: 18px;
+    font-weight: bold;
+    margin-right: 5px;
+    display: block;
+}
+var {
+    font-style: normal;
+}
+
+.media img {
+    margin-right: 1rem;
+}
+.img-sm {
+    width: 90px;
+    object-fit: cover;
+}
+
+@media
+only screen 
+and (max-width: 760px), (min-device-width: 768px) 
+and (max-device-width: 1024px)  {
+
+    /* Force table to not be like tables anymore */
+    table, thead, tbody, th, td, tr {
+        display: block;
+    }
+
+    /* Hide table headers (but not display: none;, for accessibility) */
+    thead tr {
+        position: absolute;
+        top: -9999px;
+        left: -9999px;
+    }
+
+    tr {
+        margin: 0 0 1rem 0;
+    }
+
+
+    td {
+        /* Behave  like a "row" */
+        border: none;
+        border-bottom: 1px solid #eee;
+        position: relative;
+        padding-left: 50%;
+    }
+
+    td:before {
+        /* Now like a table header */
+        position: absolute;
+        /* Top/left values mimic padding */
+        top: 0;
+        left: 6px;
+        width: 45%;
+        padding-right: 10px;
+        white-space: nowrap;
+    }
+
+    td:nth-of-type(1):before { content: ""; }
+    td:nth-of-type(2):before { content: ""; }
+    td:nth-of-type(3):before { content: ""; }
+    td:nth-of-type(4):before { content: ""; }
+    td:nth-of-type(5):before { content: ""; }
+}
+

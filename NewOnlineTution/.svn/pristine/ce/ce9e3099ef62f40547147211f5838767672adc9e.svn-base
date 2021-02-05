@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<head>
+<meta charset="ISO-8859-1">
+<title>Insert title here</title>
+</head>
+<body>
+
+<div style="width:100%;">
+<form th:action="@{/logout}"  method="post" style="float:right;margin-right: 10px;"><button type="submit">Log Out</button></form>
+ 
+<a th:if="${#request.userPrincipal.principal.userType=='student' || #request.userPrincipal.principal.userType=='admin'} "  style="float:right;margin-right: 10px;" th:href="@{/findclass}"><button >Find Class</button></a>
+<a th:if="${#request.userPrincipal.principal.userType=='teacher'}"  style="float:right;margin-right: 10px;" th:href="@{/myclasses}"><button >Show My Classes</button></a>
+<a th:if="${#request.userPrincipal.principal.userType=='admin' || #request.userPrincipal.principal.userType=='data_entry'}"  style="float:right;margin-right: 10px;" th:href="@{/bankslips}"><button >Pending Bank Slips</button></a>
+</div>
+ <h1 th:inline="text" >Hello [[${#httpServletRequest.remoteUser}]]!</h1>
+ 
+<div sec:authorize="isAuthenticated()">
+    <span th:text="${#request.userPrincipal.principal.firstName}"></span></div>
+ 
+ <img src="img/ad3.jpg">
+</body>
+</html>

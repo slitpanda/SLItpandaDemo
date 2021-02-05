@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <meta name="description" content="" />
+        <meta name="author" content="" />
+        <title>Dashboard -  Admin</title>
+       
+          <!-- Custom CSS -->
+     
+         <link rel="stylesheet" href="/css/style.css">
+          <link href="/css/adminstyles.css" rel="stylesheet" />
+         
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/js/all.min.js" crossorigin="anonymous"></script>
+         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+          <script src="https://code.jquery.com/jquery-3.5.1.min.js" crossorigin="anonymous"></script>
+             <script th:inline="javascript">
+
+$(document).ready(function() {  
+	
+	 
+	/*<![CDATA[*/
+
+		admin= /*[[${#request.userPrincipal.principal.userType=='admin'}]]*/;
+	   dataEntry= /*[[${#request.userPrincipal.principal.userType=='data_entry'}]]*/;
+	   teacherList = /*[[${teacher}]]*/"teacher";
+
+		/*]]>*/
+
+        	
+		checkUserType();
+		selectedBank();
+		
+	
+		
+
+		
+		
+	
+
+	});
+</script>
+    </head>
+    <body class="sb-nav-fixed">
+    
+     
+    <!-- navigation -->
+    <div class="fixed-top" style="z-index: 1039">
+    <div th:replace="sidebar::navigation">
+    
+    </div>
+    </div>
+        <div id="layoutSidenav">
+        <!-- side bar -->
+            <div th:replace="sidebar::sidebar"></div>
+            
+            <div id="layoutSidenav_content">
+                <main>
+                 
+                    <div class="container-fluid mt-5 mb-5">
+                   
+					
+            <div class="row mt-2"  th:object="${teacher}">
+                  
+             
+					
+                <div class="col-md-8 m-auto">
+              
+               <center> <img alt="teacher" th:src="@{'/teacher/image/'+*{teacherId}}" style="width: 200px; height: 200px;" class="img-thumbnail img-sm mt-3 m-auto"></center>
+              <table class="table mt-3" >
+              
+              <tbody>
+              
+              <tr>
+              <th>Name :</th>
+              <td ><h5 th:text="*{firstName +' '+middleName+' '+lastName}"></h5></td>
+              </tr>
+              
+               <tr>
+              <th>Email :</th>
+              <td ><span th:text="*{username}"></span></td>
+              </tr>
+              <tr>
+              <th>Category :</th>
+              <td ><span th:text="*{clCategoryName +' / '+medium}"></span></td>
+              </tr>
+              
+               <tr>
+              <th>Subject :</th>
+              <td ><span th:text="*{subjectName}"></span></td>
+              </tr>
+              
+              <tr>
+              <th>Mobile :</th>
+              <td ><span th:text="*{mobile}"></span></td>
+              </tr>
+              
+               <tr>
+              <th>Institute Charge % :</th>
+              <td ><div style="display: flex;"><input class="form-control col-md-5 " th:value="*{insChargePercentage}" id="insChargPres">
+              <input type="text" hidden="" id="teacherId" th:value="*{teacherId}">
+              <button class="btn btn-success col-md-2  ml-3" id="btnSave">Save</button>
+              </div>
+              <label id="msg" class="mt-1"></label>
+              </td>
+              </tr>
+              
+              <tr>
+              <th colspan="2"><h4>Bank Account Details</h4></th>
+              </tr>
+              <tr>
+              <th>Bank</th>
+              <td>
+             
+              <select class="form-control custom-select col-md-8"  id="bank"  >
+                                                <option value="0">--- Select Bank ---</option>
+                                                <option  th:each="bank:${bankList}" th:value="${bank.bankId}" th:text="${bank.bankName} "></option>
+                                            </select>
+              </td>
+              </tr>
+              <tr>
+              <th>Branch</th>
+              <td><input type="text" id="branch" class="form-control col-md-8" th:value="*{branch}"></td>
+              </tr>
+              <tr>
+              <th>Account Number</th>
+              <td><input type="text" id="accountNumber" class="form-control col-md-8" th:value="*{accountNumber}"></td>
+              </tr>
+              <tr>
+              <td><label id="bankMsg"></label></td>
+              <td><button class="btn btn-success col-md-5" id="btnSaveBankDetails">Save</button></td>
+              </tr>
+              </tbody>
+              </table>
+             
+
+                </div>
+            </div>
+        
+
+				</div>
+                </main>
+                
+            <!-- footer -->
+            <div  th:replace="footer::footer" >
+                
+            </div>
+            
+            <!-- /footer -->
+            </div>
+        </div>
+      
+       
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js">
+        </script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js">
+        </script>
+        <script  th:src="@{/js/scripts.js}"></script>
+         <script src="/js/singleTeacher.js"></script>
+         <script src="/js/constant.js"></script>
+      
+    </body>
+</html>

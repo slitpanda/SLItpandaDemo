@@ -1,0 +1,107 @@
+package com.itpanda.tution;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+
+import org.apache.http.Header;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpHeaders;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
+import org.springframework.stereotype.Service;
+
+
+@Service
+public class SendSMSMessage {
+	
+	public static String SMS_URL="https://app.notify.lk/api/v1/send";
+	public static String USER_ID="12294";
+	public static String API_KEY="g8gQnBntfGgP4YxdsZ2U";
+	public static String SENDER_ID="NotifyDEMO";
+	
+	private final CloseableHttpClient httpClient = HttpClients.createDefault();
+	
+	/*
+	 * public String sendClassJoinMessage(String toMobileNumber,String
+	 * userName,String message) { message="Hi "+userName+", "+message; //TODO format
+	 * to number like 94773479981 return sendSMS(toMobileNumber,message) ; }
+	 */
+	
+	
+	public String sendSMS(String toMobileNumber,String message)  {
+		
+		//TODO remove after test START
+		boolean test=true;
+		if(test)
+			return "{\"status\":\"success\",\"data\":\"Sent\"}";
+
+		//TODO remove after test END
+		
+		try {
+		//TODO get SMS sending URL from the application.properties file  	
+		toMobileNumber=formatMobileNumber(toMobileNumber);
+		if(toMobileNumber==null) {
+			return "{\"status\":\"failed\",\"data\":\"Invalid Mobile Number \"}";
+		}
+			
+		//String urlWithParam="https://app.notify.lk/api/v1/send?user_id=12294&api_key=g8gQnBntfGgP4YxdsZ2U&sender_id=NotifyDEMO&to=94773479981&message=";	
+		String urlWithParam="?user_id="+USER_ID+"&api_key="+API_KEY+"&sender_id="+SENDER_ID+"&to="+toMobileNumber+"&message=";	
+        
+		String encodedMessage = null;
+		//remove spacing of the message
+		 //encodedMessage = URLEncoder.encode("Test two website", "UTF-8");
+		encodedMessage = URLEncoder.encode(message, "UTF-8");
+		
+		HttpGet request = new HttpGet(SMS_URL+urlWithParam+encodedMessage);
+
+        // add request headers
+     
+
+        try (CloseableHttpResponse response = httpClient.execute(request)) {
+
+            // Get HttpResponse Status
+            System.out.println(response.getStatusLine().toString());
+
+            HttpEntity entity = response.getEntity();
+            Header headers = entity.getContentType();
+            System.out.println(headers);
+
+            if (entity != null) {
+                // return it as a String
+                String result = EntityUtils.toString(entity);
+                
+                //System.out.println(result);
+                return result;
+                //Content-Type: application/json
+               // {"status":"success","data":"Sent"}
+            }
+
+        }
+		}catch(Exception ex) {
+			ex.printStackTrace();
+			return null;
+		}        
+       return null; 
+    }
+	
+	private String formatMobileNumber(String mobileNumber) {
+
+		try {
+			if (mobileNumber != null && mobileNumber.trim().length() > 9) {
+				mobileNumber = mobileNumber.trim().substring(1);
+				mobileNumber = "94" + mobileNumber;
+				return mobileNumber;
+			} else {
+				return null;
+			}
+
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			return null;
+		}
+	}
+
+}

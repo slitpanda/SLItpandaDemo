@@ -1,0 +1,64 @@
+package com.itpanda.tution.repository;
+
+import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.itpanda.tution.entity.ClassJoin;
+
+public interface ClassJoinRepository extends JpaRepository<ClassJoin, Integer> {
+
+	@Transactional
+	@Modifying
+	@Query(value = "UPDATE classjoin SET status=?1 , type=?2 WHERE classjoin.cl_join_id=?3", nativeQuery = true)
+	void updateClassJoin(String status,String type,int clJoinId);
+	
+	@Query(value = "select count(*) from classjoin where class_id=?1 and status=?2" ,nativeQuery = true)
+	int getClassesByStatus(int classId,String status);
+	
+	@Transactional
+	@Modifying
+	@Query(value = "update classjoin set type=?1, bank_slip=?2 where classjoin.cl_join_id=?3 " ,nativeQuery = true)
+	void updateBankSlip(String type,String fileName,int clJoinId);
+	
+	@Query(value = "select * from classjoin where type=?1 and status=?2" ,nativeQuery = true)
+	List<ClassJoin> getPendingBankDepositSlips(String type,String status);
+	
+	@Transactional
+	@Modifying
+	@Query(value = "update classjoin set status=?1 where classjoin.cl_join_id=?2 " ,nativeQuery = true)
+	void updateBankSlipStatus(String status,int clJoinId);
+	
+	
+	
+	 @Query(value="Select b from ClassJoin b where type=:type and status like :status" )
+		List<ClassJoin> filterBankSlipsByType(@Param("type")String type,@Param("status")String status);
+	 
+	 @Query(value="Select b from ClassJoin b where type=:type and status like :status and b.classes.classId =:classId" )
+		List<ClassJoin> filterBankSlipsByTypeAndClassId(@Param("type")String type,@Param("status")String status,@Param("classId")int classId);
+	 
+	 @Query(value="Select b from ClassJoin b where type=:type and status like :status and b.classes.teacher.teacherId =:teacherId" )
+		List<ClassJoin> filterBankSlipsByTypeAndTeacherId(@Param("type")String type,@Param("status")String status,@Param("teacherId")int teacherId);
+		
+	
+	@Query(value = "select * from classjoin where user_id=?1 and status=?2" , nativeQuery = true)
+	List<ClassJoin> getJoindClassByUserId(Long userId,String status);
+	
+	
+	@Query(value = "select sum(b.ammount)  from ClassJoin b where b.status=:status and b.classes.teacher.teacherId =:teacherId")
+	public float getSumOfamount(@Param("status") String status, @Param("teacherId") int teacherId);
+	
+	@Query(value = "select count(b.ammount) from ClassJoin b where b.status=:status and b.classes.teacher.teacherId =:teacherId")
+	public int  countJoinedStudents(@Param("status") String status, @Param("teacherId") int teacherId);
+	
+	@Query(value = "select count(b.user.id) from ClassJoin b where b.user.id=:userId and b.classes.classId =:classId and b.status=:status")
+	public int  isUserJoined(@Param("userId") Long userId, @Param("classId") int classId,@Param("status") String status);
+	
+	
+	
+	
+}

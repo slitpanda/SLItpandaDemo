@@ -1,0 +1,107 @@
+<!doctype html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+
+    <head>
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.0.0/animate.min.css"/>
+        
+        
+        <!-- Custom CSS -->
+     
+         <link rel="stylesheet" href="css/style.css">
+         
+          <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+        <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js">  </script>
+        
+          
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/js/all.min.js" crossorigin="anonymous"></script>
+
+        <title>Team Work Process</title>
+         <style>
+            .hero-image {
+                background-image: url("img/a.jpg");
+                height: 800px;
+                background-position: center;
+                background-repeat: no-repeat;
+                background-size: cover;
+                position: relative;
+            }
+
+            .hero-text {
+                position: absolute;
+                top: 40%;
+                left: 40%;
+                transform: translate(-50%, -50%);
+                
+            }
+        </style>
+    </head>
+<script >
+
+$(document).ready(function() {  
+	
+	
+
+ 
+});
+</script>
+    <body>
+       <!-- header -->
+      <div  th:replace="header::header"></div>
+       <!-- / header -->
+       
+       
+       <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12  mt-5 mt-md-0">
+                    <div class="hero-image">
+                        <div class="hero-text">
+                            <div class="align-self-center">
+                                <h2 class="notice pl-4">Notice</h2>
+                                <h4>Online Education Classes</h4>
+
+                                <h1 style="font-size: 50px">Are you ready to<br><b>Lead the way</b></h1>
+                                <h4 >SEA is top level secondary education institute which conducting courses for G.C.E. Advanced Level examination and further education</h4>
+
+                                <div class="wrap mt-5">
+                                    <a th:href="@{/login}"> <button class="button btn-primary text-light" style="background-color: #035696 ">Sign In | පිවිසෙන්න </button></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+       
+       
+            <!-- footer -->
+            <div  th:replace="footer::footer" >
+                
+            </div>
+            
+            <!-- /footer -->
+        </div>
+
+ 
+
+
+        <!-- Optional JavaScript -->2
+       
+      
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js">
+        </script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js">
+        </script>
+          <script src="js/admin.js"></script>
+      
+    </body>
+
+</html>

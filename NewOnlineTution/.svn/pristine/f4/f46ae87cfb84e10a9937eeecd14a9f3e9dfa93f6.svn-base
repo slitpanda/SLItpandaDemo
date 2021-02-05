@@ -1,0 +1,82 @@
+//////////////////////////////////////
+$("#password").on(
+		'input',
+		function() {
+			if ($("#mobile").val() == "") {
+				$("#mobile").focus();
+				$(this).val("");
+			} else {
+				if ($(this).val() != "") {
+
+					if ($("#confirmPassword").val() != ""
+							&& $("#confirmPassword").val() != $(this).val()) {
+
+						$("#btnUpdate").attr("hidden", true);
+						$("#confirmPassword").css('border-color', 'red');
+						$(this).css('border-color', 'red');
+					} else if ($("#confirmPassword").val() != ""
+							&& $("#confirmPassword").val() == $(this).val()) {
+						$("#confirmPassword").attr("readonly", false);
+						$("#btnUpdate").attr("hidden", false);
+						$("#confirmPassword").css('border-color', 'green');
+						$(this).css('border-color', 'green');
+					} else {
+						$("#confirmPassword").attr("readonly", false);
+						$("#btnUpdate").attr("hidden", true)
+					}
+
+				} else {
+					$("#confirmPassword").attr("readonly", true);
+					$("#btnUpdate").attr("hidden", false);
+					$("#confirmPassword").val("");
+					$(this).css('border-color', '');
+					$('#confirmPassword').css('border-color', '');
+				}
+			}
+
+		});
+
+/////////////////////////////////////
+$("#confirmPassword").on('input', function() {
+	if ($(this).val() != $("#password").val()) {
+		$(this).css('border-color', 'red');
+		$("#password").css('border-color', 'red');
+		$("#btnUpdate").attr("hidden", true);
+	} else {
+		$("#btnUpdate").attr("hidden", false);
+		$(this).css('border-color', 'green');
+		$("#password").css('border-color', 'green');
+	}
+
+});
+
+
+////////////////////////////////////////
+
+$("#mobile").on('input', function() {
+
+	var mobile = $(this).val();
+
+	if (mobile.length == 0) {
+		$(this).css('border', "solid 1px #e5e0e0");
+		$("#btnUpdate").attr("hidden", false);
+		$("#password").attr("readonly", false);
+	} else {
+		if (mobile.charAt(0) != "0") {
+			$(this).val("");
+		} else {
+			if (mobile.length < 10 || mobile.length > 10) {
+				$(this).css('border', "solid 1px");
+				$(this).css('border-color', "red");
+				$("#password").attr("readonly", true);
+				$("#btnUpdate").attr("hidden", true);
+			} else {
+				$(this).css('border', "solid 1px");
+				$(this).css('border-color', "green");
+				$("#btnUpdate").attr("hidden", false);
+				$("#password").attr("readonly", false);
+			}
+		}
+
+	}
+});

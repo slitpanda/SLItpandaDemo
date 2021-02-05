@@ -1,0 +1,88 @@
+package com.itpanda.tution.service;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.itpanda.tution.entity.ClassJoin;
+import com.itpanda.tution.entity.Classes;
+import com.itpanda.tution.entity.Teacher;
+import com.itpanda.tution.repository.ClassJoinRepository;
+import com.itpanda.tution.repository.TestRepo;
+
+@Service
+@Transactional
+public class ClassJoinService {
+
+	
+	@Autowired
+	private ClassJoinRepository classJoinRepository;
+	
+	@Autowired
+	TestRepo testRepo;
+	
+	public ClassJoin saveClassJoin(ClassJoin classJoin) {
+		return classJoinRepository.save(classJoin);
+	}
+	
+	public void updateClassJoin(String status,String type,int classJoinId) {
+		classJoinRepository.updateClassJoin(status,type, classJoinId);
+	}
+	
+    public int getClassesByStatus(int classId,String status){
+	
+    	return classJoinRepository.getClassesByStatus(classId, status);
+	}
+    
+    public void updateBankSlip(String type,String fileName,int clJoinId) {
+    
+    	classJoinRepository.updateBankSlip(type,fileName, clJoinId);
+    }
+    
+    public List<ClassJoin> getPendingBankDepositSlips(String type,String status) {
+    	return classJoinRepository.getPendingBankDepositSlips(type, status);
+    }
+    
+    public void updateBankSlipStatus(String status,int clJoinId) {
+    	classJoinRepository.updateBankSlipStatus(status, clJoinId);
+    }
+    public List<ClassJoin> filterBankSlips(String type,String status,int teacherId,int classId) {
+    	
+    	if(classId==0 && teacherId==0) {
+    		return classJoinRepository.filterBankSlipsByType(type,status+"%");
+    	
+    	}else if(classId==0) {
+    		return classJoinRepository.filterBankSlipsByTypeAndTeacherId(type,status+"%",teacherId);
+    	}
+    	else{
+    		return classJoinRepository.filterBankSlipsByTypeAndClassId(type,status+"%",classId);
+    	}
+    	
+    }
+    
+    public  List<ClassJoin> getJoindClassByUserId(Long userId,String status) {
+    	
+    	return classJoinRepository.getJoindClassByUserId(userId,status);
+    }
+    
+    //for temp search----------//
+    public List<ClassJoin> searchbankSlip(String status,String type,Teacher teacher,Classes classes){
+    	
+    	
+    	return testRepo.findByStatusLikeAndTypeAndClasses_teacherAndClasses(status+"%",type,teacher,classes);
+    }
+    
+    //--------------------//
+    
+    
+    public float getSumOfamount(String status,int teacherId) {
+    	return classJoinRepository.getSumOfamount(status, teacherId);
+    }
+    
+    public int  countJoinedStudents(String status,  int teacherId) {
+    	return classJoinRepository.countJoinedStudents(status, teacherId);
+    }
+}

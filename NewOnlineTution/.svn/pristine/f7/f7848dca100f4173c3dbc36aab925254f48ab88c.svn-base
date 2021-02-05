@@ -1,0 +1,44 @@
+// payment bbuttons
+ 
+ 
+	 $("#paymentOnlin").on('change',function(){
+			$("#btnUpload").css('display','none');
+			$("#btnLocal").css('display','block');
+			$("#bankSlip").css('display','none');
+			$("#btnOnline").css('display','block');
+			$("#bankSlip").prop("disabled",true);
+			
+			$("#bankDetailsection").css('display','none');
+			
+			
+		});
+ 
+ 
+
+	 $("#paymentBank").on('change',function(){
+			$("#btnUpload").css('display','block');
+			$("#bankSlip").css('display','block');
+			$("#btnLocal").css('display','none');
+			$("#btnOnline").css('display','none');
+			$("#bankSlip").prop("disabled",false);
+			
+			$("#bankDetailsection").css('display','block');
+			
+			
+		});
+	 
+	 
+	 function checkSelectedPaymentMeyhod(){
+		 
+		 if($("#paymentBank").is(":checked")){
+			 $("#btnUpload").css('display','block');
+				$("#bankSlip").css('display','block');
+				$("#btnLocal").css('display','none');
+				$("#btnOnline").css('display','none');
+				$("#bankSlip").prop("disabled",false);
+				$("#bankDetailsection").css('display','none');
+				
+		 }
+		 
+	 }
+ 

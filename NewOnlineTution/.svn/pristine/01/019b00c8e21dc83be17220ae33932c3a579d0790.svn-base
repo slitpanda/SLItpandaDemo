@@ -1,0 +1,34 @@
+var teacherList;
+var classList;
+
+function setTeacherList(){
+	var htmlcode="<option value='0'>Select Teacher</option>";
+	
+	for(var i=0;i<teacherList.length;i++){
+		htmlcode=htmlcode+"<option value='"+teacherList[i].teacherId+"'>"+teacherList[i].firstName+" "+teacherList[i].middleName+" "+teacherList[i].lastName+"</option>";
+	}
+	
+	$("#teacher").html(htmlcode);
+}
+
+function getClassesByAccordingToTeacher(){
+	var selectedTeacherId;
+	
+	$("#teacher").on('change',function(){
+		var htmlcode="<option value='0'>Select Class</option>"
+		var selectedTeacherId=parseInt($(this).val());
+		
+		for(var i=0;i<classList.length;i++){
+			if(classList[i].teacherId===selectedTeacherId){
+				htmlcode=htmlcode+"<option value='"+classList[i].classId+"'>"+classList[i].descriptionEnglish+" / "+classList[i].descriptionSinhala+"</option>";
+			}
+		}
+		
+		$("#class").html(htmlcode);
+		
+	});
+}
+
+$("#logOutLink").on('click',function(){
+	form.submit();
+});

@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+<meta name="description" content="" />
+<meta name="author" content="" />
+<title>Dashboard - Admin</title>
+
+<!-- Custom CSS -->
+<link href="/css/adminstyles.css" rel="stylesheet" />
+
+<!-- Bootstrap CSS -->
+<link rel="stylesheet"
+	href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.0.0/animate.min.css" />
+
+<script
+	src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/js/all.min.js"></script>
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+
+<link rel="stylesheet" href="/css/style.css">
+
+
+<script th:inline="javascript">
+
+$(document).ready(function() {  
+	
+	 
+	/*<![CDATA[*/
+
+		
+		admin= /*[[${#request.userPrincipal.principal.userType=='admin'}]]*/;
+	   dataEntry= /*[[${#request.userPrincipal.principal.userType=='data_entry'}]]*/;
+		/*]]>*/
+
+        	
+		checkUserType();
+		addZoomUrls();
+		
+
+	});
+</script>
+</head>
+<body class="sb-nav-fixed" style="background-image: url('/img/a.jpg');">
+
+
+	<!-- navigation -->
+	<div class="fixed-top" style="z-index: 1039">
+		<div th:replace="sidebar::navigation"></div>
+		<div class="row"
+			th:unless="${#request.userPrincipal.principal.userType=='data_entry' || #request.userPrincipal.principal.userType=='admin'} ">
+			<div class="col-md-12 shadow-sm" style="background-color: white">
+				<nav aria-label="breadcrumb" class="second" th:object="${class}">
+					<ol class="breadcrumb pl-4 pr-4 pb-0"
+						style="background-color: white">
+						<li class="breadcrumb-item"
+							th:unless="${#request.userPrincipal.principal.userType=='admin'}"><a
+							class="black-text  " th:href="@{/wall}"><span
+								class="mr-md-3 mr-2">Home</span></a><i
+							class="fa fa-angle-double-right mt-1" aria-hidden="true"></i></li>
+						<li class="breadcrumb-item"><a class="black-text "
+							th:href="@{'/classes/'+${#request.userPrincipal.principal.id}}"><span
+								class="mr-md-3 mr-2">My Classes</span></a><i
+							class="fa fa-angle-double-right mt-1" aria-hidden="true"></i></li>
+						<li class="breadcrumb-item "><a class="black-text  active-2"
+							href="#"><span
+								th:text="*{descriptionEnglish + ' - '+descriptionSinhala}"></span></a></li>
+					</ol>
+				</nav>
+			</div>
+		</div>
+	</div>
+
+	<div id="layoutSidenav">
+		<!-- side bar -->
+		<div th:replace="sidebar::sidebar"></div>
+
+		<div id="layoutSidenav_content">
+			<main>
+				<div class="container-fluid" id="mainDiv" th:object="${class}">
+					<!-- <div class="col-md-12 mt-2" th:unless="${#request.userPrincipal.principal.userType=='admin'}"><a th:href="@{/wall}">Home </a>/<a  th:href="@{'/classes/'+${#request.userPrincipal.principal.id}}"> My Classes </a>/ <span style="font-size: 16px; font-weight: bold;" th:text="*{descriptionEnglish + ' - '+descriptionSinhala}">My Classes</span></div> -->
+
+					<div class="row mt-2 mb-4">
+						<div class="col-md-8  m-auto animate__animated animate__pulse">
+							<div class="card card-body">
+								<div class="row">
+									<div class="col-md-4 font-weight-bold">Description :</div>
+									<div class="col-md-8">
+										<span th:text="*{descriptionEnglish}"></span> / <span
+											th:text="*{descriptionSinhala}"></span>
+									</div>
+								</div>
+								<hr>
+								<div class="row">
+									<div class="col-md-4 font-weight-bold">Date :</div>
+									<div class="col-md-8" th:text="*{date}"></div>
+								</div>
+								<hr>
+								<div class="row">
+									<div class="col-md-4 font-weight-bold">Time Frame :</div>
+									<div class="col-md-8" th:text="*{startTime +' - '+endTime}"></div>
+								</div>
+								<hr>
+								 <div class="row">
+									<div class="col-md-4 font-weight-bold">Payment Type</div>
+									<div class="col-md-8" th:text="${class.paymentType}"></div>
+								</div>	
+									
+								<hr>
+								<div class="row">
+									<div class="col-md-4 font-weight-bold">Amount :</div>
+									<div class="col-md-8" th:text="*{'Rs:'+amount}"></div>
+								</div>
+								<hr>
+								<div class="row">
+									<div class="col-md-4 font-weight-bold">Class Joined :</div>
+									<div class="col-md-8" th:text="${numberOfJoined}"></div>
+								</div>
+								<hr>
+								<div class="row">
+									<div class="col-md-4 font-weight-bold">Total Amount :</div>
+									<div class="col-md-8" th:text="${'Rs:'+totalAmmount}"></div>
+								</div>
+								<hr>
+								<div class="row">
+									<div class="col-md-4 font-weight-bold">Institute Charge :</div>
+									<div class="col-md-8" th:text="${'Rs:'+instituteCharge}"></div>
+								</div>
+								<hr>
+								<div class="row">
+									<div class="col-md-4 font-weight-bold">Profit</div>
+									<div class="col-md-8" th:text="${'Rs:'+profite}"></div>
+								</div>
+								<hr>
+								<section th:if="${#request.userPrincipal.principal.userType=='admin' }">	
+						 <div class="row" >
+									<div class="col-md-4 font-weight-bold" style="color:red;"><h5 >Zoom Details</h5></div>
+									
+								</div>		
+								<hr>
+								
+								<div class="row" >
+									<div class="col-md-4 font-weight-bold">Start URL:</div>
+									<div class="col-md-8"  th:text="*{startUrl}"></div>
+									
+								</div>		
+								<hr>
+								
+								<div class="row" >
+									<div class="col-md-4 font-weight-bold">Join URL:</div>
+									<div class="col-md-8"th:text="*{joinUrl}"></div>
+								</div>	
+								<hr>
+								</section>	
+								<div class="row  text-center">
+									<div class="col-md-6">
+										<a th:href="*{startUrl}" target="_blank"
+											class="text-light  pr-2">
+											<button class="button  btn-primary btn-block"
+												style="background-color: #035696">Start Class</button>
+										</a>
+									</div>
+									<div class="col-md-6">
+										<form th:action="@{/singleclass/edit}" th:method="get">
+											<input type="text" th:value="*{classId}" hidden=""
+												id="classId" th:name="classId">
+											<button type="submit"
+												class="button  btn-danger btn-block">Edit</button>
+
+										</form>
+									</div>
+								</div>
+							</div>
+						</div>
+
+
+						
+					</div>
+				</div>
+			</main>
+			<!-- footer -->
+			<div th:replace="footer::footer"></div>
+
+			<!-- /footer -->
+		</div>
+	</div>
+
+
+
+	<script
+		src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js">
+        </script>
+	<script
+		src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js">
+        </script>
+	<script th:src="@{/js/scripts.js}"></script>
+	<script th:src="@{/js/classes.js}"></script>
+
+
+</body>
+</html>

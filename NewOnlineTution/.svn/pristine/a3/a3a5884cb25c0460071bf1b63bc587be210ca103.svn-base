@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+
+<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script th:inline="javascript">
+
+$(document).ready(function() {  
+	
+	 
+	/*<![CDATA[*/
+
+		catList = /*[[${categoryList}]]*/"categoryList";
+		subjectList = /*[[${subjectList}]]*/"subjectList";
+		teacherList = /*[[${teacherModelList}]]*/"teacherModelList";
+		idList = /*[[${idList}]]*/"idList";
+		classList = /*[[${classList}]]*/"classList";
+		/*]]>*/
+
+		// get subject according to selected category
+		getSubjectByCategoryId();
+
+		//get Teachers according to class category and subject
+		getTeachersByClCategoryIdAndSubjectId();
+		
+		//teacher on change
+		onChangeTeachers();
+
+		//set select box values according to searched ids
+		searchIds();
+
+	});
+</script>
+</head>
+<body>
+
+	<center>
+		<h1>Find Class</h1>
+
+		<form th:action="@{/searchclass}" method="get">
+			<table style="width: 50%">
+				<tr>
+					<td>Class Category</td>
+
+					<td>Subject</td>
+					<td>Teacher</td>
+				</tr>
+
+				<tr>
+					<td><select id="clCategory" th:name="clCategory">
+							<option value="0">select category</option>
+							<option th:each="clCatList:${categoryList}"
+								th:value="${clCatList.clCategoryId}"
+								th:text="${clCatList.stream +' '+ clCatList.medium} "></option>
+					</select></td>
+					<td><select id="subjects" th:name="subject" disabled="disabled"><option value="0">select subject</option></select></td>
+					<td><select id="techers" th:name="teacher" disabled="disabled"><option value="0">select teacher</option></select></td>
+					<td><input type="submit" id="btnFind"  disabled="disabled" value="Find"></td>
+				</tr>
+
+			</table>
+		</form>
+
+
+
+		<div style="width: 60%; margin-top: 30px;">
+			<table cellpadding="10">
+
+
+				<tr>
+					<th>Description</th>
+					<th>Date</th>
+					<th>Time Frame</th>
+					<th>Ammount</th>
+					
+				</tr>
+
+
+				<tr th:each="classes:${classList}">
+					<td
+						th:text="${classes.descriptionEnglish +' / '+classes.descriptionSinhala}"></td>
+					<td th:text="${classes.date}"></td>
+					<td th:text="${classes.startTime +' - '+classes.endTime}"></td>
+					<td>Rs: <span th:text="${classes.amount}"></span></td>
+					<td>sss</td>
+					<td> <form th:action="@{/singleclass/student}" method="get" >
+					     <input type="text" th:value="${classes.classId}" th:name="classId" hidden=""> 
+					    <button type="submit" th:if="${classes.status=='pending'}">Join</button>
+						<button type="submit" th:unless="${classes.status=='pending'}">Play</button>
+						</form></td>
+				</tr>
+
+				<tr>
+					<td colspan="5" id="noDataMsg"></td>
+				</tr>
+			</table>
+		</div>
+	</center>
+
+	<script src="js/classes.js"></script>
+</body>
+</html>

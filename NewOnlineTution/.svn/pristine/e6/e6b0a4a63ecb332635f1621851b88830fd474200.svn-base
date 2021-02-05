@@ -1,0 +1,47 @@
+package com.itpanda.tution.entity;
+
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+@Entity
+@Table(name="classcategory")
+public class ClassCategory {
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	private int clCategoryId;
+	
+	private String stream;
+	
+	private String medium;
+
+	public int getClCategoryId() {
+		return clCategoryId;
+	}
+
+	public void setClCategoryId(int clCategoryId) {
+		this.clCategoryId = clCategoryId;
+	}
+
+	public String getStream() {
+		return stream;
+	}
+
+	public void setStream(String stream) {
+		this.stream = stream;
+	}
+
+	public String getMedium() {
+		return medium;
+	}
+
+	public void setMedium(String medium) {
+		this.medium = medium;
+	}
+	
+	
+	
+}

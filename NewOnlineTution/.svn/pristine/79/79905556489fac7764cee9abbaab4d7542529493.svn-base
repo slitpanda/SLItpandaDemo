@@ -1,0 +1,20 @@
+package com.itpanda.tution.repository;
+
+import java.util.List;
+
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.lang.NonNull;
+
+import com.itpanda.tution.entity.ClassJoin;
+import com.itpanda.tution.entity.Classes;
+import com.itpanda.tution.entity.Teacher;
+
+public interface TestRepo extends CrudRepository<ClassJoin, Integer>{
+
+	
+	List<ClassJoin> findByStatusLikeAndTypeAndClasses_teacherAndClasses(String status,String type,Teacher teacher,Classes classes);
+	
+	@Query(value = "SELECT c FROM `class` c join c.classJoins a WHERE a.type=?1 and a.status like ?2 and CAST( c.teacher.teacher_id as CHAR) like ?3 and CAST( c.class_id as CHAR) like ?4 " ,nativeQuery = true)
+	List<ClassJoin> filterBankSlips(String type,String status,String teacherId,String classId);
+}

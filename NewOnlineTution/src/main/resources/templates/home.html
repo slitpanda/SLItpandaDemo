@@ -1,0 +1,23 @@
+<!doctype html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="ISO-8859-1">
+<title>SLItpanda Sample</title>
+
+<!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.0.0/animate.min.css"/>
+        
+</head>
+<body class="ml-2 mr-2">
+<h1 class="col-md-5 m-auto" style="text-align: center;">Welcome <span th:text="${username}"></span> </h1>
+
+<br>
+
+<a type="submit" th:href="@{/allusers}" class="btn btn-success col-md-3"  style="font-weight: bold;">All Users</a>
+
+
+
+</body>
+</html>

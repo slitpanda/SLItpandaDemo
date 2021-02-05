@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<head>
+<meta charset="ISO-8859-1">
+<title>Insert title here</title>
+</head>
+<body>
+<div><a th:if="${#request.userPrincipal.principal.userType=='teacher'}"  style="float:right;margin-right: 10px;" th:href="@{/addnewclass}" ><button >Add New Class</button></a></div>
+
+<center>
+<div style="width: 60%; margin-top: 30px;">
+			<table cellpadding="10">
+
+
+				<tr>
+					<th>Description</th>
+					<th>Date</th>
+					<th>Time Frame</th>
+					<th>Ammount</th>
+					
+				</tr>
+
+
+				<tr th:each="classes:${classList}">
+					<td
+						th:text="${classes.descriptionEnglish +' / '+classes.descriptionSinhala}"></td>
+					<td th:text="${classes.date}"></td>
+					<td th:text="${classes.startTime +' - '+classes.endTime}"></td>
+					<td>Rs: <span th:text="${classes.amount}"></span></td>
+					
+					<td> <form th:action="@{/singleclass/teacher}" method="get" >
+					     <input type="text" th:value="${classes.classId}" th:name="classId" hidden=""> 
+					    
+						<button type="submit" >View</button>
+						</form></td>
+				</tr>
+
+				<tr>
+					<td colspan="5" id="noDataMsg"></td>
+				</tr>
+			</table>
+		</div>
+		</center>
+</body>
+</html>

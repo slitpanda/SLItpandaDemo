@@ -1,0 +1,102 @@
+package com.itpanda.tution.service;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.itpanda.tution.SendEmail;
+import com.itpanda.tution.SendSMSMessage;
+import com.itpanda.tution.SmsResult;
+import com.itpanda.tution.entity.ClassJoin;
+import com.itpanda.tution.entity.Classes;
+import com.itpanda.tution.loginSecurity.entity.User;
+import com.itpanda.tution.repository.ClassJoinRepository;
+
+@Service
+@Transactional
+public class CommonServiceUtil {
+
+	//@Autowired
+	//private ClassJoinRepository classJoinRepository;
+
+	@Autowired
+	SendEmail sendEmail;
+
+	@Autowired
+	SendSMSMessage sendSMSMessage;
+
+	public void sendClassJoinMessages(ClassJoin classJoin) {
+
+		// ClassJoin classJoin = null;
+		Classes classes = null;
+		User user = null;
+		String smsResultJson = null;
+
+		if (classJoin != null) {
+			classJoin.getUser();
+			user = classJoin.getUser();
+			classes = classJoin.getClasses();
+
+			if (user != null) {
+				String mobileNumber = user.getMobile();
+				String smsMessage = "";
+				String classDesc=classes.getDescriptionEnglish();
+				if(classDesc!=null && classDesc.length()>25)
+					classDesc=classDesc.subSequence(0, 25).toString()+"...";
+				
+				if (classes != null)
+					smsMessage = "Please use the following URL for joining the class :\n"
+					+"Teacher: "+getTeacherName(classes)+
+							"\nLesson: "+ classDesc + "  \nURL: " + classes.getJoinUrl();
+
+				if (mobileNumber != null && classes != null)
+					smsResultJson = sendSMSMessage.sendSMS(mobileNumber, smsMessage);
+					//smsResultJson = sendSMSMessage.sendClassJoinMessage(mobileNumber, user.getFirstName(), smsMessage);
+
+				boolean isSMSSent = false;
+				try {
+					ObjectMapper objectMapper = new ObjectMapper();
+					// read json file and convert to customer object
+					SmsResult smsResultObj = objectMapper.readValue(smsResultJson, SmsResult.class);
+					if (smsResultObj != null && "success".equals(smsResultObj.getStatus())) {
+						isSMSSent = true;
+					}
+				} catch (Exception ex) {
+					isSMSSent = false;
+				}
+
+				if (classes != null) {
+					String emailMessage="Hi " +user.getFirstName()+ ",\n"+
+					 "Please use the following URL for joining the class :\n"
+							+"Teacher: "+getTeacherName(classes)+
+									"\nLesson: "+ classes.getDescriptionEnglish() + "  \nURL: " + classes.getJoinUrl()
+									+"\n Thank you.";
+					
+					//sendEmail.sendEmail(user.getUsername(), user.getFirstName(), classes.getJoinUrl());
+					try {
+						sendEmail.sendEmailMessage(user.getUsername(), "SEA online tuition class", emailMessage);
+					}catch (Exception ex) {
+						ex.printStackTrace();
+					}
+				}
+			}
+		}
+	}
+	
+	
+	public String getTeacherName(Classes classes) {
+		try {
+		if(classes!=null) {
+			User user=classes.getTeacher().getUser();
+			String name=user.getFirstName()+ " " + user.getLastName();
+			return name;
+		}
+		}catch(Exception ex) {
+			ex.printStackTrace();
+		}
+		
+		return "";
+	}
+
+}

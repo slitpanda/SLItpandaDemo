@@ -1,0 +1,92 @@
+package com.itpanda.tution.loginSecurity.service;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.servlet.http.HttpSession;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
+
+import com.itpanda.tution.entity.ClassCategory;
+import com.itpanda.tution.entity.Subject;
+import com.itpanda.tution.entity.Teacher;
+import com.itpanda.tution.loginSecurity.repository.UserRepository;
+import com.itpanda.tution.model.UserDTO;
+import com.itpanda.tution.repository.ClassCategoryRepository;
+import com.itpanda.tution.repository.SubjectRepository;
+import com.itpanda.tution.service.TeacherService;
+import com.itpanda.tution.util.DataLoader;
+
+@Service
+public class UserDetailsServiceImpl implements UserDetailsService {
+
+    @Autowired
+    UserRepository userRepository;
+    
+  
+	@Autowired
+	TeacherService teacherService;
+	
+	@Autowired
+	ClassCategoryRepository classCategoryRepository;
+	
+	@Autowired
+	SubjectRepository subjectRepository;
+	
+    
+    @Autowired(required=true)
+	private HttpSession session;
+    
+    
+    DataLoader dataLoader=new DataLoader();
+	
+    @Override
+     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+		
+     //Buscar el usuario con el repositorio y si no existe lanzar una exepcion
+     com.itpanda.tution.loginSecurity.entity.User appUser = 
+                 userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("No existe usuario"));
+	
+ 	try {
+		
+		List<ClassCategory> classCategoryList=classCategoryRepository.findAll();
+		List<Subject> subjectList=subjectRepository.findAll();
+		//List<Teacher> teacherList=teacherService.getAllTeachers();
+		
+		
+		
+		if(!classCategoryList.isEmpty() || !subjectList.isEmpty()) {
+			
+			session.setAttribute("classCategoryList", dataLoader.copyClassCategoryToClassCategoryModel(classCategoryList));
+			session.setAttribute("subjectList", dataLoader.copySubjectToSubjectModel(subjectList));
+			//session.setAttribute("teacherList", teacherList);
+			
+			
+	      
+			
+		}else {
+			
+			
+		}
+		
+		
+	} catch (Exception e) {
+		System.out.println(e);
+		
+	}
+     
+     UserDTO userDto=new UserDTO(appUser);
+    
+   
+    //Crear El objeto UserDetails que va a ir en sesion y retornarlo.
+   // UserDetails user = (UserDetails) new User(appUser.getUsername(), appUser.getPassword(), grantList);
+         return userDto;
+    }
+}

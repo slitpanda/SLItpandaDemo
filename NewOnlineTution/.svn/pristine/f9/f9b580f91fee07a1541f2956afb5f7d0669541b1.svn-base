@@ -1,0 +1,60 @@
+
+var list;
+
+
+	function getSubjectByClassCategoryId (){
+		$("#classCategory").on('change',function(){
+			var selectedClassCategoryId=parseInt($(this).val());
+			
+			var htmlCode="";
+			
+			for(var i=0;i<list.length;i++){
+				
+				
+				if(list[i].clCategoryId==selectedClassCategoryId){
+					htmlCode=htmlCode+"<option  value='"+list[i].subjectId+"'>"+list[i].subjectName+"</option>";
+				}
+			}
+			$("#subject").html(htmlCode);
+		});
+		   
+		 //  alert(list[0].stream);
+	     
+	}
+	
+	
+	function updateInstituteCharge(){
+		
+		$("#btnSave").on('click',function(){
+		 var insCharg=$("#insChargPres").val();
+		 var teacherId=$("#teacherId").val();
+			$.ajax({
+
+				type : "PUT",
+				url : "/updateinscharg",
+				
+				data : JSON.stringify({
+					  
+					teacherId:teacherId,
+					insChargePercentage: insCharg
+				}),
+
+				contentType : "application/json; charset=utf-8",
+				cache : false,
+				success : function(data) {
+					
+					
+					$('#msg').text("Saved").css('color','green').delay(2000).show();
+				},
+				error : function(err) {
+					alert("not called");
+				}
+			});
+		});
+		
+	}
+	
+	
+	
+	
+	

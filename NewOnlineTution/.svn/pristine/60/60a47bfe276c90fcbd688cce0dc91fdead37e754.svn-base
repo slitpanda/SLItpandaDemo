@@ -1,0 +1,123 @@
+package com.itpanda.tution.entity;
+
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
+import com.itpanda.tution.loginSecurity.entity.User;
+
+@Entity
+@Table(name = "classjoin")
+public class ClassJoin {
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	private int clJoinId;
+	
+	//private Long userId;
+	//private int classId;
+	private float ammount;
+	private String paymentDate;
+	private String paymentTime;
+	private String type;
+	private String status;
+    private String bankSlip;
+  //  private int teacherId;
+    
+    
+    @ManyToOne
+    @JoinColumn(name="userId", nullable=false)
+    User user;
+    
+	/*
+	 * @ManyToOne
+	 * 
+	 * @JoinColumn(name="teacherId", nullable=false) Teacher teacher;
+	 */
+    
+    @ManyToOne
+    @JoinColumn(name="classId", nullable=false)
+    Classes classes;
+    
+    
+    
+    
+    
+	public User getUser() {
+		return user;
+	}
+	public void setUser(User user) {
+		this.user = user;
+	}
+
+	/*
+	 * public Teacher getTeacher() { return teacher; } public void
+	 * setTeacher(Teacher teacher) { this.teacher = teacher; }
+	 */
+	public Classes getClasses() {
+		return classes;
+	}
+	public void setClasses(Classes classes) {
+		this.classes = classes;
+	}
+	public int getClJoinId() {
+		return clJoinId;
+	}
+	public void setClJoinId(int clJoinId) {
+		this.clJoinId = clJoinId;
+	}
+
+	/*
+	 * public Long getUserId() { return userId; } public void setUserId(Long userId)
+	 * { this.userId = userId; } public int getClassId() { return classId; } public
+	 * void setClassId(int classId) { this.classId = classId; }
+	 */
+	public float getAmmount() {
+		return ammount;
+	}
+	public void setAmmount(float ammount) {
+		this.ammount = ammount;
+	}
+	public String getPaymentDate() {
+		return paymentDate;
+	}
+	public void setPaymentDate(String paymentDate) {
+		this.paymentDate = paymentDate;
+	}
+	public String getPaymentTime() {
+		return paymentTime;
+	}
+	public void setPaymentTime(String paymentTime) {
+		this.paymentTime = paymentTime;
+	}
+	public String getType() {
+		return type;
+	}
+	public void setType(String type) {
+		this.type = type;
+	}
+	public String getStatus() {
+		return status;
+	}
+	public void setStatus(String status) {
+		this.status = status;
+	}
+	public String getBankSlip() {
+		return bankSlip;
+	}
+	public void setBankSlip(String bankSlip) {
+		this.bankSlip = bankSlip;
+	}
+	/*
+	 * public int getTeacherId() { return teacherId; } public void setTeacherId(int
+	 * teacherId) { this.teacherId = teacherId; }
+	 */
+	
+	
+	
+
+}

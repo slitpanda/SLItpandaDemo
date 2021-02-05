@@ -1,0 +1,133 @@
+package com.itpanda.tution.service;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.itpanda.tution.entity.ClassCategory;
+import com.itpanda.tution.entity.Subject;
+import com.itpanda.tution.entity.Teacher;
+import com.itpanda.tution.loginSecurity.entity.User;
+import com.itpanda.tution.loginSecurity.repository.UserRepository;
+import com.itpanda.tution.repository.ClassCategoryRepository;
+import com.itpanda.tution.repository.SubjectRepository;
+import com.itpanda.tution.repository.TeacherRepository;
+
+@Service
+@Transactional
+public class TeacherService {
+
+	@Autowired
+	private ClassCategoryRepository classCategoryRepository;
+	
+	@Autowired
+	private SubjectRepository subjectRepository;
+	
+	@Autowired
+	private TeacherRepository teacherRepository;
+	
+	@Autowired
+	UserRepository userRepository;
+	
+	// get All class category from classcategory table 
+	public List<ClassCategory> getAllClassCategories(){
+		
+		return classCategoryRepository.findAll();
+	}
+	
+	// get category by id
+	public Optional<ClassCategory> getCategoryById(int id){
+		return classCategoryRepository.findById(id);
+	}
+	
+	//get all subjects  from subject table
+	
+	public List<Subject> getAllSubjects(){
+		return subjectRepository.findAll();
+	}
+	
+	//get  subjects  by subject id
+	
+		public Optional<Subject> getSubjectById(int id){
+			return subjectRepository.findById(id);
+		}
+	
+	// save new teacher
+	
+	public void saveTacher(Teacher teacher) {
+		teacherRepository.save(teacher);
+		
+	}
+	
+	//find teacher by email
+	public List<User> findTeacherByEmail(String email) {
+		return  userRepository.findByEmail(email);
+	}
+	
+	//find teacher by userId
+	
+	public List<Teacher> findTeacherByUserId(Long userId) {
+		return teacherRepository.findByUserId(userId);
+	}
+	
+	//find Teachers
+	
+	public List<User> findTeachers(String type){
+		return userRepository.findTeachers(type);
+	}
+	
+	//find teacher by teacher Id
+	public List<Teacher> getTeacherById(int teacherId){
+		
+		return teacherRepository.findByTeacherId(teacherId);
+	}
+	
+	// get profile image
+	public byte[] getProImageByUserId(Long id) {
+		return teacherRepository.getProImageByUserId(id);
+	}
+	
+	// get teacher id by user id
+	public int getTeacherIdBtUserId(Long id) {
+		return teacherRepository.getTeacherIdByUserId(id);
+	}
+	
+	// get teacher institute charge percentage by user id
+	public float getInsPrecentageByUserId(Long id) {
+		return teacherRepository.getInsPrecentageBtUseRId(id);
+	}
+	
+	// get all teachers 
+	public List<Teacher> getAllTeachers(){
+		return teacherRepository.findAll();
+	}
+	
+	// update teacher's institute charge precentage
+	public void updateInsCharge(float insChargePercentage,int teacherId) {
+		teacherRepository.updateInsCharge(insChargePercentage, teacherId);
+	}
+	
+	// search teachers on admin view
+	public List<Teacher> searchTeachers(int clCategoryId,int subjectId){
+		
+		if(subjectId==0) {
+			return teacherRepository.searchTeachersByClCatId(clCategoryId);
+		}else {
+			return teacherRepository.searchTeachersByClCatIdAndSubId(clCategoryId, subjectId);
+		}
+		
+	}
+	
+	public void updateBankDetails(String bank,String branch,int accountNumber,int teacherId) {
+		teacherRepository.updateBankDetails(bank, branch, accountNumber, teacherId);
+	}
+	
+	public Subject findSubjectById(int subjectId){
+		
+		return subjectRepository.getSubjectById(subjectId);
+	}
+	
+}
